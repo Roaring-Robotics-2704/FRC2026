@@ -5,7 +5,6 @@ plugins {
     id "checkstyle"
 }
 
-
 // Configure repositories for tooling like Checkstyle
 repositories {
     mavenLocal()
