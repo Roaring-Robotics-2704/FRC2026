@@ -6,13 +6,12 @@ package frc.robot.subsystems.superstructure.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.superstructure.SuperStructure;
 
 public class Intake extends SubsystemBase {
 
 
   /** Creates a new Intake. */
-  public Intake(SuperStructure superStructure) {
+  public Intake() {
 
   }
 

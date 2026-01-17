@@ -5,6 +5,7 @@ public class SuperStructure {
 
     private SuperStructure() {
     }
+
     private static SuperStructure instance;
     public static SuperStructure getInstance() {
         if (instance == null) {
