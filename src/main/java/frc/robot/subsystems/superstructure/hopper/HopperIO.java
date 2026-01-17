@@ -10,8 +10,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
-
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutVoltage;
