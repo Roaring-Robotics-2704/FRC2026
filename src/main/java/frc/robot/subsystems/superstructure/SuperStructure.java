@@ -4,36 +4,37 @@ import static frc.robot.subsystems.superstructure.SuperStructureStates.*;
 
 public class SuperStructure {
 
-  private SuperStructure() {}
-
-  private static SuperStructure instance;
-
-  public static SuperStructure getInstance() {
-    if (instance == null) {
-      instance = new SuperStructure();
+    private SuperStructure() {
     }
-    return instance;
-  }
 
-  private WantedState wantedState = WantedState.IDLE;
-  private CurrentState currentState = CurrentState.IDLE;
+    private static SuperStructure instance;
 
-  public void setWantedState(WantedState state) {
-    if (currentState.toString() != wantedState.toString()) {
-      currentState = CurrentState.TRANSITIONING;
+    public static SuperStructure getInstance() {
+        if (instance == null) {
+            instance = new SuperStructure();
+        }
+        return instance;
     }
-    this.wantedState = state;
-  }
 
-  public WantedState getWantedState() {
-    return this.wantedState;
-  }
+    private WantedState wantedState = WantedState.IDLE;
+    private CurrentState currentState = CurrentState.IDLE;
 
-  public void setCurrentState(CurrentState state) {
-    this.currentState = state;
-  }
+    public void setWantedState(WantedState state) {
+        if (currentState.toString() != wantedState.toString()) {
+            currentState = CurrentState.TRANSITIONING;
+        }
+        this.wantedState = state;
+    }
 
-  public CurrentState getCurrentState() {
-    return this.currentState;
-  }
+    public WantedState getWantedState() {
+        return this.wantedState;
+    }
+
+    public void setCurrentState(CurrentState state) {
+        this.currentState = state;
+    }
+
+    public CurrentState getCurrentState() {
+        return this.currentState;
+    }
 }
