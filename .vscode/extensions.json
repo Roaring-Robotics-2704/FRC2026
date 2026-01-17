@@ -2,7 +2,7 @@
   "recommendations": [
     "richardwillis.vscode-spotless-gradle",
     "shengchen.vscode-checkstyle",
-    "EditorConfig.EditorConfig"
+    "EditorConfig.EditorConfig",
     "usernamehw.errorlens"
   ]
 }
