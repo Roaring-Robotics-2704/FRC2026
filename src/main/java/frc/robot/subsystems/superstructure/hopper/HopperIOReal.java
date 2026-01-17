@@ -6,15 +6,14 @@ package frc.robot.subsystems.superstructure.hopper;
 
 /** Real implementation of the hopper */
 public class HopperIOReal implements HopperIO {
-	
 
-	public HopperIOReal() {
-		
-	}
+    public HopperIOReal() {
 
-	@Override
-	public void updateInputs(HopperIOInputs inputs) { 
-		
-	}
+    }
+
+    @Override
+    public void updateInputs(HopperIOInputs inputs) {
+
+    }
 
 }
