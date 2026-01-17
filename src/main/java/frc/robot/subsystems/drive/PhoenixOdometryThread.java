@@ -40,6 +40,16 @@ public class PhoenixOdometryThread extends Thread {
   private static boolean isCANFD = TunerConstants.kCANBus.isNetworkFD();
   private static PhoenixOdometryThread instance = null;
 
+  /**
+   * Returns the singleton instance of PhoenixOdometryThread, creating it on first use.
+   *
+   * <p>This method performs lazy initialization of the singleton. It is not
+   * synchronized; if multiple threads may call this concurrently, consider
+   * making the initialization thread-safe (for example, by synchronizing the
+   * method, using double-checked locking, or initializing the instance eagerly).
+   *
+   * @return the shared PhoenixOdometryThread instance
+   */
   public static PhoenixOdometryThread getInstance() {
     if (instance == null) {
       instance = new PhoenixOdometryThread();
@@ -117,7 +127,9 @@ public class PhoenixOdometryThread extends Thread {
           // that is not CAN FD, regardless of Pro licensing. No reasoning for this
           // behavior is provided by the documentation.
           Thread.sleep((long) (1000.0 / Drive.ODOMETRY_FREQUENCY));
-          if (phoenixSignals.length > 0) BaseStatusSignal.refreshAll(phoenixSignals);
+          if (phoenixSignals.length > 0) {
+            BaseStatusSignal.refreshAll(phoenixSignals);
+          }
         }
       } catch (InterruptedException e) {
         e.printStackTrace();

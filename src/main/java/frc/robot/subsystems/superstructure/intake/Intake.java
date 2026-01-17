@@ -9,12 +9,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.BooleanSupplier;
 
+/** Intake subsystem for controlling the robot's intake mechanism. */
 public class Intake extends SubsystemBase {
   private Goal goal = Goal.STOWED;
 
   /** Creates a new Intake. */
   public Intake() {}
 
+  /** This method will be called once per scheduler run. */
   @Override
   public void periodic() {
 
@@ -33,7 +35,7 @@ public class Intake extends SubsystemBase {
   // Command section
 
   /**
-   * Deploys the intake
+   * Deploys the intake.
    *
    * @param motorOn whether the intake motor should be on
    * @return command to deploy the intake
@@ -48,7 +50,7 @@ public class Intake extends SubsystemBase {
   }
 
   /**
-   * Stows the intake
+   * Stows the intake.
    *
    * @return command to stow the intake
    */
@@ -58,6 +60,7 @@ public class Intake extends SubsystemBase {
     return Commands.run(() -> goal = Goal.STOWED, this);
   }
 
+  /** Possible goals for the intake subsystem. */
   public enum Goal {
     STOWED,
     DEPLOYED_OFF,

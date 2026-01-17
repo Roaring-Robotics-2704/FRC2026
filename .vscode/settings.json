@@ -63,12 +63,11 @@
     "edu.wpi.first.math.**.struct.*"
   ],
   "java.dependency.enableDependencyCheckup": false,
-  "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle",
+  "editor.defaultFormatter": "redhat.java",
   "[json]": {
-    "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle"
+    "editor.defaultFormatter": "redhat.java"
   },
   "[java]": {
-    "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle"
+    "editor.defaultFormatter": "redhat.java"
   },
-  "java.checkstyle.configuration": "/google_checks.xml"
-}
+  "java.checkstyle.configuration": "${workspaceFolder}\\checkstyle.xml",}

@@ -232,7 +232,8 @@ checkstyle {
     // This avoids invalid local configs and keeps the ruleset aligned with the tool version.
     // If you prefer a local file, replace the next line with: configFile = file("config/checkstyle/google_checks.xml")
     // Use the first JAR file in the checkstyle configuration (handles multiple files / transitive deps)
-    config = resources.text.fromArchiveEntry(configurations.checkstyle.files.find { it.name.endsWith('.jar') }, "google_checks.xml")
+    //config = resources.text.fromArchiveEntry(configurations.checkstyle.files.find { it.name.endsWith('.jar') }, "google_checks.xml")
+    configFile = file("google_checks.xml")
 }
 
 // Configure Checkstyle task reporting and failure behavior
