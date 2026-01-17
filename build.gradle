@@ -3,8 +3,15 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2026.1.1"
     id "com.peterabeles.gversion" version "1.10"
     id "com.diffplug.spotless" version "6.12.0"
+    id "checkstyle"
 }
 
+
+// Configure repositories for tooling like Checkstyle
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -215,4 +222,25 @@ spotless {
         indentWithSpaces(2)
         endWithNewline()
     }
+}
+
+// Checkstyle configuration - use Google's Java style guide via local config file
+checkstyle {
+    // Pick a stable Checkstyle version; change if you need a newer one
+    toolVersion = "10.12.0"
+    // Prefer the built-in google_checks.xml shipped with the Checkstyle JAR.
+    // This avoids invalid local configs and keeps the ruleset aligned with the tool version.
+    // If you prefer a local file, replace the next line with: configFile = file("config/checkstyle/google_checks.xml")
+    // Use the first JAR file in the checkstyle configuration (handles multiple files / transitive deps)
+    config = resources.text.fromArchiveEntry(configurations.checkstyle.files.find { it.name.endsWith('.jar') }, "google_checks.xml")
+}
+
+// Configure Checkstyle task reporting and failure behavior
+tasks.withType(Checkstyle) {
+    reports {
+        xml.required = false
+        html.required = true
+    }
+    // Fail the build on violations (change to true/false if you prefer warnings)
+    ignoreFailures = false
 }
