@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
+
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutVoltage;
@@ -21,12 +23,12 @@ public interface HopperIO {
         public MutAngularVelocity motorVelocity = RotationsPerSecond.mutable(0);
     }
 
-    default void updateInputs(HopperIOInputs inputs) {
+    public default void updateInputs(HopperIOInputs inputs) {
     }
 
-    default void setMotorVoltage(MutVoltage voltage) {
+    public default void setMotorVoltage(MutVoltage voltage) {
     }
 
-    default void stopMotor() {
+    public default void stopMotor() {
     }
 }

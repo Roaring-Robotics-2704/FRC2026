@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems.superstructure.hopper;
 
+import com.revrobotics.spark.SparkMax;
+
 /** Real implementation of the hopper */
-public class HopperIOReal extends HopperIO {
-	
+public class HopperIOReal implements HopperIO {
+	SparkMax hopperMotor = new SparkMax(10, SparkMax.MotorType.kBrushless);
 
 	public HopperIOReal() {
 		
