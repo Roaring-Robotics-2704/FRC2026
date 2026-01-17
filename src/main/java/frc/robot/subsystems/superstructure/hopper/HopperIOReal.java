@@ -4,14 +4,17 @@
 
 package frc.robot.subsystems.superstructure.hopper;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+/** Real implementation of the hopper */
+public class HopperIOReal implements HopperIO {
+	
 
-public class Hopper extends SubsystemBase {
-	/** Creates a new Hopper. */
-	public Hopper() {}
+	public HopperIOReal() {
+		
+	}
 
 	@Override
-	public void periodic() {
-    // This method will be called once per scheduler run
+	public void updateInputs(HopperIOInputs inputs) { 
+		
 	}
+
 }
