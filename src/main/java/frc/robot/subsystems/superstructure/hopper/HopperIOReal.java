@@ -4,19 +4,47 @@
 
 package frc.robot.subsystems.superstructure.hopper;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import edu.wpi.first.units.measure.Voltage;
+import frc.robot.util.SparkUtil;
+
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.subsystems.superstructure.hopper.HopperConstants.*;
 
 /** Real implementation of the hopper */
 public class HopperIOReal implements HopperIO {
+	
+	
 	SparkMax hopperMotor = new SparkMax(10, SparkMax.MotorType.kBrushless);
 
 	public HopperIOReal() {
-		
+		SparkMaxConfig hopperConfig = new SparkMaxConfig();
+		hopperConfig.idleMode(IdleMode.kCoast);
+		hopperConfig.smartCurrentLimit(HOPPER_CURRENT_LIMIT);
+		SparkUtil.tryUntilOk(hopperMotor,5, () -> hopperMotor.configure(hopperConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+
 	}
 
 	@Override
 	public void updateInputs(HopperIOInputs inputs) { 
-		
+		inputs.currentDraw.mut_replace(Amps.of(hopperMotor.getOutputCurrent()));
+		inputs.appliedVoltage.mut_replace(Volts.of(hopperMotor.getAppliedOutput()));
+		inputs.motorVelocity.mut_replace(RotationsPerSecond.of(hopperMotor.getEncoder().getVelocity()));
 	}
-
+	@Override
+	public void setMotorVoltage(Voltage voltage) {
+		hopperMotor.setVoltage(voltage);
+	}
+	@Override
+	public void stopMotor() {
+		hopperMotor.stopMotor();
+	}
+	
 }
