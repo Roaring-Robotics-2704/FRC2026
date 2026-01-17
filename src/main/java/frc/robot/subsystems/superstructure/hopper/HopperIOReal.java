@@ -5,7 +5,7 @@
 package frc.robot.subsystems.superstructure.hopper;
 
 /** Real implementation of the hopper */
-public class HopperIOReal extends HopperIO {
+public class HopperIOReal implements HopperIO {
 	
 
 	public HopperIOReal() {
