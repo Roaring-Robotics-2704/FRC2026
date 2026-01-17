@@ -8,6 +8,40 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * Subsystem responsible for controlling the robot's hopper (ball/coin/wheel transporter).
+ *
+ * <p>This class implements a simple state machine to manage the hopper motor via a provided
+ * HopperIO implementation. It exposes a small public surface:
+ * - periodic(): executed once per scheduler run to progress transitions, apply motor outputs,
+ *   and sample/log inputs.
+ * - setDesiredState(HopperState): request a new hopper state; if different from the current
+ *   state the subsystem enters the TRANSITIONING state and will apply the requested state on the
+ *   next periodic() call.
+ * - getCurrentState(): read the current state of the hopper state machine.
+ *
+ * <p>States and behavior:
+ * - IDLE: motor is stopped.
+ * - FEEDING: motor is driven forward using HopperConstants.HOPPER_VOLTAGE.
+ * - REVERSING: motor is driven in reverse using the negated HopperConstants.HOPPER_VOLTAGE.
+ * - TRANSITIONING: internal transient state used to atomically switch from one active state
+ *   to another; callers should not set this state directly.
+ *
+ * <p>Responsibilities performed each scheduler run (periodic):
+ * - If the subsystem is in TRANSITIONING, switch to the desired state and apply the
+ *   corresponding motor command (stop / forward voltage / reverse voltage).
+ * - Read hardware inputs via hopperIO.updateInputs(...) and log them through AdvantageKit
+ *   (Logger.processInputs(...)).
+ *
+ * <p>Threading and usage notes:
+ * - This subsystem is designed to be run from the WPILib scheduler thread (robot loop).
+ * - setDesiredState(...) is intended to be called from commands or other robot code; if the
+ *   requested state differs from the current state the subsystem will defer the actual motor
+ *   change until the next periodic() invocation to keep state transitions deterministic.
+ *
+ * @see HopperIO
+ * @see HopperConstants
+ */
 public class Hopper extends SubsystemBase {
 	private final HopperIO hopperIO;
 	private final HopperIOInputsAutoLogged inputs = new HopperIOInputsAutoLogged();

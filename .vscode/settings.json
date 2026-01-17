@@ -26,7 +26,6 @@
         "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release"
       }
     },
-    null
   ],
   "java.test.defaultConfig": "WPIlibUnitTests",
   "spotlessGradle.format.enable": true,

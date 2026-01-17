@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** Hopper IO branch. */
 public interface HopperIO {
-    /** Hopper IO inputs. */
+	/** Hopper IO inputs. */
 	@AutoLog
     public class HopperIOInputs {
         public MutCurrent currentDraw = Amps.mutable(0);

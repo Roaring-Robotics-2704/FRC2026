@@ -4,19 +4,19 @@
 
 package frc.robot.subsystems.superstructure.hopper;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
-import edu.wpi.first.units.measure.Voltage;
-import frc.robot.util.SparkUtil;
-
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.subsystems.superstructure.hopper.HopperConstants.*;
+import static frc.robot.subsystems.superstructure.hopper.HopperConstants.HOPPER_CURRENT_LIMIT;
+
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.units.measure.Voltage;
+import frc.robot.util.SparkUtil;
 
 /** Real implementation of the hopper */
 public class HopperIOReal implements HopperIO {
