@@ -12,11 +12,21 @@ import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutVoltage;
 
-/** Hopper  */
-public class HopperIO {
+/** Hopper IO branch. */
+public interface HopperIO {
+    /** Hopper IO inputs. */
     public class HopperIOInputs {
         public MutCurrent currentDraw = Amps.mutable(0);
         public MutVoltage appliedVoltage = Volts.mutable(0);
         public MutAngularVelocity motorVelocity = RotationsPerSecond.mutable(0);
+    }
+
+    default void updateInputs(HopperIOInputs inputs) {
+    }
+
+    default void setMotorVoltage(MutVoltage voltage) {
+    }
+
+    default void stopMotor() {
     }
 }
