@@ -7,7 +7,15 @@
 
 package frc.robot;
 
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -29,10 +37,7 @@ import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.HopperIO;
 import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
 import frc.robot.subsystems.superstructure.hopper.HopperIOSim;
-
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import frc.robot.subsystems.vision.Vision;
-import static frc.robot.subsystems.vision.VisionConstants.*;
 import frc.robot.subsystems.vision.VisionIO;
 //import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
@@ -216,8 +221,10 @@ public class RobotContainer {
                                 .ignoringDisable(true));
 
         superStructure.setDefaultCommand(
-            Commands.idle(superStructure)
-        ); //TODO: Add superstructure commands
+            Commands.idle(superStructure)); //TODO add superstructure commands
+
+        vision.setDefaultCommand(Commands.idle(vision)); //Idle vision command
+
     }
 
     /**
