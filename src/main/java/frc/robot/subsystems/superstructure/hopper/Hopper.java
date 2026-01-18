@@ -168,6 +168,7 @@ public class Hopper extends SubsystemBase {
         }
     }
 
+
     public boolean isAtWantedState() {
         return this.currentState == this.desiredState;
     }

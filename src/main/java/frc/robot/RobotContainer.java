@@ -33,6 +33,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.superstructure.SuperStructure;
+import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.HopperIO;
 import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
@@ -220,8 +221,8 @@ public class RobotContainer {
                                 drive)
                                 .ignoringDisable(true));
 
-        superStructure.setDefaultCommand(
-            Commands.idle(superStructure)); //TODO add superstructure commands
+        controller.leftTrigger().onTrue(superStructure.goToState(WantedState.INTAKE));
+        controller.rightTrigger().onTrue(superStructure.goToState(WantedState.SHOOT));
 
         vision.setDefaultCommand(Commands.idle(vision)); //Idle vision command
 
