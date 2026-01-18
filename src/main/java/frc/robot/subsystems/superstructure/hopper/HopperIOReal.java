@@ -20,8 +20,6 @@ import frc.robot.util.SparkUtil;
 
 /** Real implementation of the hopper */
 public class HopperIOReal implements HopperIO {
-	
-	
 	SparkMax hopperMotor = new SparkMax(10, SparkMax.MotorType.kBrushless);
 
 	public HopperIOReal() {
