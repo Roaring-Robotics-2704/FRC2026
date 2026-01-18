@@ -72,7 +72,7 @@ public class Robot extends LoggedRobot {
                 break;
             default:
                 break;
-        }
+        };
         // Register URCL
         Logger.registerURCL(URCL.startExternal());
         // Start AdvantageKit logger
