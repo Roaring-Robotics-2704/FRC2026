@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.subsystems.superstructure.hopper.HopperConstants.HOPPER_CURRENT_LIMIT;
+import static frc.robot.subsystems.superstructure.hopper.HopperConstants.HOPPER_MOTOR_ID;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -21,7 +22,7 @@ import frc.robot.util.SparkUtil;
 /** Real implementation of the hopper. */
 public class HopperIOReal implements HopperIO {
 
-    SparkMax hopperMotor = new SparkMax(10, SparkMax.MotorType.kBrushless);
+    SparkMax hopperMotor = new SparkMax(HOPPER_MOTOR_ID, SparkMax.MotorType.kBrushless);
 
     /** Instantiates the Real Hopper hardware. */
     public HopperIOReal() {
