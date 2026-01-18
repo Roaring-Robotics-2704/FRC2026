@@ -24,6 +24,12 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.superstructure.SuperStructure;
+import frc.robot.subsystems.superstructure.hopper.Hopper;
+import frc.robot.subsystems.superstructure.hopper.HopperIO;
+import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
+import frc.robot.subsystems.superstructure.hopper.HopperIOSim;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -38,6 +44,10 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final Hopper hopper;
+
+    //SuperStructure
+    private final SuperStructure superStructure;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -78,6 +88,8 @@ public class RobotContainer {
                 // new ModuleIOTalonFXS(TunerConstants.FrontRight),
                 // new ModuleIOTalonFXS(TunerConstants.BackLeft),
                 // new ModuleIOTalonFXS(TunerConstants.BackRight));
+
+                hopper = new Hopper(new HopperIOReal());
                 break;
 
             case SIM:
@@ -89,6 +101,7 @@ public class RobotContainer {
                         new ModuleIOSim(TunerConstants.FrontRight),
                         new ModuleIOSim(TunerConstants.BackLeft),
                         new ModuleIOSim(TunerConstants.BackRight));
+                hopper = new Hopper(new HopperIOSim());
                 break;
 
             default:
@@ -104,17 +117,23 @@ public class RobotContainer {
                         },
                         new ModuleIO() {
                         });
+                hopper = new Hopper(new HopperIO() {});
                 break;
         }
+
+        // Set up superstructure
+        superStructure = new SuperStructure(hopper);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         // Set up SysId routines
         autoChooser.addOption(
-                "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+                "Drive Wheel Radius Characterization",
+                DriveCommands.wheelRadiusCharacterization(drive));
         autoChooser.addOption(
-                "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+                "Drive Simple FF Characterization",
+                DriveCommands.feedforwardCharacterization(drive));
         autoChooser.addOption(
                 "Drive SysId (Quasistatic Forward)",
                 drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -122,9 +141,11 @@ public class RobotContainer {
                 "Drive SysId (Quasistatic Reverse)",
                 drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
         autoChooser.addOption(
-                "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+                "Drive SysId (Dynamic Forward)",
+                drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
         autoChooser.addOption(
-                "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+                "Drive SysId (Dynamic Reverse)",
+                drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
         // Configure the button bindings
         configureButtonBindings();
@@ -167,9 +188,15 @@ public class RobotContainer {
                 .onTrue(
                         Commands.runOnce(
                                 () -> drive.setPose(
-                                        new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                                        new Pose2d(
+                                            drive.getPose().getTranslation(),
+                                            Rotation2d.kZero)),
                                 drive)
                                 .ignoringDisable(true));
+
+        superStructure.setDefaultCommand(
+            Commands.idle(superStructure)
+        ); //TODO: Add superstructure commands
     }
 
     /**

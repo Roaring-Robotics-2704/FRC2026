@@ -10,7 +10,9 @@ package frc.robot.subsystems.drive;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
+/** Interface for the module IO implementations. */
 public interface ModuleIO {
+    /** Contains all of the loggable inputs for the module IO. */
     @AutoLog
     public static class ModuleIOInputs {
         public boolean driveConnected = false;

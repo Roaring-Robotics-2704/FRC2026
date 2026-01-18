@@ -19,7 +19,7 @@ import edu.wpi.first.units.measure.Voltage;
 public interface HopperIO {
     /** Hopper IO inputs. */
     @AutoLog
-    public class HopperIOInputs {
+    public static class HopperIOInputs {
         public MutCurrent currentDraw = Amps.mutable(0);
         public MutVoltage appliedVoltage = Volts.mutable(0);
         public MutAngularVelocity motorVelocity = RotationsPerSecond.mutable(0);

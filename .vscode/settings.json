@@ -72,4 +72,7 @@
   "java.checkstyle.configuration": "${workspaceFolder}\\checkstyle.xml",
   "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable",
   "java.checkstyle.version": "9.3",
+  "java.import.gradle.enabled": false,
+  "java.format.settings.url": "eclipse-formatter.xml"
+
 }

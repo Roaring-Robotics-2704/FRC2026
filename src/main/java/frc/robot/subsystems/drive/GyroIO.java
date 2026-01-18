@@ -10,7 +10,10 @@ package frc.robot.subsystems.drive;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
+/** Interface for the gyro IO implementations. */
 public interface GyroIO {
+
+    /** Contains all of the loggable inputs for the gyro IO. */
     @AutoLog
     public static class GyroIOInputs {
         public boolean connected = false;
