@@ -10,8 +10,8 @@ import edu.wpi.first.units.measure.Voltage;
 
 /** Add your docs here. */
 public class HopperConstants {
-	public static final Voltage HOPPER_VOLTAGE = Volts.of(6);
-	public static final int HOPPER_CURRENT_LIMIT = 20;
-	public static final int HOPPER_MOTOR_ID = 30;
+    public static final Voltage HOPPER_VOLTAGE = Volts.of(6);
+    public static final int HOPPER_CURRENT_LIMIT = 20;
+    public static final int HOPPER_MOTOR_ID = 30;
 
 }
