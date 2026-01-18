@@ -1,23 +1,48 @@
 package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.superstructure.SuperStructureStates.CurrentState;
 import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
+import frc.robot.subsystems.superstructure.hopper.Hopper.HopperState;
 
 /** SuperStructure subsystem for controlling the robot's superstructure mechanisms. */
 public class SuperStructure extends SubsystemBase {
+    private WantedState wantedState = WantedState.IDLE;
+    private WantedState currentState = WantedState.IDLE;
 
+    //Subsystems
+    private final Hopper hopper;
+
+    /** Creates a new SuperStructure. */
     public SuperStructure(Hopper hopper) {
+        this.hopper = hopper;
     }
 
     @Override
     public void periodic() {
-
+        if (currentState == WantedState.TRANSITIONING) {
+            // Here would be the logic to check if the superstructure has reached the wanted state
+            // For now, we will assume it reaches the wanted state immediately for simplicity
+            switch (wantedState) {
+                case IDLE:
+                    break;
+                case INTAKE:
+                    hopper.setDesiredState(HopperState.REVERSING);
+                    
+                    break;
+                case SHOOT:
+                    break;
+                // Add additional cases as needed
+                default:
+                    break;
+            }
+            if (hopper.isAtWantedState()) {
+                currentState = wantedState;
+            }
+        }
     }
 
-    private WantedState wantedState = WantedState.IDLE;
-    private CurrentState currentState = CurrentState.IDLE;
+
 
  
     /**
@@ -31,21 +56,29 @@ public class SuperStructure extends SubsystemBase {
      * @param state the desired WantedState to transition to
      */
     public void setWantedState(WantedState state) {
-        if (currentState.toString() != wantedState.toString()) {
-            currentState = CurrentState.TRANSITIONING;
+        // Only change if different than what is it at, or what it is going to
+        if (state == WantedState.TRANSITIONING) {
+            throw new IllegalArgumentException(
+                    "Cannot set wanted state to TRANSITIONING directly.");
+        } else if (state != currentState || state != wantedState) {
+            this.wantedState = state;
+            currentState = WantedState.TRANSITIONING;
         }
-        this.wantedState = state;
     }
 
     public WantedState getWantedState() {
         return this.wantedState;
     }
 
-    public void setCurrentState(CurrentState state) {
+    public void setCurrentState(WantedState state) {
         this.currentState = state;
     }
 
-    public CurrentState getCurrentState() {
+    public WantedState getCurrentState() {
         return this.currentState;
+    }
+    
+    public boolean isAtWantedState() {
+        return this.currentState == this.wantedState;
     }
 }

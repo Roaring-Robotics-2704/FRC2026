@@ -15,17 +15,6 @@ public class SuperStructureStates {
         FEED, // Gentle shooting with intake out
         SHOOT, // Full shooting position
         CLIMB, // Climbing position
-    }
-    
-    /** Current states for the superstructure. */
-    public enum CurrentState {
-        START, // Starting config(All inside robot)
-        IDLE, // Default state
-        INTAKE, // Intake out
-        PASS, // Gentle shooting with intake stowed
-        FEED, // Gentle shooting with intake out
-        SHOOT, // Full shooting position
-        CLIMB, // Climbing position
         TRANSITIONING, // Moving to wanted state
     }
 }
