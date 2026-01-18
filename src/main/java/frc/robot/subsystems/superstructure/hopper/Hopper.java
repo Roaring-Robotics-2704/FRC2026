@@ -4,8 +4,14 @@
 
 package frc.robot.subsystems.superstructure.hopper;
 
+import static frc.robot.subsystems.superstructure.hopper.HopperConstants.HOPPER_VOLTAGE;
+import static frc.robot.subsystems.superstructure.hopper.HopperConstants.HOPPER_VOLTAGE_RAMP_RATE;
+
 import org.littletonrobotics.junction.Logger;
 
+import static edu.wpi.first.units.Units.Volts;
+
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -60,6 +66,11 @@ public class Hopper extends SubsystemBase {
     private final HopperIOInputsAutoLogged inputs = new HopperIOInputsAutoLogged();
     private HopperState currentState = HopperState.IDLE;
     private HopperState desiredState = HopperState.IDLE;
+    private SlewRateLimiter voltageSlewRateLimiter = new SlewRateLimiter(HOPPER_VOLTAGE_RAMP_RATE);
+
+    Double targetVolts;
+    Double rampedVolts;
+
 
     /**
      * Creates a new Hopper.
@@ -74,23 +85,46 @@ public class Hopper extends SubsystemBase {
     @Override
     public void periodic() {
         if (currentState == HopperState.TRANSITIONING) {
+            // Determine numeric target volts based on desired state
             switch (desiredState) {
                 case IDLE:
-                    hopperIO.stopMotor();
-                    currentState = HopperState.IDLE;
+                    targetVolts = 0.0;
                     break;
                 case FEEDING:
-                    hopperIO.setMotorVoltage(HopperConstants.HOPPER_VOLTAGE);
-                    currentState = HopperState.FEEDING;
+                    targetVolts = HOPPER_VOLTAGE.in(Volts);
                     break;
                 case REVERSING:
-                    hopperIO.setMotorVoltage(HopperConstants.HOPPER_VOLTAGE.unaryMinus());
-                    currentState = HopperState.REVERSING;
+                    targetVolts = -HOPPER_VOLTAGE.in(Volts);
                     break;
                 default:
-                    hopperIO.stopMotor();
-                    currentState = HopperState.IDLE;
+                    targetVolts = 0.0;
                     break;
+            }
+
+            // Ramp toward the target each scheduler run and command the ramped value
+            rampedVolts = voltageSlewRateLimiter.calculate(targetVolts);
+            hopperIO.setMotorVoltage(Volts.of(rampedVolts));
+
+            // Only leave TRANSITIONING once we're effectively at the setpoint
+            final double EPS_V = 0.01; // volts tolerance
+            if (Math.abs(rampedVolts - targetVolts) <= EPS_V) {
+                // Ensure final commanded value is the exact setpoint (or stopped)
+                switch (desiredState) {
+                    case IDLE:
+                        hopperIO.stopMotor();
+                        break;
+                    case FEEDING:
+                        hopperIO.setMotorVoltage(HOPPER_VOLTAGE);
+                        break;
+                    case REVERSING:
+                        hopperIO.setMotorVoltage(Volts.of(-HOPPER_VOLTAGE.in(Volts)));
+                        break;
+                    default:
+                        hopperIO.stopMotor();
+                        break;
+                }
+
+                currentState = desiredState;
             }
         }
         // This method will be called once per scheduler run
