@@ -247,16 +247,6 @@ public class TunerConstants {
                     kBackRightEncoderInverted);
 
     /**
-     * Creates a CommandSwerveDrivetrain instance. This should only be called once
-     * in your robot
-     * program,.
-     */
-    // public static CommandSwerveDrivetrain createDrivetrain() {
-    // return new CommandSwerveDrivetrain(
-    // DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
-    // }
-
-    /**
      * Swerve Drive class utilizing CTR Electronics' Phoenix 6 API with the selected
      * device types.
      */
@@ -264,8 +254,7 @@ public class TunerConstants {
         /**
          * Constructs a CTRE SwerveDrivetrain using the specified constants.
          *
-         * <p>
-         * This constructs the underlying hardware devices, so users should not
+         * <p>This constructs the underlying hardware devices, so users should not
          * construct the devices
          * themselves. If they need the devices, they can access them through getters in
          * the classes.
@@ -283,8 +272,7 @@ public class TunerConstants {
         /**
          * Constructs a CTRE SwerveDrivetrain using the specified constants.
          *
-         * <p>
-         * This constructs the underlying hardware devices, so users should not
+         * <p>This constructs the underlying hardware devices, so users should not
          * construct the devices
          * themselves. If they need the devices, they can access them through getters in
          * the classes.
@@ -313,8 +301,7 @@ public class TunerConstants {
         /**
          * Constructs a CTRE SwerveDrivetrain using the specified constants.
          *
-         * <p>
-         * This constructs the underlying hardware devices, so users should not
+         * <p>This constructs the underlying hardware devices, so users should not
          * construct the devices
          * themselves. If they need the devices, they can access them through getters in
          * the classes.

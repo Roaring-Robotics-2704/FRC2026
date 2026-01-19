@@ -192,7 +192,7 @@ checkstyle {
     // Use the first JAR file in the checkstyle configuration (handles multiple files / transitive deps)
     //config = resources.text.fromArchiveEntry(configurations.checkstyle.files.find { it.name.endsWith('.jar') }, "google_checks.xml")
     configFile = file("checkstyle.xml")
-    configProperties = [ "suppressionFile" : project(':').file('suppressions.xml')]
+    configProperties = [ "suppressionFile" : file('suppressions.xml')]
 }
 
 // Configure Checkstyle task reporting and failure behavior
@@ -203,4 +203,5 @@ tasks.withType(Checkstyle) {
     }
     // Fail the build on violations (change to true/false if you prefer warnings)
     ignoreFailures = false
+
 }
