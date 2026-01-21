@@ -10,6 +10,8 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.littletonrobotics.junction.AutoLog;
+
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutVoltage;
@@ -23,12 +25,11 @@ import edu.wpi.first.units.measure.Voltage;
  */
 public interface IntakeIO {
     /** Inputs read from the intake hardware. */
-    public class IntakeIOInputs {
+    public static class IntakeIOInputs {
         // Slide values
         MutVoltage slideAppliedVoltage = Volts.mutable(0);
         MutCurrent slideCurrentDraw = Amps.mutable(0);
-        AtomicBoolean slideEndstopHit = new AtomicBoolean(false);
-
+        boolean slideEndstopHit = false;
         // Roller values
         MutVoltage rollerAppliedVoltage = Volts.mutable(0);
         MutCurrent rollerCurrentDraw = Amps.mutable(0);
