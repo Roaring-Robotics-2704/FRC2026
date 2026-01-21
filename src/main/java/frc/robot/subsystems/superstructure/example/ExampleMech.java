@@ -21,7 +21,8 @@ public class ExampleMech extends SubsystemBase {
 
     // Current and goal states for the mechanism
     private ExampleMechState currentState = ExampleMechState.STATE1; // Initialize current state to starting state
-    private ExampleMechState goalState = ExampleMechState.STATE1; // Initialize goal state to starting state so no movement at start
+    private ExampleMechState goalState = ExampleMechState.STATE1;
+    // Initialize goal state to starting state so no movement at start
 
     /** Initializes the subsystem.
      *
