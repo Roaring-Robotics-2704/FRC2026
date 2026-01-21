@@ -20,6 +20,22 @@ public final class Constants {
     public static final Mode simMode = Mode.SIM;
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
+    /**
+     * Runtime mode selector for the robot application.
+     *
+     * <p>Determines how the system should behave with respect to hardware, timing,
+     * and data sources:
+     * <ul>
+     *   <li>{@link #REAL} — Running on the physical robot; use real hardware and sensors.</li>
+     *   <li>{@link #SIM} — Running in a physics simulator; substitute simulated
+     *       sensors/actuators and physics-driven timing.</li>
+     *   <li>{@link #REPLAY} — Replaying from recorded logs; use recorded sensor inputs
+     *       and deterministic playback semantics.</li>
+     * </ul>
+     *
+     * <p>Use this enum to branch initialization and runtime logic so that code paths
+     * for hardware access, logging, and timing are appropriate for the current execution context.
+     */
     public static enum Mode {
         /** Running on a real robot. */
         REAL,

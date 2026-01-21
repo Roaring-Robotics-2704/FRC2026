@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+/** Collection of drive commands. */
 public class DriveCommands {
     private static final double DEADBAND = 0.1;
     private static final double ANGLE_KP = 5.0;
@@ -64,7 +65,10 @@ public class DriveCommands {
      */
     public static Command joystickDrive(
             Drive drive,
+
+            @SuppressWarnings("checkstyle:ParameterName")
             DoubleSupplier xSupplier,
+            @SuppressWarnings("checkstyle:ParameterName")
             DoubleSupplier ySupplier,
             DoubleSupplier omegaSupplier) {
         return Commands.run(
@@ -105,7 +109,9 @@ public class DriveCommands {
      */
     public static Command joystickDriveAtAngle(
             Drive drive,
+            @SuppressWarnings("checkstyle:ParameterName")
             DoubleSupplier xSupplier,
+            @SuppressWarnings("checkstyle:ParameterName")
             DoubleSupplier ySupplier,
             Supplier<Rotation2d> rotationSupplier) {
 
@@ -151,8 +157,7 @@ public class DriveCommands {
     /**
      * Measures the velocity feedforward constants for the drive motors.
      *
-     * <p>
-     * This command should only be used in voltage control mode.
+     * <p>This command should only be used in voltage control mode.
      */
     public static Command feedforwardCharacterization(Drive drive) {
         List<Double> velocitySamples = new LinkedList<>();
@@ -202,13 +207,13 @@ public class DriveCommands {
                                         sumXY += velocitySamples.get(i) * voltageSamples.get(i);
                                         sumX2 += velocitySamples.get(i) * velocitySamples.get(i);
                                     }
-                                    double kS = (sumY * sumX2 - sumX * sumXY) / (n * sumX2 - sumX * sumX);
-                                    double kV = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                                    double staticForce = (sumY * sumX2 - sumX * sumXY) / (n * sumX2 - sumX * sumX);
+                                    double voltageForce = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
 
                                     NumberFormat formatter = new DecimalFormat("#0.00000");
                                     System.out.println("********** Drive FF Characterization Results **********");
-                                    System.out.println("\tkS: " + formatter.format(kS));
-                                    System.out.println("\tkV: " + formatter.format(kV));
+                                    System.out.println("\tkS: " + formatter.format(staticForce));
+                                    System.out.println("\tkV: " + formatter.format(voltageForce));
                                 }));
     }
 

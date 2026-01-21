@@ -7,7 +7,15 @@
 
 package frc.robot;
 
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -24,9 +32,13 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import frc.robot.subsystems.superstructure.SuperStructure;
+import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
+import frc.robot.subsystems.superstructure.hopper.Hopper;
+import frc.robot.subsystems.superstructure.hopper.HopperIO;
+import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
+import frc.robot.subsystems.superstructure.hopper.HopperIOSim;
 import frc.robot.subsystems.vision.Vision;
-import static frc.robot.subsystems.vision.VisionConstants.*;
 import frc.robot.subsystems.vision.VisionIO;
 //import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
@@ -44,7 +56,13 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final Hopper hopper;
+
     private final Vision vision;
+
+    //SuperStructure
+    private final SuperStructure superStructure;
+
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -86,6 +104,7 @@ public class RobotContainer {
                 // new ModuleIOTalonFXS(TunerConstants.BackLeft),
                 // new ModuleIOTalonFXS(TunerConstants.BackRight));
 
+                hopper = new Hopper(new HopperIOReal());
                 vision = new Vision(
                         drive::addVisionMeasurement,
                         new VisionIOPhotonVision(camera0Name, robotToCamera0),
@@ -101,6 +120,7 @@ public class RobotContainer {
                         new ModuleIOSim(TunerConstants.FrontRight),
                         new ModuleIOSim(TunerConstants.BackLeft),
                         new ModuleIOSim(TunerConstants.BackRight));
+                hopper = new Hopper(new HopperIOSim());
 
                 vision = new Vision(
                         drive::addVisionMeasurement,
@@ -121,21 +141,26 @@ public class RobotContainer {
                         },
                         new ModuleIO() {
                         });
+                hopper = new Hopper(new HopperIO() {});
 
                 vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
-                }, new VisionIO() {
-                });
+                }, new VisionIO() {});
                 break;
         }
+
+        // Set up superstructure
+        superStructure = new SuperStructure(hopper);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         // Set up SysId routines
         autoChooser.addOption(
-                "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+                "Drive Wheel Radius Characterization",
+                DriveCommands.wheelRadiusCharacterization(drive));
         autoChooser.addOption(
-                "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+                "Drive Simple FF Characterization",
+                DriveCommands.feedforwardCharacterization(drive));
         autoChooser.addOption(
                 "Drive SysId (Quasistatic Forward)",
                 drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -143,9 +168,11 @@ public class RobotContainer {
                 "Drive SysId (Quasistatic Reverse)",
                 drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
         autoChooser.addOption(
-                "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+                "Drive SysId (Dynamic Forward)",
+                drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
         autoChooser.addOption(
-                "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+                "Drive SysId (Dynamic Reverse)",
+                drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
         // Configure the button bindings
         configureButtonBindings();
@@ -188,9 +215,17 @@ public class RobotContainer {
                 .onTrue(
                         Commands.runOnce(
                                 () -> drive.setPose(
-                                        new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                                        new Pose2d(
+                                            drive.getPose().getTranslation(),
+                                            Rotation2d.kZero)),
                                 drive)
                                 .ignoringDisable(true));
+
+        controller.leftTrigger().onTrue(superStructure.goToState(WantedState.INTAKE));
+        controller.rightTrigger().onTrue(superStructure.goToState(WantedState.SHOOT));
+
+        vision.setDefaultCommand(Commands.idle(vision)); //Idle vision command
+
     }
 
     /**

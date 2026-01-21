@@ -11,7 +11,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
+/** Interface for the vision IO implementations. */
 public interface VisionIO {
+    /** Contains all of the loggable inputs for the vision IO. */
     @AutoLog
     public static class VisionIOInputs {
         public boolean connected = false;
@@ -34,12 +36,14 @@ public interface VisionIO {
             PoseObservationType type) {
     }
 
+    /** Types of pose observations used for pose estimation. */
     public static enum PoseObservationType {
         MEGATAG_1,
         MEGATAG_2,
         PHOTONVISION
     }
-
+    
+    /** Updates the set of loggable inputs. */
     public default void updateInputs(VisionIOInputs inputs) {
     }
 }

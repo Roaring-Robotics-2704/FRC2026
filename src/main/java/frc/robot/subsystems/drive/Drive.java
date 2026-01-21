@@ -7,7 +7,14 @@
 
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -16,6 +23,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -43,11 +51,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
+/** Subsystem for the swerve drive drivetrain. */
 public class Drive extends SubsystemBase {
     // TunerConstants doesn't include these constants, so they are declared locally
     static final double ODOMETRY_FREQUENCY = TunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
@@ -88,14 +93,57 @@ public class Drive extends SubsystemBase {
     private Rotation2d rawGyroRotation = Rotation2d.kZero;
     private SwerveModulePosition[] lastModulePositions = // For delta tracking
             new SwerveModulePosition[] {
-                    new SwerveModulePosition(),
-                    new SwerveModulePosition(),
-                    new SwerveModulePosition(),
-                    new SwerveModulePosition()
+                new SwerveModulePosition(),
+                new SwerveModulePosition(),
+                new SwerveModulePosition(),
+                new SwerveModulePosition()
             };
     private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics, rawGyroRotation,
             lastModulePositions, Pose2d.kZero);
 
+    /**
+     * Constructs and configures the Drive subsystem.
+     *
+     * <p>Initializes the drive gyro and the four swerve modules (front-left, front-right,
+     * back-left, back-right). Registers usage with HAL, starts the odometry thread, and
+     * configures path-following, pathfinding, logging, and system-identification facilities
+     * required by the robot runtime.
+     *
+     * <p>Side effects and global behavior:
+     * <ul>
+     *   <li>Populates the internal module array with newly created Module instances.</li>
+     *   <li>Calls HAL.report(...) to announce the robot drive resource.</li>
+     *   <li>Starts the PhoenixOdometryThread background thread (singleton) — this will
+     *       begin producing odometry updates immediately.</li>
+     *   <li>Configures PathPlanner's AutoBuilder with method references for pose access and
+     *       low-level velocity control, a holonomic PID heading controller, and an alliance
+     *       inversion supplier. This registers AutoBuilder callbacks used during autonomous
+     *       trajectory following.</li>
+     *   <li>Sets the global pathfinder implementation (Pathfinding.setPathfinder) and
+     *       registers PathPlanner logging callbacks for active trajectories and target poses
+     *       (Logger.recordOutput calls).</li>
+     *   <li>Configures the SysId routine used for mechanism characterization and connects
+     *       it to this Drive instance's characterization routine. This will record SysId
+     *       state outputs and enable running voltage-based characterization when invoked.</li>
+     * </ul>
+     *
+     * <p>Notes and recommendations:
+     * <ul>
+     *   <li>All IO parameters (gyroIO and the four ModuleIOs) are expected to be non-null
+     *       and represent the hardware abstraction layer for the respective devices.</li>
+     *   <li>Because this constructor registers global callbacks and starts threads, it is
+     *       intended to be called once during robot initialization. Creating multiple Drive
+     *       instances may result in duplicated threads, callbacks, or conflicting registrations.</li>
+     *   <li>Exceptions thrown by underlying subsystems or invalid hardware IO should be
+     *       handled by the caller; this constructor does not catch or hide those failures.</li>
+     * </ul>
+     *
+     * @param gyroIO  Hardware/IO interface for the gyro sensor used for robot heading and odometry.
+     * @param flModuleIO Hardware/IO interface for the front-left swerve module.
+     * @param frModuleIO Hardware/IO interface for the front-right swerve module.
+     * @param blModuleIO Hardware/IO interface for the back-left swerve module.
+     * @param brModuleIO Hardware/IO interface for the back-right swerve module.
+     */
     public Drive(
             GyroIO gyroIO,
             ModuleIO flModuleIO,
@@ -121,7 +169,8 @@ public class Drive extends SubsystemBase {
                 this::getChassisSpeeds,
                 this::runVelocity,
                 new PPHolonomicDriveController(
-                        new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+                        new PIDConstants(5.0, 0.0, 0.0),
+                        new PIDConstants(5.0, 0.0, 0.0)), //These should NEVER change
                 PP_CONFIG,
                 () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                 this);
@@ -356,10 +405,10 @@ public class Drive extends SubsystemBase {
     /** Returns an array of module translations. */
     public static Translation2d[] getModuleTranslations() {
         return new Translation2d[] {
-                new Translation2d(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
-                new Translation2d(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY),
-                new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
-                new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
+            new Translation2d(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
+            new Translation2d(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY),
+            new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
+            new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
         };
     }
 }

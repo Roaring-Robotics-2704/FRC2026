@@ -27,6 +27,7 @@ public class GyroIOPigeon2 implements GyroIO {
     private final Queue<Double> yawTimestampQueue;
     private final StatusSignal<AngularVelocity> yawVelocity = pigeon.getAngularVelocityZWorld();
 
+    /** Creates a new GyroIOPigeon2. */
     public GyroIOPigeon2() {
         if (TunerConstants.DrivetrainConstants.Pigeon2Configs != null) {
             pigeon.getConfigurator().apply(TunerConstants.DrivetrainConstants.Pigeon2Configs);

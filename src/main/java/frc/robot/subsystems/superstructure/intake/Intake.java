@@ -63,8 +63,10 @@ public class Intake extends SubsystemBase {
 
     /** Possible goals for the intake subsystem. */
     public enum Goal {
+        START,
         STOWED,
         DEPLOYED_OFF,
-        DEPLOYED_ON
+        DEPLOYED_ON,
+        TRANSITIONING,
     }
 }

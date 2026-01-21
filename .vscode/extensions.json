@@ -3,6 +3,7 @@
     "richardwillis.vscode-spotless-gradle",
     "shengchen.vscode-checkstyle",
     "EditorConfig.EditorConfig",
-    "usernamehw.errorlens"
+    "usernamehw.errorlens",
+    "redhat.java"
   ]
 }

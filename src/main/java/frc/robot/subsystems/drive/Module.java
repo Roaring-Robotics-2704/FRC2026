@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import org.littletonrobotics.junction.Logger;
 
+/** Represents a single swerve module of the drivetrain. */
 public class Module {
     private final ModuleIO io;
     private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
@@ -29,6 +30,7 @@ public class Module {
     private final Alert turnEncoderDisconnectedAlert;
     private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
 
+    /** Creates a new Module with the given IO, index, and constants. */
     public Module(
             ModuleIO io,
             int index,
@@ -46,6 +48,7 @@ public class Module {
                 AlertType.kError);
     }
 
+    /** Updates the module inputs and alerts. */
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
