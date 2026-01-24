@@ -14,6 +14,7 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -56,6 +57,8 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final CANBus rioBus = CANBus.roboRIO();
+    private final CANBus driveBus = new CANBus("Drivetrain");
     private final Hopper hopper;
 
     private final Vision vision;
@@ -236,4 +239,13 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return autoChooser.get();
     }
+
+    public CANBus getRIOBus() {
+        return rioBus;
+    }
+    
+    public CANBus getDriveBus() {
+        return driveBus;
+    }
+
 }
