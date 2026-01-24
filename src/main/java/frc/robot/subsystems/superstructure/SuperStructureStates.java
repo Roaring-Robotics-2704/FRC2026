@@ -16,7 +16,7 @@ public class SuperStructureStates {
         SHOOT, // Full shooting position
         CLIMB, // Climbing position
         TRANSITIONING, // Moving to wanted state
-        INTAKE_CALIBRATE_IN,// Calibrating intake in
+        INTAKE_CALIBRATE_IN, // Calibrating intake in
         INTAKE_CALIBRATE_OUT// Calibrating intake out
     }
 }

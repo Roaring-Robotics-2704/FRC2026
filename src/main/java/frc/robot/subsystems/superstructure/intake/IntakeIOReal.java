@@ -4,29 +4,37 @@
 
 package frc.robot.subsystems.superstructure.intake;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.FeedbackSensor;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.*;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.ENCODER_GEAR_RATIO;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.ROLLER_CURRENT_LIMIT;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_CURRENT_LIMIT;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_MAX_ACCELERATION;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_MAX_VELOCITY;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KA;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KD;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KG;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KI;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KP;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KS;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KV;
+
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import frc.robot.util.SparkUtil;
 
 /** Add your docs here. */

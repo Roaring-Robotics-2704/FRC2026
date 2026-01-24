@@ -12,7 +12,6 @@ import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_M
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -77,6 +76,7 @@ public class Intake extends SubsystemBase {
                         intakeIO.resetSlideEncoder(Inches.zero());
                     } else if (desiredState == IntakeState.CALIBRATE_OUT) {
                         foundMaxDistance = Inches.of(inputs.slidePosition.in(Inches));
+                        System.out.println("Found max distance: " + foundMaxDistance);
                     }
                     currentState = IntakeState.INSIDE;
                     calibrationTimer.stop();
@@ -101,7 +101,10 @@ public class Intake extends SubsystemBase {
         DEPLOYED_ON(false),
         CALIBRATE_OUT(true),
         CALIBRATE_IN(true);
+
         boolean calibrating;
+        
+        /** Constructor for IntakeState enum. */
         private IntakeState(boolean calibrating) {
             this.calibrating = calibrating;
         }
