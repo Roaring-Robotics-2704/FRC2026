@@ -39,6 +39,9 @@ import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.HopperIO;
 import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
 import frc.robot.subsystems.superstructure.hopper.HopperIOSim;
+import frc.robot.subsystems.superstructure.intake.Intake;
+import frc.robot.subsystems.superstructure.intake.IntakeIO;
+import frc.robot.subsystems.superstructure.intake.IntakeIOReal;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 //import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -57,8 +60,7 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final CANBus rioBus = CANBus.roboRIO();
-    private final CANBus driveBus = new CANBus("Drivetrain");
+    private final Intake intake;
     private final Hopper hopper;
 
     private final Vision vision;
@@ -106,7 +108,7 @@ public class RobotContainer {
                 // new ModuleIOTalonFXS(TunerConstants.FrontRight),
                 // new ModuleIOTalonFXS(TunerConstants.BackLeft),
                 // new ModuleIOTalonFXS(TunerConstants.BackRight));
-
+                intake = new Intake(new IntakeIOReal());
                 hopper = new Hopper(new HopperIOReal());
                 vision = new Vision(
                         drive::addVisionMeasurement,
@@ -123,6 +125,7 @@ public class RobotContainer {
                         new ModuleIOSim(TunerConstants.FrontRight),
                         new ModuleIOSim(TunerConstants.BackLeft),
                         new ModuleIOSim(TunerConstants.BackRight));
+                intake = new Intake(new IntakeIO() {});
                 hopper = new Hopper(new HopperIOSim());
 
                 vision = new Vision(
@@ -144,6 +147,7 @@ public class RobotContainer {
                         },
                         new ModuleIO() {
                         });
+                intake = new Intake(new IntakeIO() {});
                 hopper = new Hopper(new HopperIO() {});
 
                 vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
@@ -152,7 +156,7 @@ public class RobotContainer {
         }
 
         // Set up superstructure
-        superStructure = new SuperStructure(hopper);
+        superStructure = new SuperStructure(intake, hopper);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -239,13 +243,14 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return autoChooser.get();
     }
-
-    public CANBus getRIOBus() {
-        return rioBus;
-    }
     
-    public CANBus getDriveBus() {
-        return driveBus;
+    /**
+     * Use this to pass the calibration command to the main {@link Robot} class.
+     *
+     * @return the command to run in calibration
+     */
+    public Command getCalibrationCommand() {
+        return Commands.sequence(superStructure.goToState(WantedState.INTAKE_CALIBRATE_IN),
+            superStructure.goToState(WantedState.INTAKE_CALIBRATE_OUT));
     }
-
 }

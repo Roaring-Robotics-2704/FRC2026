@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -151,6 +152,7 @@ public class Robot extends LoggedRobot {
     public void testInit() {
         // Cancels all running commands at the start of test mode.
         CommandScheduler.getInstance().cancelAll();
+        CommandScheduler.getInstance().schedule(robotContainer.getCalibrationCommand());
     }
 
     /** This function is called periodically during test mode. */
