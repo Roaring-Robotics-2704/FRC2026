@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.Hopper.HopperState;
+import frc.robot.subsystems.superstructure.intake.Intake;
+import frc.robot.subsystems.superstructure.intake.Intake.IntakeState;
 
 /**
  * SuperStructure subsystem for controlling the robot's superstructure
@@ -16,10 +18,12 @@ public class SuperStructure extends SubsystemBase {
     private WantedState currentState = WantedState.IDLE;
 
     // Subsystems
+    private final Intake intake;
     private final Hopper hopper;
 
     /** Creates a new SuperStructure. */
-    public SuperStructure(Hopper hopper) {
+    public SuperStructure(Intake intake, Hopper hopper) {
+        this.intake = intake;
         this.hopper = hopper;
     }
 
@@ -32,25 +36,38 @@ public class SuperStructure extends SubsystemBase {
             // simplicity
             switch (wantedState) {
                 case START:
+                    intake.setDesiredState(IntakeState.INSIDE);
                     hopper.setDesiredState(HopperState.IDLE);
                     break;
                 case IDLE:
+                    intake.setDesiredState(IntakeState.STOWED);
                     hopper.setDesiredState(HopperState.IDLE);
                     break;
                 case INTAKE:
+                    intake.setDesiredState(IntakeState.DEPLOYED_ON);
                     hopper.setDesiredState(HopperState.REVERSING);
                     break;
                 case PASS:
+                    intake.setDesiredState(IntakeState.STOWED);
                     hopper.setDesiredState(HopperState.FEEDING);
                     break;
                 case FEED:
+                    intake.setDesiredState(IntakeState.DEPLOYED_ON);
                     hopper.setDesiredState(HopperState.FEEDING);
                     break;
                 case SHOOT:
+                    intake.setDesiredState(IntakeState.STOWED);
                     hopper.setDesiredState(HopperState.FEEDING);
                     break;
                 case CLIMB:
+                    intake.setDesiredState(IntakeState.INSIDE);
                     hopper.setDesiredState(HopperState.IDLE);
+                    break;
+                case INTAKE_CALIBRATE_IN:
+                    intake.setDesiredState(IntakeState.CALIBRATE_IN);
+                    break;
+                case INTAKE_CALIBRATE_OUT:
+                    intake.setDesiredState(IntakeState.CALIBRATE_OUT);
                     break;
                 // Add additional cases as needed
                 default:
