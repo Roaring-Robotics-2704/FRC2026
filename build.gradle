@@ -54,7 +54,7 @@ deploy {
                     directory = '/home/lvuser/deploy'
                     // Change to true to delete files on roboRIO that no
                     // longer exist in deploy directory on roboRIO
-                    deleteOldFiles = false
+                    deleteOldFiles = true
                 }
             }
         }
@@ -145,7 +145,7 @@ gversion {
     className    = "BuildConstants"
     dateFormat   = "yyyy-MM-dd HH:mm:ss z"
     timeZone     = "America/Chicago"
-    indent       = "  "
+    indent       = "    "
 }
 
 // Create commit with working changes on event branches
@@ -192,6 +192,7 @@ checkstyle {
     // Use the first JAR file in the checkstyle configuration (handles multiple files / transitive deps)
     //config = resources.text.fromArchiveEntry(configurations.checkstyle.files.find { it.name.endsWith('.jar') }, "google_checks.xml")
     configFile = file("checkstyle.xml")
+    configProperties = [ "suppressionFile" : file('suppressions.xml')]
 }
 
 // Configure Checkstyle task reporting and failure behavior
@@ -202,4 +203,5 @@ tasks.withType(Checkstyle) {
     }
     // Fail the build on violations (change to true/false if you prefer warnings)
     ignoreFailures = false
+
 }
