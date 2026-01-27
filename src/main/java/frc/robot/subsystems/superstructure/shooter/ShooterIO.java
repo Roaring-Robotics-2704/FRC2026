@@ -5,32 +5,50 @@
 package frc.robot.subsystems.superstructure.shooter;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutCurrent;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
+
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Volt;
+
 import org.littletonrobotics.junction.AutoLog;
 
-  /** Creates a new ShooterIO. */
-  public interface ShooterIO { // creates and sets baseline values of robot for logging
+/** Creates a new ShooterIO. */
+public interface ShooterIO { // creates and sets baseline values of robot for logging
     @AutoLog
-    class ShooterIOInputs {
-      public double ShooterAngle = 0.0;
-      public double ShooterVelocity = 0.0;
-      public double shootShooterAppliedVolts = 0.0;
-      public double angleShooterAppliedVolts = 0.0;
-      public double shootShooterCurrentAmps = 0.0;
-      public double angleShooterCurrentAmps = 0.0;
+    public static class ShooterIOInputs {
+        public MutAngle hoodAngle = Degrees.mutable(0);
+        public MutAngularVelocity flywheelVelocity = DegreesPerSecond.mutable(0);
+        public MutVoltage flywheelAppliedVolts = Volt.mutable(0);
+        public MutVoltage hoodAppliedVolts = Volt.mutable(0);
+        public MutCurrent flywheelCurrentAmps = Amps.mutable(0);
+        public MutCurrent hoodCurrentAmps = Amps.mutable(0);
     }
-  
 
-  default void updateInputs(ShooterIOInputs inputs) {}
+    default void updateInputs(ShooterIOInputs inputs) {
+    }
 
-  default void setShooterVelocity(double velocityRadperSec) {}
+    // voltage methods for flywheel and hood
+    default void setFlywheelVoltage(Voltage voltage) {
+    }
+    default void setHoodVoltage(Voltage voltage) {
+    }
 
-  default void runVolts(Voltage volts) {};
+    default void setHoodAngle(Angle angle) {
+    }
 
-  default void runSetpoint(TrapezoidProfile.State position) {};
+    default void setFlywheelVelocity(AngularVelocity velocity) {
+    }
 
-  default void stop() {};
 
-  default void init() {};
+    
+
 }

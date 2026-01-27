@@ -57,8 +57,6 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final CANBus rioBus = CANBus.roboRIO();
-    private final CANBus driveBus = new CANBus("Drivetrain");
     private final Hopper hopper;
 
     private final Vision vision;
@@ -239,4 +237,13 @@ public class RobotContainer {
                 .ignoringDisable(true));
   }
 
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
+    public Command getAutonomousCommand() {
+        // Return the selected autonomous command
+        return autoChooser.get();
+    }
 }

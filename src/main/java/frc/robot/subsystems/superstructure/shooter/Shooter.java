@@ -4,63 +4,77 @@
 
 package frc.robot.subsystems.superstructure.shooter;
 
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MAX_SHOOTER_VOLTAGE;
+import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.*;
+import java.util.function.Supplier;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.filter.MedianFilter;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.RobotContainer;
 import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
 
-  boolean manual = false;
+    private ShooterState currentState = ShooterState.STATIONARY;
+    private ShooterState desiredState = ShooterState.STATIONARY;
+    
+    private Distance distance;
+    private Angle hoodAngle;
 
-  private final ShooterIO io;
+    private final ShooterIO io;
+    private final Supplier<Distance> distanceSupplier;
 
-  private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
- 
-  private double median = 0;
-  private double medianCount = 0; // median filters window of data for little offset errors
-  private boolean hasRanCalibration = false;
+    private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-  MedianFilter filter = new MedianFilter(10); // adjust this value later if necessary
+    public Shooter(ShooterIO io, Supplier<Distance> distanceSupplier) {
+        this.io = io;
+        this.distanceSupplier = distanceSupplier;
+    }
 
-  private ProfiledPIDController controller = new ProfiledPIDController(
-    ShooterConstants.SHOOTER_KP, 
-    ShooterConstants.SHOOTER_KI, 
-    ShooterConstants.SHOOTER_KD, 
-    new TrapezoidProfile.Constraints(1, 10)); // adjust the trapezoid profile values as needed
+    @Override
+    public void periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs("Shooter", inputs);
+        distance = distanceSupplier.get();
+        Logger.recordOutput("Shooter/DistanceToTarget", distance);
+        hoodAngle = HoodAngleCalc.getInstance().getHoodAngle(distance);
+        Logger.recordOutput("Shooter/HoodAngle", hoodAngle);
 
-  private SysIdRoutine sysIdRoutine = new SysIdRoutine(
-    new SysIdRoutine.Config(
-      Volts.of(0.5).per(Second),
-      Volts.of(2),
-      null,
-      state -> Logger.recordOutput("Elevator.SysIdState", state.toString())),
-    new SysIdRoutine.Mechanism(this::setElevatorVolts, null, local()));
+        Logger.recordOutput("Shooter/DesiredState", desiredState.toString());
+        Logger.recordOutput("Shooter/CurrentState", currentState.toString());
+        
+        if (currentState != desiredState) {
+            switch (desiredState) {
+                case STATIONARY:
+                    io.setFlywheelVoltage(Volts.of(0));
+                    io.setHoodAngle(MIN_ANGLE);;
+                    break;
+                case IDLE:
+                    io.setFlywheelVelocity(SHOOTER_IDLE_RPM);
+                    io.setHoodAngle(ShooterConstants.MIN_ANGLE);
+                    break;
+                case READY_TO_SHOOT:
+                    io.setHoodAngle(hoodAngle);
+                    io.setFlywheelVelocity(ShooterConstants.SHOOTER_TARGET_RPM);
+                    break;
+                case SHOOTING:
+                    
+                    break;
+            }
+            currentState = desiredState;
+            
+        }
+        // This method will be called once per scheduler run
+    }
 
-  public Shooter(ShooterIO io, RobotContainer robotContainer) {
-    SmartDashboard.putData("Elevator PID", controller);
-    this.io = io;
-    this.robotContainer = robotContainer;
-    io.init();
-  }
+    public void setDesiredState(ShooterState state) {
+        this.desiredState = state;
+    }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+    public enum ShooterState {
+        STATIONARY, IDLE, READY_TO_SHOOT, SHOOTING
+    }
 
-  }
-
-  private Shooter local() {
-    return this;
-  }
 }
