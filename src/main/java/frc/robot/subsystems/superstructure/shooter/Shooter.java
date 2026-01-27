@@ -44,7 +44,7 @@ public class Shooter extends SubsystemBase {
 
         Logger.recordOutput("Shooter/DesiredState", desiredState.toString());
         Logger.recordOutput("Shooter/CurrentState", currentState.toString());
-        
+
         if (currentState != desiredState) {
             switch (desiredState) {
                 case STATIONARY:
@@ -53,17 +53,20 @@ public class Shooter extends SubsystemBase {
                     break;
                 case IDLE:
                     io.setFlywheelVelocity(SHOOTER_IDLE_RPM);
-                    io.setHoodAngle(ShooterConstants.MIN_ANGLE);
+                    io.setHoodAngle(MIN_ANGLE);
                     break;
                 case READY_TO_SHOOT:
                     io.setHoodAngle(hoodAngle);
-                    io.setFlywheelVelocity(ShooterConstants.SHOOTER_TARGET_RPM);
+                    io.setFlywheelVelocity(SHOOTER_TARGET_RPM);
                     break;
                 case SHOOTING:
-                    
+                    io.setHoodAngle(hoodAngle);
+                    io.setFlywheelVelocity(SHOOTER_TARGET_RPM);
                     break;
             }
-            currentState = desiredState;
+            if (inputs.atTargetAngle && inputs.atTargetVelocity) {
+                currentState = desiredState;
+            }
             
         }
         // This method will be called once per scheduler run

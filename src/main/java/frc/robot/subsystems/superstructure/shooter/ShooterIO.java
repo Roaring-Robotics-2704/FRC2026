@@ -31,6 +31,9 @@ public interface ShooterIO { // creates and sets baseline values of robot for lo
         public MutVoltage hoodAppliedVolts = Volt.mutable(0);
         public MutCurrent flywheelCurrentAmps = Amps.mutable(0);
         public MutCurrent hoodCurrentAmps = Amps.mutable(0);
+
+        public boolean atTargetVelocity = false;
+        public boolean atTargetAngle = false;
     }
 
     default void updateInputs(ShooterIOInputs inputs) {
@@ -47,7 +50,6 @@ public interface ShooterIO { // creates and sets baseline values of robot for lo
 
     default void setFlywheelVelocity(AngularVelocity velocity) {
     }
-
 
     
 
