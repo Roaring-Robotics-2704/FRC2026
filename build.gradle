@@ -181,7 +181,6 @@ task(eventDeploy) {
 }
 createVersionFile.dependsOn(eventDeploy)
 
-
 // Checkstyle configuration - use Google's Java style guide via local config file
 checkstyle {
     // Pick a stable Checkstyle version; change if you need a newer one
@@ -191,6 +190,8 @@ checkstyle {
     // If you prefer a local file, replace the next line with: configFile = file("config/checkstyle/google_checks.xml")
     // Use the first JAR file in the checkstyle configuration (handles multiple files / transitive deps)
     //config = resources.text.fromArchiveEntry(configurations.checkstyle.files.find { it.name.endsWith('.jar') }, "google_checks.xml")
+    configProperties = [ "suppressionFile" : file('suppressions-check.xml')]
+
     configFile = file("checkstyle.xml")
     configProperties = [ "suppressionFile" : file('suppressions.xml')]
 }
