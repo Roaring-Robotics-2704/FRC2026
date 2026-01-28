@@ -57,8 +57,6 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final CANBus rioBus = CANBus.roboRIO();
-    private final CANBus driveBus = new CANBus("Drivetrain");
     private final Hopper hopper;
 
     private final Vision vision;
@@ -213,23 +211,31 @@ public class RobotContainer {
 
         // Reset gyro to 0 deg when B button is pressed
 
-        controller
-                .b()
-                .onTrue(
-                        Commands.runOnce(
-                                () -> drive.setPose(
-                                        new Pose2d(
-                                            drive.getPose().getTranslation(),
-                                            Rotation2d.kZero)),
-                                drive)
-                                .ignoringDisable(true));
+    // Lock to 0 deg when A button is held
+    controller
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> Rotation2d.kZero));
 
         controller.leftTrigger().onTrue(superStructure.goToState(WantedState.INTAKE));
         controller.rightTrigger().onTrue(superStructure.goToState(WantedState.SHOOT));
 
-        vision.setDefaultCommand(Commands.idle(vision)); //Idle vision command
+    // Reset gyro to 0 deg when B button is pressed
 
-    }
+    controller
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                    drive)
+                .ignoringDisable(true));
+  }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -237,15 +243,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
+        // Return the selected autonomous command
         return autoChooser.get();
     }
-
-    public CANBus getRIOBus() {
-        return rioBus;
-    }
-    
-    public CANBus getDriveBus() {
-        return driveBus;
-    }
-
 }

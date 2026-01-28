@@ -131,6 +131,9 @@ public class Hopper extends SubsystemBase {
 
         hopperIO.updateInputs(inputs); // Update inputs from hardware
         Logger.processInputs("Hopper", inputs); // Log inputs to AdvantageKit
+
+        Logger.recordOutput("Hopper/DesiredState", desiredState.toString());
+        Logger.recordOutput("Hopper/CurrentState", currentState.toString());
     }
 
     /**
