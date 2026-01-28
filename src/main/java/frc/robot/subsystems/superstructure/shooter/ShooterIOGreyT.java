@@ -41,13 +41,14 @@ public class ShooterIOGreyT implements ShooterIO {
     private StatusSignal<Voltage> flywheelAppliedVoltsSignal;
     private StatusSignal<Current> flywheelCurrentAmpsSignal;
     private StatusSignalCollection statusSignals = new StatusSignalCollection();
+    private Angle hoodAngle;
 
     private TalonFX flywheelMotor1;
     private TalonFX flywheelMotor2;
 
     /** Instantiates the GreyT Shooter hardware. */
-    private Servo hoodServo1 = new Servo(HOOD_SERVO1_PORT);
-    private Servo hoodServo2 = new Servo(HOOD_SERVO2_PORT);
+    private LinearServo hoodServo1 = new LinearServo(HOOD_SERVO1_PORT, 100, 30);
+    private LinearServo hoodServo2 = new LinearServo(HOOD_SERVO2_PORT, 100, 30);
 
     public ShooterIOGreyT() {
         flywheelMotor1 = new TalonFX(FLYWHEEL_MOTOR_ONE);
@@ -100,6 +101,7 @@ public class ShooterIOGreyT implements ShooterIO {
         inputs.flywheelAppliedVolts.mut_replace(flywheelAppliedVoltsSignal.getValue());
         inputs.flywheelCurrentAmps.mut_replace(flywheelCurrentAmpsSignal.getValue());
 
+        inputs.hoodAngle.mut_replace(getHoodServoPosition());
         inputs.atTargetVelocity = flywheelMotor1.getClosedLoopError().getValue() < SHOOTER_TOLERANCE_RPM;
         inputs.atTargetAngle = true; // Hood angle feedback not implemented yet
     }
@@ -127,13 +129,15 @@ public class ShooterIOGreyT implements ShooterIO {
     public void setHoodAngle(Angle angle) {
         double servoPosition = (angle.in(Degrees) - MIN_ANGLE.in(Degrees))
                 / (MAX_ANGLE.in(Degrees) - MIN_ANGLE.in(Degrees));
-        hoodServo1.setPosition(servoPosition);
-        hoodServo2.setPosition(servoPosition);
-        
+        hoodServo1.setPosition(servoPosition * 100);
+        hoodServo2.setPosition(servoPosition * 100);
+        hoodAngle = angle;
     }
 
-    private double getHoodServoPosition() {
-        return hoodServo1.getPosition();
+    private Angle getHoodServoPosition() {
+        return Degrees.of(
+            hoodServo1.getPosition() / 100 * (MAX_ANGLE.in(Degrees) - MIN_ANGLE.in(Degrees)) + MIN_ANGLE.in(Degrees)
+        );
     }
 
 }
