@@ -25,6 +25,7 @@ public class HoodAngleCalc {
         hoodAngleMap.put(5.0, 45.0);
     }
 
+    /** Singleton pattern to get the instance of HoodAngleCalc. */
     public static HoodAngleCalc getInstance() {
         if (instance == null) {
             instance = new HoodAngleCalc();

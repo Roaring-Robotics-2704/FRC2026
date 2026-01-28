@@ -63,6 +63,8 @@ public class Shooter extends SubsystemBase {
                     io.setHoodAngle(hoodAngle);
                     io.setFlywheelVelocity(SHOOTER_TARGET_RPM);
                     break;
+                default:
+                    break;
             }
             if (inputs.atTargetAngle && inputs.atTargetVelocity) {
                 currentState = desiredState;
