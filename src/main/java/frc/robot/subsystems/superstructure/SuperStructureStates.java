@@ -13,6 +13,7 @@ public class SuperStructureStates {
         INTAKE, // Intake out
         PASS, // Gentle shooting with intake stowed
         FEED, // Gentle shooting with intake out
+        SHOOTER_PREP, // Getting ready to shoot
         SHOOT, // Full shooting position
         CLIMB, // Climbing position
         TRANSITIONING, // Moving to wanted state

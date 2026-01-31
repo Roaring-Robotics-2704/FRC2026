@@ -19,7 +19,7 @@ public class Shooter extends SubsystemBase {
 
     private ShooterState currentState = ShooterState.STATIONARY;
     private ShooterState desiredState = ShooterState.STATIONARY;
-    
+
     private Distance distance;
     private Angle hoodAngle;
 
@@ -49,15 +49,12 @@ public class Shooter extends SubsystemBase {
             switch (desiredState) {
                 case STATIONARY:
                     io.setFlywheelVoltage(Volts.of(0));
-                    io.setHoodAngle(MIN_ANGLE);;
+                    io.setHoodAngle(MIN_ANGLE);
+                    ;
                     break;
                 case IDLE:
                     io.setFlywheelVelocity(SHOOTER_IDLE_RPM);
                     io.setHoodAngle(MIN_ANGLE);
-                    break;
-                case READY_TO_SHOOT:
-                    io.setHoodAngle(hoodAngle);
-                    io.setFlywheelVelocity(SHOOTER_TARGET_RPM);
                     break;
                 case SHOOTING:
                     io.setHoodAngle(hoodAngle);
@@ -69,17 +66,27 @@ public class Shooter extends SubsystemBase {
             if (inputs.atTargetAngle && inputs.atTargetVelocity) {
                 currentState = desiredState;
             }
-            
+
         }
         // This method will be called once per scheduler run
     }
 
     public void setDesiredState(ShooterState state) {
+
         this.desiredState = state;
+
+    }
+
+    public ShooterState getCurrentState() {
+        return currentState;
+    }
+
+    public boolean isAtWantedState() {
+        return currentState == desiredState;
     }
 
     public enum ShooterState {
-        STATIONARY, IDLE, READY_TO_SHOOT, SHOOTING
+        STATIONARY, IDLE, SHOOTING
     }
 
 }

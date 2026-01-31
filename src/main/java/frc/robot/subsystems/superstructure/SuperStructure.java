@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.Hopper.HopperState;
+import frc.robot.subsystems.superstructure.shooter.Shooter;
+import frc.robot.subsystems.superstructure.shooter.Shooter.ShooterState;
 
 /**
  * SuperStructure subsystem for controlling the robot's superstructure
@@ -17,10 +19,12 @@ public class SuperStructure extends SubsystemBase {
 
     // Subsystems
     private final Hopper hopper;
+    private final Shooter shooter;
 
     /** Creates a new SuperStructure. */
-    public SuperStructure(Hopper hopper) {
+    public SuperStructure(Hopper hopper, Shooter shooter) {
         this.hopper = hopper;
+        this.shooter = shooter;
     }
 
     @Override
@@ -33,30 +37,41 @@ public class SuperStructure extends SubsystemBase {
             switch (wantedState) {
                 case START:
                     hopper.setDesiredState(HopperState.IDLE);
+                    shooter.setDesiredState(ShooterState.STATIONARY);
                     break;
                 case IDLE:
                     hopper.setDesiredState(HopperState.IDLE);
+                    shooter.setDesiredState(ShooterState.IDLE);
                     break;
                 case INTAKE:
                     hopper.setDesiredState(HopperState.REVERSING);
+                    // shooter.setDesiredState(ShooterState.IDLE);
                     break;
                 case PASS:
                     hopper.setDesiredState(HopperState.FEEDING);
+                    shooter.setDesiredState(ShooterState.SHOOTING);
                     break;
                 case FEED:
                     hopper.setDesiredState(HopperState.FEEDING);
+                    shooter.setDesiredState(ShooterState.SHOOTING);
+                    break;
+                case SHOOTER_PREP:
+                    hopper.setDesiredState(HopperState.IDLE);
+                    shooter.setDesiredState(ShooterState.SHOOTING);
                     break;
                 case SHOOT:
                     hopper.setDesiredState(HopperState.FEEDING);
+                    shooter.setDesiredState(ShooterState.SHOOTING);
                     break;
                 case CLIMB:
                     hopper.setDesiredState(HopperState.IDLE);
+                    shooter.setDesiredState(ShooterState.STATIONARY);
                     break;
                 // Add additional cases as needed
                 default:
                     throw new IllegalStateException("Unexpected value: " + wantedState);
             }
-            if (hopper.isAtWantedState()) {
+            if (hopper.isAtWantedState() && shooter.isAtWantedState()) {
                 currentState = wantedState;
             }
         }

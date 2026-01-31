@@ -103,7 +103,7 @@ public class ShooterIOGreyT implements ShooterIO {
 
         inputs.hoodAngle.mut_replace(getHoodServoPosition());
         inputs.atTargetVelocity = flywheelMotor1.getClosedLoopError().getValue() < SHOOTER_TOLERANCE_RPM;
-        inputs.atTargetAngle = true; // Hood angle feedback not implemented yet
+        inputs.atTargetAngle = hoodServo1.isFinished() && hoodServo2.isFinished();
     }
 
     /**
