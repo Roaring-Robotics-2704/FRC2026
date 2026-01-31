@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Feet;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
@@ -14,7 +15,6 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -39,6 +39,9 @@ import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.HopperIO;
 import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
 import frc.robot.subsystems.superstructure.hopper.HopperIOSim;
+import frc.robot.subsystems.superstructure.shooter.Shooter;
+import frc.robot.subsystems.superstructure.shooter.ShooterIO;
+import frc.robot.subsystems.superstructure.shooter.ShooterIOGreyT;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 //import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -57,15 +60,13 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final CANBus rioBus = CANBus.roboRIO();
-    private final CANBus driveBus = new CANBus("Drivetrain");
     private final Hopper hopper;
+    private final Shooter shooter;
 
     private final Vision vision;
 
-    //SuperStructure
+    // SuperStructure
     private final SuperStructure superStructure;
-
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -112,6 +113,7 @@ public class RobotContainer {
                         drive::addVisionMeasurement,
                         new VisionIOPhotonVision(camera0Name, robotToCamera0),
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
+                shooter = new Shooter(new ShooterIOGreyT(), () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
 
             case SIM:
@@ -129,6 +131,8 @@ public class RobotContainer {
                         drive::addVisionMeasurement,
                         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+                shooter = new Shooter(new ShooterIO() {
+                }, () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
 
             default:
@@ -144,15 +148,19 @@ public class RobotContainer {
                         },
                         new ModuleIO() {
                         });
-                hopper = new Hopper(new HopperIO() {});
+                hopper = new Hopper(new HopperIO() {
+                });
 
                 vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
-                }, new VisionIO() {});
+                }, new VisionIO() {
+                });
+                shooter = new Shooter(new ShooterIO() {
+                }, () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
         }
 
         // Set up superstructure
-        superStructure = new SuperStructure(hopper);
+        superStructure = new SuperStructure(hopper, shooter);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -197,6 +205,7 @@ public class RobotContainer {
                         () -> -controller.getLeftY(),
                         () -> -controller.getLeftX(),
                         () -> -controller.getRightX()));
+        vision.setDefaultCommand(vision.idle());
 
         // Lock to 0 deg when A button is held
         controller
@@ -213,22 +222,29 @@ public class RobotContainer {
 
         // Reset gyro to 0 deg when B button is pressed
 
+        // Lock to 0 deg when A button is held
+        controller
+                .a()
+                .whileTrue(
+                        DriveCommands.joystickDriveAtAngle(
+                                drive,
+                                () -> -controller.getLeftY(),
+                                () -> -controller.getLeftX(),
+                                () -> Rotation2d.kZero));
+
+        controller.leftTrigger().onTrue(superStructure.goToState(WantedState.INTAKE));
+        controller.rightTrigger().onTrue(superStructure.goToState(WantedState.SHOOT));
+
+        // Reset gyro to 0 deg when B button is pressed
+
         controller
                 .b()
                 .onTrue(
                         Commands.runOnce(
                                 () -> drive.setPose(
-                                        new Pose2d(
-                                            drive.getPose().getTranslation(),
-                                            Rotation2d.kZero)),
+                                        new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                                 drive)
                                 .ignoringDisable(true));
-
-        controller.leftTrigger().onTrue(superStructure.goToState(WantedState.INTAKE));
-        controller.rightTrigger().onTrue(superStructure.goToState(WantedState.SHOOT));
-
-        vision.setDefaultCommand(Commands.idle(vision)); //Idle vision command
-
     }
 
     /**
@@ -237,15 +253,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
+        // Return the selected autonomous command
         return autoChooser.get();
     }
-
-    public CANBus getRIOBus() {
-        return rioBus;
-    }
-    
-    public CANBus getDriveBus() {
-        return driveBus;
-    }
-
 }
