@@ -4,15 +4,29 @@
 
 package frc.robot.subsystems.superstructure.shooter;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Hertz;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.CURRENT_LIMIT;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.FLYWHEEL_MOTOR_ONE;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.FLYWHEEL_MOTOR_TWO;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.HOOD_SERVO1_PORT;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.HOOD_SERVO2_PORT;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MAX_ANGLE;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KA;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KD;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KI;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KP;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KS;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KV;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TOLERANCE_RPM;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.StatusSignalCollection;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.CustomParamsConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.ParentDevice;
@@ -25,14 +39,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Servo;
 import frc.robot.util.PhoenixUtil;
-
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Hertz;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.*;
 
 /** Add your docs here. */
 public class ShooterIOGreyT implements ShooterIO {
@@ -41,7 +49,6 @@ public class ShooterIOGreyT implements ShooterIO {
     private StatusSignal<Voltage> flywheelAppliedVoltsSignal;
     private StatusSignal<Current> flywheelCurrentAmpsSignal;
     private StatusSignalCollection statusSignals = new StatusSignalCollection();
-    private Angle hoodAngle;
 
     private TalonFX flywheelMotor1;
     private TalonFX flywheelMotor2;
@@ -50,6 +57,7 @@ public class ShooterIOGreyT implements ShooterIO {
     private LinearServo hoodServo1 = new LinearServo(HOOD_SERVO1_PORT, 100, 30);
     private LinearServo hoodServo2 = new LinearServo(HOOD_SERVO2_PORT, 100, 30);
 
+    /** Constructs the GreyT shooter code. */
     public ShooterIOGreyT() {
         flywheelMotor1 = new TalonFX(FLYWHEEL_MOTOR_ONE);
         flywheelMotor2 = new TalonFX(FLYWHEEL_MOTOR_TWO);
@@ -131,7 +139,6 @@ public class ShooterIOGreyT implements ShooterIO {
                 / (MAX_ANGLE.in(Degrees) - MIN_ANGLE.in(Degrees));
         hoodServo1.setPosition(servoPosition * 100);
         hoodServo2.setPosition(servoPosition * 100);
-        hoodAngle = angle;
     }
 
     private Angle getHoodServoPosition() {

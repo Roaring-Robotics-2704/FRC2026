@@ -5,16 +5,19 @@
 package frc.robot.subsystems.superstructure.shooter;
 
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.*;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_IDLE_RPM;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TARGET_RPM;
+
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/** The shooter subsystem. */
 public class Shooter extends SubsystemBase {
 
     private ShooterState currentState = ShooterState.STATIONARY;
@@ -71,20 +74,35 @@ public class Shooter extends SubsystemBase {
         // This method will be called once per scheduler run
     }
 
+    /**
+     * Sets the desired state of the shooter.
+     *
+     * @param state The desired ShooterState.
+     */
     public void setDesiredState(ShooterState state) {
 
         this.desiredState = state;
 
     }
 
+    /** Returns the current state of the shooter.
+     *
+     * @return The current ShooterState.
+     */
     public ShooterState getCurrentState() {
         return currentState;
     }
+
+    /** Checks if the shooter is at the desired state.
+     *
+     * @return true if the current state matches the desired state, false otherwise.
+     */
 
     public boolean isAtWantedState() {
         return currentState == desiredState;
     }
 
+    /** Possible states for the shooter subsystem. */
     public enum ShooterState {
         STATIONARY, IDLE, SHOOTING
     }

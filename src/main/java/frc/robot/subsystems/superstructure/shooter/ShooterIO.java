@@ -25,6 +25,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 /** Creates a new ShooterIO. */
 public interface ShooterIO { // creates and sets baseline values of robot for logging
+    /** Inputs for the ShooterIO. */
     @AutoLog
     public static class ShooterIOInputs {
         public MutAngle hoodAngle = Degrees.mutable(0);
@@ -43,6 +44,7 @@ public interface ShooterIO { // creates and sets baseline values of robot for lo
     // voltage methods for flywheel and hood
     default void setFlywheelVoltage(Voltage voltage) {
     }
+    
     default void setHoodVoltage(Voltage voltage) {
     }
 

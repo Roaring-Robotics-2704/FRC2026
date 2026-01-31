@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.math.MathUtil;
 
+/** Linear Servo class for controlling linear actuators. */
 public class LinearServo extends Servo {
     double speed;
     double length;
