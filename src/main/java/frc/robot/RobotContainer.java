@@ -13,16 +13,12 @@ import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
-import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -209,6 +205,7 @@ public class RobotContainer {
                         () -> -controller.getLeftY(),
                         () -> -controller.getLeftX(),
                         () -> -controller.getRightX()));
+        vision.setDefaultCommand(vision.idle());
 
         // Lock to 0 deg when A button is held
         controller

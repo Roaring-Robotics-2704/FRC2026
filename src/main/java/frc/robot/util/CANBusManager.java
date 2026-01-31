@@ -6,9 +6,7 @@ package frc.robot.util;
 
 import com.ctre.phoenix6.CANBus;
 
-import edu.wpi.first.wpilibj.CAN;
-
-/** Add your docs here. */
+/** Manages multiple CAN buses for the robot. */
 public class CANBusManager {
     private static CANBusManager instance;
 
