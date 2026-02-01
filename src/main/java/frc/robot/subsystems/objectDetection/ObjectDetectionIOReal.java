@@ -19,11 +19,11 @@ import edu.wpi.first.math.geometry.Translation3d;
 /** Add your docs here. */
 public class ObjectDetectionIOReal implements ObjectDetectionIO {
     PhotonCamera camera;
-    Translation3d cameraToRobotTransform;
+    Transform3d cameraToRobotTransform;
 
-    public ObjectDetectionIOReal(String cameraName, Transform3d cameratorobottransform2) {
+    public ObjectDetectionIOReal(String cameraName, Transform3d cameraToRobotTransform) {
         camera = new PhotonCamera(cameraName);
-        this.cameraToRobotTransform = cameratorobottransform2;
+        this.cameraToRobotTransform = cameraToRobotTransform;
     }
 
     @Override
