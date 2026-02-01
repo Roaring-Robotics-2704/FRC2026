@@ -27,10 +27,10 @@ public final class Constants {
      * <p>Determines how the system should behave with respect to hardware, timing,
      * and data sources:
      * <ul>
-     *   <li>{@link #REAL} — Running on the physical robot; use real hardware and sensors.</li>
-     *   <li>{@link #SIM} — Running in a physics simulator; substitute simulated
+     *   <li>{@link #REAL} Running on the physical robot; use real hardware and sensors.</li>
+     *   <li>{@link #SIM} Running in a physics simulator; substitute simulated
      *       sensors/actuators and physics-driven timing.</li>
-     *   <li>{@link #REPLAY} — Replaying from recorded logs; use recorded sensor inputs
+     *   <li>{@link #REPLAY} Replaying from recorded logs; use recorded sensor inputs
      *       and deterministic playback semantics.</li>
      * </ul>
      *
