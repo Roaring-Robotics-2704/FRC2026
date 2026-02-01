@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.superstructure.example;
 
-import com.ctre.phoenix6.CANBus;
 
 
 /** Constants for ExampleMech. */

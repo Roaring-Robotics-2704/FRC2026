@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Example mechanism subsystem using superstructure structuring. */
