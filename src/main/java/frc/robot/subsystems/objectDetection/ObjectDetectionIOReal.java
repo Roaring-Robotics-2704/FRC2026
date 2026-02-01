@@ -14,7 +14,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 
 /** Add your docs here. */
 public class ObjectDetectionIOReal implements ObjectDetectionIO {

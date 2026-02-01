@@ -216,6 +216,7 @@ public class RobotContainer {
                         () -> -controller.getLeftX(),
                         () -> -controller.getRightX()));
         vision.setDefaultCommand(vision.idle());
+        objectDetection.setDefaultCommand(objectDetection.idle());
 
         // Lock to 0 deg when A button is held
         controller
