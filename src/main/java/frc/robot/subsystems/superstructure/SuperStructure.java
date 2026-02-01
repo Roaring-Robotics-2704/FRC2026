@@ -25,7 +25,7 @@ public class SuperStructure extends SubsystemBase {
     private final Shooter shooter;
 
     /** Creates a new SuperStructure. */
-    public SuperStructure(Hopper hopper, Shooter shooter, Intake intake) {
+    public SuperStructure(Intake intake, Hopper hopper, Shooter shooter) {
         this.hopper = hopper;
         this.shooter = shooter;
         this.intake = intake;
