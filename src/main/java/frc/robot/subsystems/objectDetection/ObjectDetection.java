@@ -4,6 +4,15 @@
 
 package frc.robot.subsystems.objectDetection;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.cameraToRobotTransform;
+import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.fuelHeight;
+
+import java.util.ArrayList;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,15 +21,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.*;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.function.Supplier;
 
 public class ObjectDetection extends SubsystemBase {
     private final ObjectDetectionIO io;
@@ -45,8 +45,8 @@ public class ObjectDetection extends SubsystemBase {
             ArrayList<Pose2d> fuelPoses = new ArrayList<>();
             for (ObjectDetectionIO.TargetObservation observation : inputs.targetObservations) {
                 Pose2d fuelPose = getFuelPose(
-                    observation.tx().getMeasure(), 
-                    observation.ty().getMeasure(),
+                    observation.pitch().getMeasure(), 
+                    observation.yaw().getMeasure(),
                     robotPose);
                 fuelPoses.add(fuelPose);
             }
@@ -63,17 +63,17 @@ public class ObjectDetection extends SubsystemBase {
      * @param ty The vertical angle to the target.
      * @return The pose of the fuel cell relative to the camera.
      */
-    public Pose2d getFuelPose(Angle tx, Angle ty, Pose2d robotPose) {
-        Angle angleToTargetY = cameraAngley.plus(tx);
-        Distance distanceX = Inches.of(
-            Math.tan(angleToTargetY.in(Radians)) 
+    public Pose2d getFuelPose(Angle pitch, Angle yaw, Pose2d robotPose) {
+        Angle angleToTargetPitch = cameraAngley.plus(pitch);
+        Distance distanceY = Inches.of( // Distance straight outwards from the camera
+            Math.tan(angleToTargetPitch.in(Radians)) 
             * (cameraHeight.in(Inches) - fuelHeight.in(Inches)));
 
-        Angle angleToTargetX = cameraAnglex.plus(ty);
-        Distance distanceY = Inches.of(
-            Math.tan(angleToTargetX.in(Radians)) 
-            * distanceX.in(Inches));
-        return robotPose.plus(new Transform2d(distanceX, distanceY, robotPose.getRotation()));
+        Angle angleToTargetYaw = cameraAnglex.plus(yaw);
+        Distance distanceX = Inches.of( // Distance side to side from the camera
+            Math.tan(angleToTargetYaw.in(Radians)) 
+            * distanceY.in(Inches));
+        return robotPose.plus(new Transform2d(distanceY, distanceX, robotPose.getRotation()));
     }
 
     /** 
