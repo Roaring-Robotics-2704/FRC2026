@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -30,6 +31,7 @@ public class Robot extends LoggedRobot {
     private Command autonomousCommand;
     private RobotContainer robotContainer;
 
+    /** Create a new Robot. */
     public Robot() {
         // Record metadata
         Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -39,11 +41,11 @@ public class Robot extends LoggedRobot {
         Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
         Logger.recordMetadata(
                 "GitDirty",
-                switch (BuildConstants.DIRTY) {
-                    case 0 -> "All changes committed";
-                    case 1 -> "Uncommitted changes";
-                    default -> "Unknown";
-                });
+            switch (BuildConstants.DIRTY) {
+                case 0 -> "All changes committed";
+                case 1 -> "Uncommitted changes";
+                default -> "Unknown";
+            });
 
         // Set up data receivers & replay source
         switch (Constants.currentMode) {
@@ -63,9 +65,14 @@ public class Robot extends LoggedRobot {
                 setUseTiming(false); // Run as fast as possible
                 String logPath = LogFileUtil.findReplayLog();
                 Logger.setReplaySource(new WPILOGReader(logPath));
-                Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+                Logger.addDataReceiver(
+                    new WPILOGWriter(
+                        LogFileUtil.addPathSuffix(logPath, "_sim")
+                    ));
                 break;
-        }
+            default:
+                break;
+        };
         // Register URCL
         Logger.registerURCL(URCL.startExternal());
         // Start AdvantageKit logger
@@ -80,7 +87,7 @@ public class Robot extends LoggedRobot {
     public void robotPeriodic() {
         // Optionally switch the thread to high priority to improve loop
         // timing (see the template project documentation for details)
-        // Threads.setCurrentThreadPriority(true, 99);
+        Threads.setCurrentThreadPriority(true, 99);
 
         // Runs the Scheduler. This is responsible for polling buttons, adding
         // newly-scheduled commands, running already-scheduled commands, removing
@@ -90,7 +97,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
 
         // Return to non-RT thread priority (do not modify the first argument)
-        // Threads.setCurrentThreadPriority(false, 10);
+        Threads.setCurrentThreadPriority(false, 10);
     }
 
     /** This function is called once when the robot is disabled. */

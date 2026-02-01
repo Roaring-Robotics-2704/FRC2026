@@ -13,23 +13,24 @@ import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Voltage;
 
 /** Hopper IO branch. */
 public interface HopperIO {
     /** Hopper IO inputs. */
     @AutoLog
-    public class HopperIOInputs {
+    public static class HopperIOInputs {
         public MutCurrent currentDraw = Amps.mutable(0);
         public MutVoltage appliedVoltage = Volts.mutable(0);
         public MutAngularVelocity motorVelocity = RotationsPerSecond.mutable(0);
     }
 
-    default void updateInputs(HopperIOInputs inputs) {
+    public default void updateInputs(HopperIOInputs inputs) {
     }
 
-    default void setMotorVoltage(MutVoltage voltage) {
+    public default void setMotorVoltage(Voltage voltage) {
     }
 
-    default void stopMotor() {
+    public default void stopMotor() {
     }
 }

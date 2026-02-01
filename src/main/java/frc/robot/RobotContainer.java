@@ -7,30 +7,28 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
-import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import frc.robot.subsystems.superstructure.SuperStructure;
+import frc.robot.subsystems.superstructure.hopper.Hopper;
+import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
+import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.vision.Vision;
-import static frc.robot.subsystems.vision.VisionConstants.*;
-import frc.robot.subsystems.vision.VisionIO;
 //import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -44,7 +42,13 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final Hopper hopper;
+    private final Shooter shooter;
+
     private final Vision vision;
+
+    // SuperStructure
+    private final SuperStructure superStructure;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -86,10 +90,12 @@ public class RobotContainer {
                 // new ModuleIOTalonFXS(TunerConstants.BackLeft),
                 // new ModuleIOTalonFXS(TunerConstants.BackRight));
 
+                hopper = new Hopper(new HopperIOReal());
                 vision = new Vision(
                         drive::addVisionMeasurement,
                         new VisionIOPhotonVision(camera0Name, robotToCamera0),
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
+                shooter = new Shooter(new ShooterIOGreyT(), () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
 
             case SIM:
@@ -101,11 +107,14 @@ public class RobotContainer {
                         new ModuleIOSim(TunerConstants.FrontRight),
                         new ModuleIOSim(TunerConstants.BackLeft),
                         new ModuleIOSim(TunerConstants.BackRight));
+                hopper = new Hopper(new HopperIOSim());
 
                 vision = new Vision(
                         drive::addVisionMeasurement,
                         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+                shooter = new Shooter(new ShooterIO() {
+                }, () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
 
             default:
@@ -121,21 +130,30 @@ public class RobotContainer {
                         },
                         new ModuleIO() {
                         });
+                hopper = new Hopper(new HopperIO() {
+                });
 
                 vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
                 }, new VisionIO() {
                 });
+                shooter = new Shooter(new ShooterIO() {
+                }, () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
         }
+
+        // Set up superstructure
+        superStructure = new SuperStructure(hopper, shooter);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         // Set up SysId routines
         autoChooser.addOption(
-                "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+                "Drive Wheel Radius Characterization",
+                DriveCommands.wheelRadiusCharacterization(drive));
         autoChooser.addOption(
-                "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+                "Drive Simple FF Characterization",
+                DriveCommands.feedforwardCharacterization(drive));
         autoChooser.addOption(
                 "Drive SysId (Quasistatic Forward)",
                 drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -143,9 +161,11 @@ public class RobotContainer {
                 "Drive SysId (Quasistatic Reverse)",
                 drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
         autoChooser.addOption(
-                "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+                "Drive SysId (Dynamic Forward)",
+                drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
         autoChooser.addOption(
-                "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+                "Drive SysId (Dynamic Reverse)",
+                drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
         // Configure the button bindings
         configureButtonBindings();
@@ -167,6 +187,7 @@ public class RobotContainer {
                         () -> -controller.getLeftY(),
                         () -> -controller.getLeftX(),
                         () -> -controller.getRightX()));
+        vision.setDefaultCommand(vision.idle());
 
         // Lock to 0 deg when A button is held
         controller
@@ -180,6 +201,21 @@ public class RobotContainer {
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+
+        // Reset gyro to 0 deg when B button is pressed
+
+        // Lock to 0 deg when A button is held
+        controller
+                .a()
+                .whileTrue(
+                        DriveCommands.joystickDriveAtAngle(
+                                drive,
+                                () -> -controller.getLeftY(),
+                                () -> -controller.getLeftX(),
+                                () -> Rotation2d.kZero));
+
+        controller.leftTrigger().onTrue(superStructure.goToState(WantedState.INTAKE));
+        controller.rightTrigger().onTrue(superStructure.goToState(WantedState.SHOOT));
 
         // Reset gyro to 0 deg when B button is pressed
 
@@ -199,6 +235,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
+        // Return the selected autonomous command
         return autoChooser.get();
     }
 }

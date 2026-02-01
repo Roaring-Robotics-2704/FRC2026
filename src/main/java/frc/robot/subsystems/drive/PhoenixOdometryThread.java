@@ -24,8 +24,7 @@ import java.util.function.DoubleSupplier;
  * Provides an interface for asynchronously reading high-frequency measurements
  * to a set of queues.
  *
- * <p>
- * This version is intended for Phoenix 6 devices on both the RIO and CANivore
+ * <p>This version is intended for Phoenix 6 devices on both the RIO and CANivore
  * buses. When using
  * a CANivore, the thread uses the "waitForAll" blocking method to enable more
  * consistent sampling.
@@ -34,7 +33,8 @@ import java.util.function.DoubleSupplier;
  * time synchronization.
  */
 public class PhoenixOdometryThread extends Thread {
-    private final Lock signalsLock = new ReentrantLock(); // Prevents conflicts when registering signals
+    private final Lock signalsLock = 
+        new ReentrantLock(); // Prevents conflicts when registering signals
     private BaseStatusSignal[] phoenixSignals = new BaseStatusSignal[0];
     private final List<DoubleSupplier> genericSignals = new ArrayList<>();
     private final List<Queue<Double>> phoenixQueues = new ArrayList<>();
@@ -48,8 +48,7 @@ public class PhoenixOdometryThread extends Thread {
      * Returns the singleton instance of PhoenixOdometryThread, creating it on first
      * use.
      *
-     * <p>
-     * This method performs lazy initialization of the singleton. It is not
+     * <p>This method performs lazy initialization of the singleton. It is not
      * synchronized; if multiple threads may call this concurrently, consider
      * making the initialization thread-safe (for example, by synchronizing the
      * method, using double-checked locking, or initializing the instance eagerly).
