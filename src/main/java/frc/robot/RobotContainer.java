@@ -31,6 +31,10 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.objectDetection.ObjectDetection;
+import frc.robot.subsystems.objectDetection.ObjectDetectionConstants;
+import frc.robot.subsystems.objectDetection.ObjectDetectionIO;
+import frc.robot.subsystems.objectDetection.ObjectDetectionIOReal;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
@@ -65,6 +69,7 @@ public class RobotContainer {
     private final Shooter shooter;
 
     private final Vision vision;
+    private final ObjectDetection objectDetection;
 
     // SuperStructure
     private final SuperStructure superStructure;
@@ -114,6 +119,7 @@ public class RobotContainer {
                         drive::addVisionMeasurement,
                         new VisionIOPhotonVision(camera0Name, robotToCamera0),
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
+                objectDetection = new ObjectDetection(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName, ObjectDetectionConstants.cameraToRobotTransform), drive::getPose);
                 shooter = new Shooter(new ShooterIOGreyT(), () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
 
@@ -132,6 +138,7 @@ public class RobotContainer {
                         drive::addVisionMeasurement,
                         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+                objectDetection = new ObjectDetection(new ObjectDetectionIO() {}, drive::getPose);
                 shooter = new Shooter(new ShooterIO() {
                 }, () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
@@ -153,8 +160,10 @@ public class RobotContainer {
                 });
 
                 vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
-                }, new VisionIO() {
-                });
+                }, new VisionIO() {});
+                objectDetection = new ObjectDetection(new ObjectDetectionIO() {}, drive::getPose);
+
+
                 shooter = new Shooter(new ShooterIO() {
                 }, () -> Feet.of(0)); // TODO: Add distance supplier
                 break;

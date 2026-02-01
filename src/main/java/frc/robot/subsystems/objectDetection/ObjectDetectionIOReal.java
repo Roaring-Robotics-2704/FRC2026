@@ -13,6 +13,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 
 /** Add your docs here. */
@@ -20,9 +21,9 @@ public class ObjectDetectionIOReal implements ObjectDetectionIO {
     PhotonCamera camera;
     Translation3d cameraToRobotTransform;
 
-    public ObjectDetectionIOReal(String cameraName, Translation3d cameraToRobotTransform) {
+    public ObjectDetectionIOReal(String cameraName, Transform3d cameratorobottransform2) {
         camera = new PhotonCamera(cameraName);
-        this.cameraToRobotTransform = cameraToRobotTransform;
+        this.cameraToRobotTransform = cameratorobottransform2;
     }
 
     @Override
