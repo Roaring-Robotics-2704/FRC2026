@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.Hopper.HopperState;
+import frc.robot.subsystems.superstructure.intake.Intake;
+import frc.robot.subsystems.superstructure.intake.Intake.IntakeState;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.superstructure.shooter.Shooter.ShooterState;
 
@@ -18,13 +20,15 @@ public class SuperStructure extends SubsystemBase {
     private WantedState currentState = WantedState.IDLE;
 
     // Subsystems
+    private final Intake intake;
     private final Hopper hopper;
     private final Shooter shooter;
 
     /** Creates a new SuperStructure. */
-    public SuperStructure(Hopper hopper, Shooter shooter) {
+    public SuperStructure(Intake intake, Hopper hopper, Shooter shooter) {
         this.hopper = hopper;
         this.shooter = shooter;
+        this.intake = intake;
     }
 
     @Override
@@ -36,22 +40,27 @@ public class SuperStructure extends SubsystemBase {
             // simplicity
             switch (wantedState) {
                 case START:
+                    intake.setDesiredState(IntakeState.INSIDE);
                     hopper.setDesiredState(HopperState.IDLE);
                     shooter.setDesiredState(ShooterState.STATIONARY);
                     break;
                 case IDLE:
+                    intake.setDesiredState(IntakeState.STOWED);
                     hopper.setDesiredState(HopperState.IDLE);
                     shooter.setDesiredState(ShooterState.IDLE);
                     break;
                 case INTAKE:
+                    intake.setDesiredState(IntakeState.DEPLOYED_ON);
                     hopper.setDesiredState(HopperState.REVERSING);
                     // shooter.setDesiredState(ShooterState.IDLE);
                     break;
                 case PASS:
+                    intake.setDesiredState(IntakeState.STOWED);
                     hopper.setDesiredState(HopperState.FEEDING);
                     shooter.setDesiredState(ShooterState.SHOOTING);
                     break;
                 case FEED:
+                    intake.setDesiredState(IntakeState.DEPLOYED_ON);
                     hopper.setDesiredState(HopperState.FEEDING);
                     shooter.setDesiredState(ShooterState.SHOOTING);
                     break;
@@ -60,12 +69,20 @@ public class SuperStructure extends SubsystemBase {
                     shooter.setDesiredState(ShooterState.SHOOTING);
                     break;
                 case SHOOT:
+                    intake.setDesiredState(IntakeState.STOWED);
                     hopper.setDesiredState(HopperState.FEEDING);
                     shooter.setDesiredState(ShooterState.SHOOTING);
                     break;
                 case CLIMB:
+                    intake.setDesiredState(IntakeState.INSIDE);
                     hopper.setDesiredState(HopperState.IDLE);
                     shooter.setDesiredState(ShooterState.STATIONARY);
+                    break;
+                case INTAKE_CALIBRATE_IN:
+                    intake.setDesiredState(IntakeState.CALIBRATE_IN);
+                    break;
+                case INTAKE_CALIBRATE_OUT:
+                    intake.setDesiredState(IntakeState.CALIBRATE_OUT);
                     break;
                 // Add additional cases as needed
                 default:
