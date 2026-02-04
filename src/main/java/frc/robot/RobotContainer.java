@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Feet;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
@@ -24,7 +23,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -33,6 +31,10 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.objectDetection.ObjectDetection;
+import frc.robot.subsystems.objectDetection.ObjectDetectionConstants;
+import frc.robot.subsystems.objectDetection.ObjectDetectionIO;
+import frc.robot.subsystems.objectDetection.ObjectDetectionIOReal;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
@@ -47,6 +49,9 @@ import frc.robot.subsystems.vision.VisionIO;
 //import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
+import static edu.wpi.first.units.Units.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -64,6 +69,7 @@ public class RobotContainer {
     private final Shooter shooter;
 
     private final Vision vision;
+    private final ObjectDetection objectDetection;
 
     // SuperStructure
     private final SuperStructure superStructure;
@@ -113,6 +119,7 @@ public class RobotContainer {
                         drive::addVisionMeasurement,
                         new VisionIOPhotonVision(camera0Name, robotToCamera0),
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
+                objectDetection = new ObjectDetection(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName, ObjectDetectionConstants.cameraToRobotTransform), drive::getPose);
                 shooter = new Shooter(new ShooterIOGreyT(), () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
 
@@ -131,6 +138,7 @@ public class RobotContainer {
                         drive::addVisionMeasurement,
                         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+                objectDetection = new ObjectDetection(new ObjectDetectionIO() {}, drive::getPose);
                 shooter = new Shooter(new ShooterIO() {
                 }, () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
@@ -152,8 +160,10 @@ public class RobotContainer {
                 });
 
                 vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
-                }, new VisionIO() {
-                });
+                }, new VisionIO() {});
+                objectDetection = new ObjectDetection(new ObjectDetectionIO() {}, drive::getPose);
+
+
                 shooter = new Shooter(new ShooterIO() {
                 }, () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
@@ -206,6 +216,7 @@ public class RobotContainer {
                         () -> -controller.getLeftX(),
                         () -> -controller.getRightX()));
         vision.setDefaultCommand(vision.idle());
+        objectDetection.setDefaultCommand(objectDetection.idle());
 
         // Lock to 0 deg when A button is held
         controller

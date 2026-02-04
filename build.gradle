@@ -193,7 +193,6 @@ checkstyle {
     configProperties = [ "suppressionFile" : file('suppressions-check.xml')]
 
     configFile = file("checkstyle.xml")
-    configProperties = [ "suppressionFile" : file('suppressions.xml')]
 }
 
 // Configure Checkstyle task reporting and failure behavior
