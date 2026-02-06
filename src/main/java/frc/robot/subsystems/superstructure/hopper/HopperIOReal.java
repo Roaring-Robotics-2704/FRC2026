@@ -4,17 +4,56 @@
 
 package frc.robot.subsystems.superstructure.hopper;
 
-/** Real implementation of the hopper */
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.subsystems.superstructure.hopper.HopperConstants.HOPPER_CURRENT_LIMIT;
+import static frc.robot.subsystems.superstructure.hopper.HopperConstants.HOPPER_MOTOR_ID;
+
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.units.measure.Voltage;
+import frc.robot.util.SparkUtil;
+
+/** Real implementation of the hopper. */
 public class HopperIOReal implements HopperIO {
-	
 
-	public HopperIOReal() {
-		
-	}
+    SparkMax hopperMotor = new SparkMax(HOPPER_MOTOR_ID, SparkMax.MotorType.kBrushless);
 
-	@Override
-	public void updateInputs(HopperIOInputs inputs) { 
-		
-	}
+    /** Instantiates the Real Hopper hardware. */
+    public HopperIOReal() {
+        SparkMaxConfig hopperConfig = new SparkMaxConfig();
+        hopperConfig.idleMode(IdleMode.kCoast);
+        hopperConfig.smartCurrentLimit(HOPPER_CURRENT_LIMIT);
+        SparkUtil.tryUntilOk(hopperMotor, 5,
+            () -> hopperMotor.configure(hopperConfig,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters)
+        );
+
+    }
+
+    @Override
+    public void updateInputs(HopperIOInputs inputs) {
+        inputs.currentDraw.mut_replace(Amps.of(hopperMotor.getOutputCurrent()));
+        inputs.appliedVoltage.mut_replace(Volts.of(hopperMotor.getAppliedOutput()));
+        inputs.motorVelocity.mut_replace(RotationsPerSecond.of(
+            hopperMotor.getEncoder().getVelocity()
+        ));
+    }
+
+    @Override
+    public void setMotorVoltage(Voltage voltage) {
+        hopperMotor.setVoltage(voltage);
+    }
+
+    @Override
+    public void stopMotor() {
+        hopperMotor.stopMotor();
+    }
 
 }
