@@ -1,7 +1,10 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.Stack;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.AutoLogOutput;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -19,6 +22,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.objectDetection.ObjectDetection.FuelPoseEstimate;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.poseEst.OdometrySwerveDrivePoseEstimator;
 import frc.robot.subsystems.vision.Vision.IndividualTagEstimate;
@@ -46,7 +51,7 @@ public class RobotState {
         // }
     }
 
-    public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(Drive.getModuleTranslations());
+    public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(DriveConstants.moduleTranslations);
     private Rotation2d rawGyroRotation = Rotation2d.kZero;
 
     // For delta tracking
@@ -219,6 +224,7 @@ public class RobotState {
         return robotVelocity;
     }
 
+
     /**
      * Gets the robot's linear velocity in meters per second.
      * @return
@@ -229,5 +235,18 @@ public class RobotState {
 
     public ChassisSpeeds getFieldVelocity() {
         return ChassisSpeeds.fromRobotRelativeSpeeds(robotVelocity, getRotation());
+    }
+
+    private Stack<FuelPoseEstimate> fuelPoseEstimates = new Stack<>();
+    public void addFuelPose(FuelPoseEstimate poseEstimate) {
+        fuelPoseEstimates.push(poseEstimate);
+        updateFuelPoseEstimates();
+    }
+    public Stack<FuelPoseEstimate> getFuelPoseEstimates() {
+        updateFuelPoseEstimates();
+        return fuelPoseEstimates;
+    }
+    public void updateFuelPoseEstimates() {
+        fuelPoseEstimates.removeIf(pe -> Timer.getTimestamp() - pe.timestamp().in(Seconds) > 5.0);
     }
 }

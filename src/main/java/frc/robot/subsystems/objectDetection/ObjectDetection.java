@@ -7,6 +7,7 @@ package frc.robot.subsystems.objectDetection;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.cameraToRobotTransform;
 import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.fuelHeight;
 
@@ -20,7 +21,11 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotState;
 
 public class ObjectDetection extends SubsystemBase {
     private final ObjectDetectionIO io;
@@ -49,11 +54,13 @@ public class ObjectDetection extends SubsystemBase {
                     observation.yaw().getMeasure(),
                     robotPose);
                 fuelPoses.add(fuelPose);
+                RobotState.getInstance().addFuelPose(new FuelPoseEstimate(fuelPose, Seconds.of(Timer.getFPGATimestamp())));
             }
             fuelPoses = sortPosesByDistance(fuelPoses);
             Pose2d[] fuelPosesArray = new Pose2d[fuelPoses.size()];
             fuelPosesArray = fuelPoses.toArray(fuelPosesArray);
             Logger.recordOutput("Object Detection/Fuel Poses",  fuelPosesArray);
+
         }
     }
 
@@ -91,5 +98,7 @@ public class ObjectDetection extends SubsystemBase {
             return Double.compare(distanceA.in(Inches), distanceB.in(Inches));
         });
         return poses;
+    }
+    public static record  FuelPoseEstimate(Pose2d pose, Time timestamp) {
     }
 }
