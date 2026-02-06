@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.objectdetection.ObjectDetection.FuelPoseEstimate;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.poseEst.OdometrySwerveDrivePoseEstimator;
 import frc.robot.subsystems.vision.Vision.IndividualTagEstimate;
 
@@ -45,9 +46,9 @@ public class RobotState {
 
     private RobotState() {
         // Private constructor to enforce singleton
-        // for(int i = 1; i <= VisionConstants.aprilTagLayout.getTags().size(); i++) {
-        //     individualTagPoses.put(i, new IndividualTagEstimate(Pose2d.kZero, Double.POSITIVE_INFINITY, -1.0));
-        // }
+        for (int i = 1; i <= VisionConstants.aprilTagLayout.getTags().size(); i++) {
+            individualTagPoses.put(i, new IndividualTagEstimate(Pose2d.kZero, Double.POSITIVE_INFINITY, -1.0));
+        }
     }
 
     public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(DriveConstants.moduleTranslations);
