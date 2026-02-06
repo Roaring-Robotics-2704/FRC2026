@@ -31,6 +31,7 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
 import frc.robot.subsystems.objectDetection.ObjectDetection;
 import frc.robot.subsystems.objectDetection.ObjectDetectionConstants;
 import frc.robot.subsystems.objectDetection.ObjectDetectionIO;
@@ -53,6 +54,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.subsystems.drive.swerve.SwerveDriveSimulation;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -68,6 +70,7 @@ import static edu.wpi.first.units.Units.*;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final SwerveDriveSimulation driveSimulation;
     private final Hopper hopper;
     private final Intake intake;
     private final Shooter shooter;
@@ -95,10 +98,10 @@ public class RobotContainer {
                 // a CANcoder
                 drive = new Drive(
                         new GyroIOPigeon2(),
-                        new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                        new ModuleIOTalonFX(TunerConstants.FrontRight),
-                        new ModuleIOTalonFX(TunerConstants.BackLeft),
-                        new ModuleIOTalonFX(TunerConstants.BackRight));
+                        new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
+                        new ModuleIOTalonFXReal(TunerConstants.FrontRight),
+                        new ModuleIOTalonFXReal(TunerConstants.BackLeft),
+                        new ModuleIOTalonFXReal(TunerConstants.BackRight));
 
                 // The ModuleIOTalonFXS implementation provides an example implementation for
                 // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -123,27 +126,34 @@ public class RobotContainer {
                         drive::addVisionMeasurement,
                         new VisionIOPhotonVision(camera0Name, robotToCamera0),
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
-                objectDetection = new ObjectDetection(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName, ObjectDetectionConstants.cameraToRobotTransform), drive::getPose);
+                objectDetection = new ObjectDetection(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
+                        ObjectDetectionConstants.cameraToRobotTransform), drive::getPose);
                 shooter = new Shooter(new ShooterIOGreyT(), () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
 
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
+                driveSimulation = new SwerveDriveSimulation(DriveConstants.mapleSimConfig,
+                        new Pose2d(3, 3, new Rotation2d()));
+
                 drive = new Drive(
-                        new GyroIO() {
-                        },
-                        new ModuleIOSim(TunerConstants.FrontLeft),
-                        new ModuleIOSim(TunerConstants.FrontRight),
-                        new ModuleIOSim(TunerConstants.BackLeft),
-                        new ModuleIOSim(TunerConstants.BackRight));
-                intake = new Intake(new IntakeIO() {});
+                        new GyroIOSim(driveSimulation::getGyroAngle),
+                        new ModuleIOTalonFXSim(DriveConstants.frontLeftConfig, driveSimulation.getModules()[0]),
+                        new ModuleIOTalonFXSim(DriveConstants.frontRightConfig, driveSimulation.getModules()[1]),
+                        new ModuleIOTalonFXSim(DriveConstants.backLeftConfig, driveSimulation.getModules()[2]),
+                        new ModuleIOTalonFXSim(DriveConstants.backRightConfig, driveSimulation.getModules()[3]));
+                intake = new Intake(new IntakeIO() {
+                });
                 hopper = new Hopper(new HopperIOSim());
 
                 vision = new Vision(
                         drive::addVisionMeasurement,
-                        new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
-                        new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
-                objectDetection = new ObjectDetection(new ObjectDetectionIO() {}, drive::getPose);
+                        new VisionIOPhotonVisionSim(camera0Name, robotToCamera0,
+                                driveSimulation::getSimulatedDriveTrainPose),
+                        new VisionIOPhotonVisionSim(camera1Name, robotToCamera1,
+                                driveSimulation::getSimulatedDriveTrainPose));
+                objectDetection = new ObjectDetection(new ObjectDetectionIO() {
+                }, driveSimulation::getSimulatedDriveTrainPose);
                 shooter = new Shooter(new ShooterIO() {
                 }, () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
@@ -161,13 +171,16 @@ public class RobotContainer {
                         },
                         new ModuleIO() {
                         });
-                intake = new Intake(new IntakeIO() {});
-                hopper = new Hopper(new HopperIO() {});
+                intake = new Intake(new IntakeIO() {
+                });
+                hopper = new Hopper(new HopperIO() {
+                });
 
                 vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
-                }, new VisionIO() {});
-                objectDetection = new ObjectDetection(new ObjectDetectionIO() {}, drive::getPose);
-
+                }, new VisionIO() {
+                });
+                objectDetection = new ObjectDetection(new ObjectDetectionIO() {
+                }, drive::getPose);
 
                 shooter = new Shooter(new ShooterIO() {
                 }, () -> Feet.of(0)); // TODO: Add distance supplier
@@ -272,7 +285,7 @@ public class RobotContainer {
         // Return the selected autonomous command
         return autoChooser.get();
     }
-    
+
     /**
      * Use this to pass the calibration command to the main {@link Robot} class.
      *
@@ -280,6 +293,27 @@ public class RobotContainer {
      */
     public Command getCalibrationCommand() {
         return Commands.sequence(superStructure.goToState(WantedState.INTAKE_CALIBRATE_IN),
-            superStructure.goToState(WantedState.INTAKE_CALIBRATE_OUT));
+                superStructure.goToState(WantedState.INTAKE_CALIBRATE_OUT));
+    }
+
+    public void resetSimulationField() {
+        if (Constants.currentMode != Constants.Mode.SIM)
+            return;
+
+        driveSimulation.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()));
+        SimulatedArena.getInstance().resetFieldForAuto();
+    }
+
+    /** Update the simulation. */
+    public void updateSimulation() {
+        if (Constants.currentMode != Constants.Mode.SIM)
+            return;
+
+        SimulatedArena.getInstance().simulationPeriodic();
+        Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
+        Logger.recordOutput(
+                "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+        Logger.recordOutput(
+                "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
     }
 }

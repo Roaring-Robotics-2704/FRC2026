@@ -7,7 +7,8 @@
   "targetDt":0.05
  },
  "params":{
-  "waypoints":[],
+  "waypoints":[
+    {"x":{"exp":"1.9480291604995728 m", "val":1.9480291604995728}, "y":{"exp":"3.3949568271636963 m", "val":3.3949568271636963}, "heading":{"exp":"3.141592653589793 rad", "val":3.141592653589793}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
