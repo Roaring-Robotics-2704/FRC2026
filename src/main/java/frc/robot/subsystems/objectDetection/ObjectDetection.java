@@ -12,7 +12,6 @@ import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.came
 import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.fuelHeight;
 
 import java.util.ArrayList;
-import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -22,7 +21,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
@@ -33,26 +31,23 @@ public class ObjectDetection extends SubsystemBase {
     private Angle cameraAngley = cameraToRobotTransform.getRotation().getMeasureX();
     private Angle cameraAnglex = cameraToRobotTransform.getRotation().getMeasureY();
     private Distance cameraHeight = cameraToRobotTransform.getTranslation().getMeasureZ();
-    private final Supplier<Pose2d> robotPoseSupplier;
 
     /** Creates a new ObjectDetection. */
-    public ObjectDetection(ObjectDetectionIO io, Supplier<Pose2d> robotPoseSupplier) {
+    public ObjectDetection(ObjectDetectionIO io) {
         this.io = io;
-        this.robotPoseSupplier = robotPoseSupplier;
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Object Detection", inputs);
-        if (inputs.targetObservations.length > 0) {
-            Pose2d robotPose = robotPoseSupplier.get();
+        if (inputs.targetObservations.length > 0) {;
             ArrayList<Pose2d> fuelPoses = new ArrayList<>();
             for (ObjectDetectionIO.TargetObservation observation : inputs.targetObservations) {
                 Pose2d fuelPose = getFuelPose(
                     observation.pitch().getMeasure(), 
                     observation.yaw().getMeasure(),
-                    robotPose);
+                    RobotState.getInstance().getPose());
                 fuelPoses.add(fuelPose);
                 RobotState.getInstance().addFuelPose(new FuelPoseEstimate(fuelPose, Seconds.of(Timer.getFPGATimestamp())));
             }
@@ -89,7 +84,7 @@ public class ObjectDetection extends SubsystemBase {
      * @return The sorted list of poses.
      */
     public ArrayList<Pose2d> sortPosesByDistance(ArrayList<Pose2d> poses) {
-        Pose2d robotPose = robotPoseSupplier.get();
+        Pose2d robotPose = RobotState.getInstance().getPose();
         poses.sort((a, b) -> {
             Distance distanceA = Meters.of(new Translation2d(a.getX(), a.getY())
                 .getDistance(robotPose.getTranslation()));

@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.DriveTuningCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -50,7 +51,6 @@ import frc.robot.subsystems.vision.VisionIO;
 //import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
@@ -71,7 +71,7 @@ import static edu.wpi.first.units.Units.*;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final SwerveDriveSimulation driveSimulation;
+    private SwerveDriveSimulation driveSimulation = null;
     private final Hopper hopper;
     private final Intake intake;
     private final Shooter shooter;
@@ -91,7 +91,9 @@ public class RobotContainer {
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
+    
     public RobotContainer() {
+        RobotState.getInstance(); // Ensure RobotState is initialized
         switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
@@ -106,11 +108,10 @@ public class RobotContainer {
                 intake = new Intake(new IntakeIOReal());
                 hopper = new Hopper(new HopperIOReal());
                 vision = new Vision(
-                        drive::addVisionMeasurement,
                         new VisionIOPhotonVision(camera0Name, robotToCamera0),
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
                 objectDetection = new ObjectDetection(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
-                        ObjectDetectionConstants.cameraToRobotTransform), drive::getPose);
+                        ObjectDetectionConstants.cameraToRobotTransform));
                 shooter = new Shooter(new ShooterIOGreyT(), () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
 
@@ -120,7 +121,7 @@ public class RobotContainer {
                         new Pose2d(3, 3, new Rotation2d()));
 
                 drive = new Drive(
-                        new GyroIOSim(driveSimulation::getGyroAngle),
+                        new GyroIOSim(driveSimulation.getGyroSimulation()),
                         new ModuleIOTalonFXSim(DriveConstants.frontLeftConfig, driveSimulation.getModules()[0]),
                         new ModuleIOTalonFXSim(DriveConstants.frontRightConfig, driveSimulation.getModules()[1]),
                         new ModuleIOTalonFXSim(DriveConstants.backLeftConfig, driveSimulation.getModules()[2]),
@@ -130,13 +131,12 @@ public class RobotContainer {
                 hopper = new Hopper(new HopperIOSim());
 
                 vision = new Vision(
-                        drive::addVisionMeasurement,
                         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0,
                                 driveSimulation::getSimulatedDriveTrainPose),
                         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1,
                                 driveSimulation::getSimulatedDriveTrainPose));
                 objectDetection = new ObjectDetection(new ObjectDetectionIO() {
-                }, driveSimulation::getSimulatedDriveTrainPose);
+        });
                 shooter = new Shooter(new ShooterIO() {
                 }, () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
@@ -159,11 +159,11 @@ public class RobotContainer {
                 hopper = new Hopper(new HopperIO() {
                 });
 
-                vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
+                vision = new Vision( new VisionIO() {
                 }, new VisionIO() {
                 });
                 objectDetection = new ObjectDetection(new ObjectDetectionIO() {
-                }, drive::getPose);
+                });
 
                 shooter = new Shooter(new ShooterIO() {
                 }, () -> Feet.of(0)); // TODO: Add distance supplier
@@ -176,25 +176,7 @@ public class RobotContainer {
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-        // Set up SysId routines
-        autoChooser.addOption(
-                "Drive Wheel Radius Characterization",
-                DriveCommands.wheelRadiusCharacterization(drive));
-        autoChooser.addOption(
-                "Drive Simple FF Characterization",
-                DriveCommands.feedforwardCharacterization(drive));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Forward)",
-                drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Reverse)",
-                drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        autoChooser.addOption(
-                "Drive SysId (Dynamic Forward)",
-                drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Dynamic Reverse)",
-                drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
 
         // Configure the button bindings
         configureButtonBindings();
@@ -254,7 +236,7 @@ public class RobotContainer {
                 .onTrue(
                         Commands.runOnce(
                                 () -> drive.setPose(
-                                        new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                                        new Pose2d(RobotState.getInstance().getPose().getTranslation(), Rotation2d.kZero)),
                                 drive)
                                 .ignoringDisable(true));
     }
