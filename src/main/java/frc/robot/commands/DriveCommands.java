@@ -21,6 +21,7 @@ import frc.robot.subsystems.drive.DriveConstants;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+/** Collection of drive commands. */
 public class DriveCommands {
     private static final double DEADBAND = 0.3;
     private static final double ANGLE_KP = 5.0;
@@ -45,6 +46,7 @@ public class DriveCommands {
     }
 
     /** Field relative drive command using two joysticks (controlling linear and angular velocities). */
+    @SuppressWarnings("ParameterName")
     public static Command joystickDrive(
             Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
         RobotState robotState = RobotState.getInstance();
@@ -77,6 +79,7 @@ public class DriveCommands {
      * Field relative drive command using joystick for linear control and PID for angular control. Possible use cases
      * include snapping to an angle, aiming at a vision target, or controlling absolute rotation with a joystick.
      */
+    @SuppressWarnings("ParameterName")
     public static Command joystickDriveAtAngle(
             Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, Supplier<Rotation2d> rotationSupplier) {
         RobotState robotState = RobotState.getInstance();

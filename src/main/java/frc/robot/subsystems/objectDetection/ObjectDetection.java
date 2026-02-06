@@ -2,18 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.objectDetection;
+package frc.robot.subsystems.objectdetection;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.cameraToRobotTransform;
-import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.fuelHeight;
+import static frc.robot.subsystems.objectdetection.ObjectDetectionConstants.cameraToRobotTransform;
+import static frc.robot.subsystems.objectdetection.ObjectDetectionConstants.fuelHeight;
 
 import java.util.ArrayList;
 
 import org.littletonrobotics.junction.Logger;
+
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
 
+/** ObjectDetection subsystem for detecting fuel using a camera. */
 public class ObjectDetection extends SubsystemBase {
     private final ObjectDetectionIO io;
     private final ObjectDetectionIOInputsAutoLogged inputs = new ObjectDetectionIOInputsAutoLogged();
@@ -41,7 +43,7 @@ public class ObjectDetection extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Object Detection", inputs);
-        if (inputs.targetObservations.length > 0) {;
+        if (inputs.targetObservations.length > 0) {
             ArrayList<Pose2d> fuelPoses = new ArrayList<>();
             for (ObjectDetectionIO.TargetObservation observation : inputs.targetObservations) {
                 Pose2d fuelPose = getFuelPose(
@@ -61,18 +63,20 @@ public class ObjectDetection extends SubsystemBase {
 
     /** 
      * Get the pose of a fuel cell relative to the camera.
-     * @param tx The horizontal angle to the target.
-     * @param ty The vertical angle to the target.
+     *
+     * @param pitch The vertical angle to the target.
+     * @param yaw The horizontal angle to the target.
+     * @param robotPose The pose of the robot.
      * @return The pose of the fuel cell relative to the camera.
      */
     public Pose2d getFuelPose(Angle pitch, Angle yaw, Pose2d robotPose) {
         Angle angleToTargetPitch = cameraAngley.plus(pitch);
-        Distance distanceY = Inches.of( // Distance straight outwards from the camera
+        Distance distanceY = Inches.of(// Distance straight outwards from the camera
             Math.tan(angleToTargetPitch.in(Radians)) 
             * (cameraHeight.in(Inches) - fuelHeight.in(Inches)));
 
         Angle angleToTargetYaw = cameraAnglex.plus(yaw);
-        Distance distanceX = Inches.of( // Distance side to side from the camera
+        Distance distanceX = Inches.of(// Distance side to side from the camera
             Math.tan(angleToTargetYaw.in(Radians)) 
             * distanceY.in(Inches));
         return robotPose.plus(new Transform2d(distanceY, distanceX, robotPose.getRotation()));
@@ -80,6 +84,7 @@ public class ObjectDetection extends SubsystemBase {
 
     /** 
      * Sorts a list of poses by distance from the robot.
+     *
      * @param poses The list of poses to sort.
      * @return The sorted list of poses.
      */
@@ -94,6 +99,13 @@ public class ObjectDetection extends SubsystemBase {
         });
         return poses;
     }
+
+    /** 
+     * Record of a fuel pose estimate with timestamp.
+     *
+     * @param pose The pose of the fuel cell.
+     * @param timestamp The timestamp of the estimate.
+     */
     public static record  FuelPoseEstimate(Pose2d pose, Time timestamp) {
     }
 }

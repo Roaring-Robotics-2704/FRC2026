@@ -37,7 +37,8 @@ import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.Container;
 
 /**
- * A collection of commands for tuning the drive subsystem. All drive tuning commands print their results and save them
+ * A collection of commands for tuning the drive subsystem. All drive tuning
+ * commands print their results and save them
  * to a JSON file on the robot.
  */
 public class DriveTuningCommands {
@@ -54,14 +55,16 @@ public class DriveTuningCommands {
 
     /** The path to the JSON file where we save our tuning results. */
     public static final String TUNING_RESULTS_FILE = Constants.currentMode == Constants.Mode.REAL
-        ? "/U/tuning_results.json" // On a real robot, this is a USB stick
-        : "./logs/tuning_results.json"; // In simulation, this is a local file
+            ? "/U/tuning_results.json" // On a real robot, this is a USB stick
+            : "./logs/tuning_results.json"; // In simulation, this is a local file
 
     /** A set of tuning results that we can load from and save to a JSON file. */
     @SuppressWarnings("unused") // This is used for serialization and deserialization
     private static class TuningResults {
         public double wheelRadiusMeters = 0.0; // Meters
+        @SuppressWarnings("MemberName")
         public double kS = 0.0; // Volts
+        @SuppressWarnings("MemberName")
         public double kV = 0.0; // Volts/(m/s)
         public double slipCurrentAmps = 0.0; // Amps
         public double slipVoltageVolts = 0.0; // Volts
@@ -74,14 +77,16 @@ public class DriveTuningCommands {
             // Make sure the parent directory exists
             file.getParentFile().mkdirs();
 
-            if(!file.exists()) return new TuningResults(); // If the file doesn't exist, return an empty result
+            if (!file.exists()) {
+                return new TuningResults(); // If the file doesn't exist, return an empty result
+            }
 
             var builder = new GsonBuilder();
             builder.setPrettyPrinting();
             var gson = builder.create();
-            try(var fileReader = new FileReader(file)) {
+            try (var fileReader = new FileReader(file)) {
                 return gson.fromJson(fileReader, TuningResults.class);
-            } catch(JsonSyntaxException | JsonIOException | IOException e) {
+            } catch (JsonSyntaxException | JsonIOException | IOException e) {
                 e.printStackTrace();
                 return new TuningResults(); // If we can't read the file, return an empty result
             }
@@ -91,10 +96,10 @@ public class DriveTuningCommands {
             var builder = new GsonBuilder();
             builder.setPrettyPrinting();
             var gson = builder.create();
-            try(var fileWriter = new java.io.FileWriter(TUNING_RESULTS_FILE)) {
+            try (var fileWriter = new java.io.FileWriter(TUNING_RESULTS_FILE)) {
                 gson.toJson(this, fileWriter);
                 System.out.println("Saved tuning results to " + TUNING_RESULTS_FILE);
-            } catch(IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -116,34 +121,33 @@ public class DriveTuningCommands {
         chooser.addOption("TUNING | Drive Slip Current Measurement", slipCurrentMeasurement(drive));
 
         // These only apply to when we're doing "real" tuning
-        if(Constants.tuningMode) {
+        if (Constants.tuningMode) {
             chooser.addOption("TUNING | Drive Simple FF Characterization", feedforwardCharacterization(drive));
 
             chooser.addOption("TUNING | Drive SysId (Quasistatic Forward)",
-                sysIdQuasistatic(drive, SysIdRoutine.Direction.kForward));
+                    sysIdQuasistatic(drive, SysIdRoutine.Direction.kForward));
             chooser.addOption("TUNING | Drive SysId (Quasistatic Reverse)",
-                sysIdQuasistatic(drive, SysIdRoutine.Direction.kReverse));
+                    sysIdQuasistatic(drive, SysIdRoutine.Direction.kReverse));
             chooser.addOption("TUNING | Drive SysId (Dynamic Forward)",
-                sysIdDynamic(drive, SysIdRoutine.Direction.kForward));
+                    sysIdDynamic(drive, SysIdRoutine.Direction.kForward));
             chooser.addOption("TUNING | Drive SysId (Dynamic Reverse)",
-                sysIdDynamic(drive, SysIdRoutine.Direction.kReverse));
+                    sysIdDynamic(drive, SysIdRoutine.Direction.kReverse));
 
             chooser.addOption("TUNING | Drive Angular SysId (Quasistatic Forward)",
-                sysIdQuasistaticAngular(drive, SysIdRoutine.Direction.kForward));
+                    sysIdQuasistaticAngular(drive, SysIdRoutine.Direction.kForward));
             chooser.addOption("TUNING | Drive Angular SysId (Quasistatic Reverse)",
-                sysIdQuasistaticAngular(drive, SysIdRoutine.Direction.kReverse));
+                    sysIdQuasistaticAngular(drive, SysIdRoutine.Direction.kReverse));
             chooser.addOption("TUNING | Drive Angular SysId (Dynamic Forward)",
-                sysIdDynamicAngular(drive, SysIdRoutine.Direction.kForward));
+                    sysIdDynamicAngular(drive, SysIdRoutine.Direction.kForward));
             chooser.addOption("TUNING | Drive Angular SysId (Dynamic Reverse)",
-                sysIdDynamicAngular(drive, SysIdRoutine.Direction.kReverse));
+                    sysIdDynamicAngular(drive, SysIdRoutine.Direction.kReverse));
         }
     }
 
     /**
      * Measures the velocity feedforward constants for the drive motors.
      *
-     * <p>
-     * This command should only be used in voltage control mode.
+     * <p>This command should only be used in voltage control mode.
      */
     public static Command feedforwardCharacterization(Drive drive) {
         List<Double> velocitySamples = new LinkedList<>();
@@ -151,50 +155,53 @@ public class DriveTuningCommands {
         Timer timer = new Timer();
 
         return Commands.sequence(
-            // Reset data
-            Commands.runOnce(() -> {
-                velocitySamples.clear();
-                voltageSamples.clear();
-            }),
+                // Reset data
+                Commands.runOnce(() -> {
+                    velocitySamples.clear();
+                    voltageSamples.clear();
+                }),
 
-            // Allow modules to orient
-            Commands.run(() -> {
-                drive.runCharacterization(0.0);
-            }, drive).withTimeout(FF_START_DELAY),
+                // Allow modules to orient
+                Commands.run(() -> {
+                    drive.runCharacterization(0.0);
+                }, drive).withTimeout(FF_START_DELAY),
 
-            // Start timer
-            Commands.runOnce(timer::restart),
+                // Start timer
+                Commands.runOnce(timer::restart),
 
-            // Accelerate and gather data
-            Commands.run(() -> {
-                double voltage = timer.get() * FF_RAMP_RATE;
-                drive.runCharacterization(voltage);
-                velocitySamples.add(drive.getFFCharacterizationVelocity());
-                voltageSamples.add(voltage);
-            }, drive).finallyDo(() -> { // When cancelled, calculate and print results
-                int n = velocitySamples.size();
-                double sumX = 0.0;
-                double sumY = 0.0;
-                double sumXY = 0.0;
-                double sumX2 = 0.0;
-                for(int i = 0; i < n; i++) {
-                    sumX += velocitySamples.get(i);
-                    sumY += voltageSamples.get(i);
-                    sumXY += velocitySamples.get(i) * voltageSamples.get(i);
-                    sumX2 += velocitySamples.get(i) * velocitySamples.get(i);
-                }
-                double kS = (sumY * sumX2 - sumX * sumXY) / (n * sumX2 - sumX * sumX);
-                double kV = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                // Accelerate and gather data
+                Commands.run(() -> {
+                    double voltage = timer.get() * FF_RAMP_RATE;
+                    drive.runCharacterization(voltage);
+                    velocitySamples.add(drive.getFFCharacterizationVelocity());
+                    voltageSamples.add(voltage);
+                }, drive).finallyDo(() -> { // When cancelled, calculate and print results
+                    int n = velocitySamples.size();
+                    double sumX = 0.0;
+                    double sumY = 0.0;
+                    double sumXY = 0.0;
+                    double sumX2 = 0.0;
+                    for (int i = 0; i < n; i++) {
+                        sumX += velocitySamples.get(i);
+                        sumY += voltageSamples.get(i);
+                        sumXY += velocitySamples.get(i) * voltageSamples.get(i);
+                        sumX2 += velocitySamples.get(i) * velocitySamples.get(i);
+                    }
 
-                NumberFormat formatter = new DecimalFormat("#0.00000");
-                System.out.println("********** Drive FF Characterization Results **********");
-                System.out.println("\tkS: " + formatter.format(kS));
-                System.out.println("\tkV: " + formatter.format(kV));
+                    @SuppressWarnings("LocalVariableName")
+                    double kS = (sumY * sumX2 - sumX * sumXY) / (n * sumX2 - sumX * sumX);
+                    @SuppressWarnings("LocalVariableName")
+                    double kV = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
 
-                tuningResults.kS = kS;
-                tuningResults.kV = kV;
-                tuningResults.save();
-            }));
+                    NumberFormat formatter = new DecimalFormat("#0.00000");
+                    System.out.println("********** Drive FF Characterization Results **********");
+                    System.out.println("\tkS: " + formatter.format(kS));
+                    System.out.println("\tkV: " + formatter.format(kV));
+
+                    tuningResults.kS = kS;
+                    tuningResults.kV = kV;
+                    tuningResults.save();
+                }));
     }
 
     private static class WheelRadiusCharacterizationState {
@@ -210,55 +217,59 @@ public class DriveTuningCommands {
         RobotState robotState = RobotState.getInstance();
 
         return Commands.parallel(
-            // Drive control sequence
-            Commands.sequence(
-                // Reset acceleration limiter
-                Commands.runOnce(() -> {
-                    limiter.reset(0.0);
-                }),
+                // Drive control sequence
+                Commands.sequence(
+                        // Reset acceleration limiter
+                        Commands.runOnce(() -> {
+                            limiter.reset(0.0);
+                        }),
 
-                // Turn in place, accelerating up to full speed
-                Commands.run(() -> {
-                    double speed = limiter.calculate(WHEEL_RADIUS_MAX_VELOCITY);
-                    drive.runVelocity(new ChassisSpeeds(0.0, 0.0, speed));
-                }, drive)),
+                        // Turn in place, accelerating up to full speed
+                        Commands.run(() -> {
+                            double speed = limiter.calculate(WHEEL_RADIUS_MAX_VELOCITY);
+                            drive.runVelocity(new ChassisSpeeds(0.0, 0.0, speed));
+                        }, drive)),
 
-            // Measurement sequence
-            Commands.sequence(
-                // Wait for modules to fully orient before starting measurement
-                Commands.waitSeconds(1.0),
+                // Measurement sequence
+                Commands.sequence(
+                        // Wait for modules to fully orient before starting measurement
+                        Commands.waitSeconds(1.0),
 
-                // Record starting measurement
-                Commands.runOnce(() -> {
-                    state.positions = drive.getWheelRadiusCharacterizationPositions();
-                    state.lastAngle = robotState.getRotation();
-                    state.gyroDelta = 0.0;
-                }),
+                        // Record starting measurement
+                        Commands.runOnce(() -> {
+                            state.positions = drive.getWheelRadiusCharacterizationPositions();
+                            state.lastAngle = robotState.getRotation();
+                            state.gyroDelta = 0.0;
+                        }),
 
-                // Update gyro delta
-                Commands.run(() -> {
-                    var rotation = robotState.getRotation();
-                    state.gyroDelta += Math.abs(rotation.minus(state.lastAngle).getRadians());
-                    state.lastAngle = rotation;
-                })
+                        // Update gyro delta
+                        Commands.run(() -> {
+                            var rotation = robotState.getRotation();
+                            state.gyroDelta += Math.abs(rotation.minus(state.lastAngle).getRadians());
+                            state.lastAngle = rotation;
+                        })
 
-                    // When cancelled, calculate and print results
-                    .finallyDo(() -> {
-                        double[] positions = drive.getWheelRadiusCharacterizationPositions();
-                        double wheelDelta = 0.0;
-                        for(int i = 0; i < 4; i++) wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
-                        double wheelRadius = (state.gyroDelta * DriveConstants.driveBaseRadius) / wheelDelta;
+                                // When cancelled, calculate and print results
+                                .finallyDo(() -> {
+                                    double[] positions = drive.getWheelRadiusCharacterizationPositions();
+                                    double wheelDelta = 0.0;
+                                    for (int i = 0; i < 4; i++) {
+                                        wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
+                                    }
+                                    double wheelRadius = (state.gyroDelta * DriveConstants.driveBaseRadius)
+                                            / wheelDelta;
 
-                        NumberFormat formatter = new DecimalFormat("#0.000");
-                        System.out.println("********** Wheel Radius Characterization Results **********");
-                        System.out.println("\tWheel Delta: " + formatter.format(wheelDelta) + " radians");
-                        System.out.println("\tGyro Delta: " + formatter.format(state.gyroDelta) + " radians");
-                        System.out.println("\tWheel Radius: " + formatter.format(wheelRadius) + " meters, "
-                            + formatter.format(Units.metersToInches(wheelRadius)) + " inches");
+                                    NumberFormat formatter = new DecimalFormat("#0.000");
+                                    System.out.println("********** Wheel Radius Characterization Results **********");
+                                    System.out.println("\tWheel Delta: " + formatter.format(wheelDelta) + " radians");
+                                    System.out
+                                            .println("\tGyro Delta: " + formatter.format(state.gyroDelta) + " radians");
+                                    System.out.println("\tWheel Radius: " + formatter.format(wheelRadius) + " meters, "
+                                            + formatter.format(Units.metersToInches(wheelRadius)) + " inches");
 
-                        tuningResults.wheelRadiusMeters = wheelRadius;
-                        tuningResults.save();
-                    })));
+                                    tuningResults.wheelRadiusMeters = wheelRadius;
+                                    tuningResults.save();
+                                })));
     }
 
     private static class SlipCurrentModuleResult {
@@ -267,8 +278,10 @@ public class DriveTuningCommands {
     }
 
     /**
-     * Measures the current at which the robot slips by progressively increasing the wheel voltage and measuring when
-     * their velocity jumps. Also estimates the wheel's coefficient of friction. The robot _must_ be placed against a
+     * Measures the current at which the robot slips by progressively increasing the
+     * wheel voltage and measuring when
+     * their velocity jumps. Also estimates the wheel's coefficient of friction. The
+     * robot _must_ be placed against a
      * wall for this to work.
      */
     public static Command slipCurrentMeasurement(Drive drive) {
@@ -276,73 +289,74 @@ public class DriveTuningCommands {
 
         int currentLimitForSlipMeasurement = 100; // Amps
 
-        Command command = Commands.sequence( //
-            Commands.runOnce(() -> {
-                // Temporarily increase the drive current limit
-                drive.setSlipMeasurementCurrentLimit(Amps.of(currentLimitForSlipMeasurement));
-                for(int i = 0; i < 4; i++) {
-                    moduleResults[i] = new SlipCurrentModuleResult();
-                }
-            }),
+        Command command = Commands.sequence(
+                Commands.runOnce(() -> {
+                    // Temporarily increase the drive current limit
+                    drive.setSlipMeasurementCurrentLimit(Amps.of(currentLimitForSlipMeasurement));
+                    for (int i = 0; i < 4; i++) {
+                        moduleResults[i] = new SlipCurrentModuleResult();
+                    }
+                }),
 
-            // Allow modules to orient
-            Commands.run(() -> {
-                drive.runCharacterization(0.0);
-            }).withTimeout(SLIP_START_DELAY),
+                // Allow modules to orient
+                Commands.run(() -> {
+                    drive.runCharacterization(0.0);
+                }).withTimeout(SLIP_START_DELAY),
 
-            Commands.defer(() -> {
-                Command[] commands = new Command[4];
-                for(int i = 0; i < 4; i++) {
-                    commands[i] = slipCurrentWheel(drive, i, moduleResults[i]);
-                }
-                return Commands.parallel(commands);
-            }, Set.of()),
+                Commands.defer(() -> {
+                    Command[] commands = new Command[4];
+                    for (int i = 0; i < 4; i++) {
+                        commands[i] = slipCurrentWheel(drive, i, moduleResults[i]);
+                    }
+                    return Commands.parallel(commands);
+                }, Set.of()),
 
-            // Restore the current limit and print results
-            Commands.runOnce(() -> {
-                drive.setSlipMeasurementCurrentLimit(DriveConstants.slipCurrent);
+                // Restore the current limit and print results
+                Commands.runOnce(() -> {
+                    drive.setSlipMeasurementCurrentLimit(DriveConstants.slipCurrent);
 
-                double averageSlipCurrent = 0.0;
-                double averageSlipVoltage = 0.0;
-                for(int i = 0; i < 4; i++) {
-                    averageSlipCurrent += moduleResults[i].slipCurrent / 4.;
-                    averageSlipVoltage += moduleResults[i].slipVoltage / 4.;
-                }
+                    double averageSlipCurrent = 0.0;
+                    double averageSlipVoltage = 0.0;
+                    for (int i = 0; i < 4; i++) {
+                        averageSlipCurrent += moduleResults[i].slipCurrent / 4.;
+                        averageSlipVoltage += moduleResults[i].slipVoltage / 4.;
+                    }
 
-                NumberFormat formatter = new DecimalFormat("#0.000");
+                    NumberFormat formatter = new DecimalFormat("#0.000");
 
-                System.out.println("********** Drive Slip Current Measurement Results **********");
-                System.out.println("\tAverage slip Current: " + formatter.format(averageSlipCurrent) + " amps");
-                System.out.println("\tAverage slip \"Voltage\": " + formatter.format(averageSlipVoltage) + " volts");
-                String[] moduleNames = new String[] {
-                    "Front left", "Front right", "Back left", "Back right"
-                };
+                    System.out.println("********** Drive Slip Current Measurement Results **********");
+                    System.out.println("\tAverage slip Current: " + formatter.format(averageSlipCurrent) + " amps");
+                    System.out
+                            .println("\tAverage slip \"Voltage\": " + formatter.format(averageSlipVoltage) + " volts");
+                    String[] moduleNames = new String[] {
+                        "Front left", "Front right", "Back left", "Back right"
+                    };
 
-                System.out.println("\tIndividual module slip currents:");
-                for(int i = 0; i < 4; i++) {
-                    System.out.println(
-                        "\t \t" + moduleNames[i] + ": " + formatter.format(moduleResults[i].slipCurrent) + " amps");
-                }
+                    System.out.println("\tIndividual module slip currents:");
+                    for (int i = 0; i < 4; i++) {
+                        System.out.println(
+                                "\t \t" + moduleNames[i] + ": " + formatter.format(moduleResults[i].slipCurrent)
+                                        + " amps");
+                    }
 
-                // Estimate the wheel's coefficient of friction
-                double motorTorque = averageSlipCurrent * DCMotor.getKrakenX60Foc(1).KtNMPerAmp;
-                double totalTorqueNm = 4 * DriveConstants.driveGearRatio * motorTorque;
-                double robotMassN = DriveConstants.robotMass.in(Kilogram) * 9.81;
-                double wheelCOF = totalTorqueNm / (robotMassN * DriveConstants.wheelRadius.in(Meters));
-                NumberFormat cofFormatter = new DecimalFormat("#0.0000");
-                System.out.println("\tEstimated wheel COF: " + cofFormatter.format(wheelCOF));
+                    // Estimate the wheel's coefficient of friction
+                    double motorTorque = averageSlipCurrent * DCMotor.getKrakenX60Foc(1).KtNMPerAmp;
+                    double totalTorqueNm = 4 * DriveConstants.driveGearRatio * motorTorque;
+                    double robotMassN = DriveConstants.robotMass.in(Kilogram) * 9.81;
+                    double wheelCOF = totalTorqueNm / (robotMassN * DriveConstants.wheelRadius.in(Meters));
+                    NumberFormat cofFormatter = new DecimalFormat("#0.0000");
+                    System.out.println("\tEstimated wheel COF: " + cofFormatter.format(wheelCOF));
 
-                // Save results
-                tuningResults.slipCurrentAmps = averageSlipCurrent;
-                tuningResults.slipVoltageVolts = averageSlipVoltage;
-                tuningResults.wheelCOF = wheelCOF;
-                for(int i = 0; i < 4; i++) {
-                    tuningResults.moduleSlipCurrentsAmps[i] = moduleResults[i].slipCurrent;
-                    tuningResults.moduleSlipVoltagesVolts[i] = moduleResults[i].slipVoltage;
-                }
-                tuningResults.save();
-            })
-        );
+                    // Save results
+                    tuningResults.slipCurrentAmps = averageSlipCurrent;
+                    tuningResults.slipVoltageVolts = averageSlipVoltage;
+                    tuningResults.wheelCOF = wheelCOF;
+                    for (int i = 0; i < 4; i++) {
+                        tuningResults.moduleSlipCurrentsAmps[i] = moduleResults[i].slipCurrent;
+                        tuningResults.moduleSlipVoltagesVolts[i] = moduleResults[i].slipVoltage;
+                    }
+                    tuningResults.save();
+                }));
         command.addRequirements(drive);
         return command;
     }
@@ -358,40 +372,40 @@ public class DriveTuningCommands {
             timer.restart();
         }),
 
-            // Accelerate and gather data
-            Commands.run(() -> {
-                double voltage = Math.min(12., timer.get() * SLIP_RAMP_RATE + SLIP_START_VOLTAGE);
-                drive.runCharacterization(module, voltage);
+                // Accelerate and gather data
+                Commands.run(() -> {
+                    double voltage = Math.min(12., timer.get() * SLIP_RAMP_RATE + SLIP_START_VOLTAGE);
+                    drive.runCharacterization(module, voltage);
 
-                currentSamples.add(drive.getSlipMeasurementCurrent(module));
-            }).until(() -> {
-                if(timer.get() * SLIP_RAMP_RATE + SLIP_START_VOLTAGE > 12.) {
-                    System.out.println("Slip current measurement capped at 12 volts. This probably isn't correct.");
-                    return true; // Stop if we hit the voltage limit
-                }
+                    currentSamples.add(drive.getSlipMeasurementCurrent(module));
+                }).until(() -> {
+                    if (timer.get() * SLIP_RAMP_RATE + SLIP_START_VOLTAGE > 12.) {
+                        System.out.println("Slip current measurement capped at 12 volts. This probably isn't correct.");
+                        return true; // Stop if we hit the voltage limit
+                    }
 
-                double distanceTraveled = Math.abs(drive.getSlipMeasurementPosition(module) - startPosition.value);
-                return distanceTraveled > SLIP_TRAVEL_AMOUNT;
-            }),
+                    double distanceTraveled = Math.abs(drive.getSlipMeasurementPosition(module) - startPosition.value);
+                    return distanceTraveled > SLIP_TRAVEL_AMOUNT;
+                }),
 
-            // Take a few samples behind when we stopped and print the result
-            Commands.runOnce(() -> {
-                drive.runCharacterization(module, 0.0);
+                // Take a few samples behind when we stopped and print the result
+                Commands.runOnce(() -> {
+                    drive.runCharacterization(module, 0.0);
 
-                moduleResult.slipCurrent = currentSamples.get(currentSamples.size() - 4);
-                moduleResult.slipVoltage = timer.get() * SLIP_RAMP_RATE + SLIP_START_VOLTAGE;
+                    moduleResult.slipCurrent = currentSamples.get(currentSamples.size() - 4);
+                    moduleResult.slipVoltage = timer.get() * SLIP_RAMP_RATE + SLIP_START_VOLTAGE;
 
-                System.out.println("Module " + module + " slip current measured.");
-            }));
+                    System.out.println("Module " + module + " slip current measured.");
+                }));
     }
 
     /** Configures the SysId routine if it hasn't been configured yet. */
     private static void initSysId(Drive drive) {
-        if(sysIdRoutine == null) {
+        if (sysIdRoutine == null) {
             sysIdRoutine = new SysIdRoutine(
-                new SysIdRoutine.Config(null, null, null,
-                    (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
-                new SysIdRoutine.Mechanism((voltage) -> drive.runCharacterization(voltage.in(Volts)), null, drive));
+                    new SysIdRoutine.Config(null, null, null,
+                            (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+                    new SysIdRoutine.Mechanism((voltage) -> drive.runCharacterization(voltage.in(Volts)), null, drive));
         }
     }
 
@@ -400,7 +414,7 @@ public class DriveTuningCommands {
         initSysId(drive);
 
         return Commands.run(() -> drive.runCharacterization(0.0), drive).withTimeout(1.0)
-            .andThen(sysIdRoutine.quasistatic(direction));
+                .andThen(sysIdRoutine.quasistatic(direction));
     }
 
     /** Returns a command to run a dynamic test in the specified direction. */
@@ -408,17 +422,17 @@ public class DriveTuningCommands {
         initSysId(drive);
 
         return Commands.run(() -> drive.runCharacterization(0.0), drive).withTimeout(1.0)
-            .andThen(sysIdRoutine.dynamic(direction));
+                .andThen(sysIdRoutine.dynamic(direction));
     }
 
     /** Configures the angular SysId routine if it hasn't been configured yet. */
     private static void initAngularSysId(Drive drive) {
-        if(angularSysIdRoutine == null) {
+        if (angularSysIdRoutine == null) {
             angularSysIdRoutine = new SysIdRoutine(
-                new SysIdRoutine.Config(null, null, null,
-                    (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
-                new SysIdRoutine.Mechanism((voltage) -> drive.runAngularCharacterization(voltage.in(Volts)), null,
-                    drive));
+                    new SysIdRoutine.Config(null, null, null,
+                            (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+                    new SysIdRoutine.Mechanism((voltage) -> drive.runAngularCharacterization(voltage.in(Volts)), null,
+                            drive));
         }
     }
 
@@ -427,7 +441,7 @@ public class DriveTuningCommands {
         initAngularSysId(drive);
 
         return Commands.run(() -> drive.runAngularCharacterization(0.0), drive).withTimeout(1.0)
-            .andThen(angularSysIdRoutine.quasistatic(direction));
+                .andThen(angularSysIdRoutine.quasistatic(direction));
     }
 
     /** Returns a command to run a dynamic test in the specified direction. */
@@ -435,6 +449,6 @@ public class DriveTuningCommands {
         initAngularSysId(drive);
 
         return Commands.run(() -> drive.runAngularCharacterization(0.0), drive).withTimeout(1.0)
-            .andThen(angularSysIdRoutine.dynamic(direction));
+                .andThen(angularSysIdRoutine.dynamic(direction));
     }
 }

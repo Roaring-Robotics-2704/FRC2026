@@ -7,11 +7,15 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Feet;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -29,11 +33,14 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.objectDetection.ObjectDetection;
-import frc.robot.subsystems.objectDetection.ObjectDetectionConstants;
-import frc.robot.subsystems.objectDetection.ObjectDetectionIO;
-import frc.robot.subsystems.objectDetection.ObjectDetectionIOReal;
+import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
+import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
+import frc.robot.subsystems.objectdetection.ObjectDetection;
+import frc.robot.subsystems.objectdetection.ObjectDetectionConstants;
+import frc.robot.subsystems.objectdetection.ObjectDetectionIO;
+import frc.robot.subsystems.objectdetection.ObjectDetectionIOReal;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
@@ -51,13 +58,6 @@ import frc.robot.subsystems.vision.VisionIO;
 //import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import org.littletonrobotics.junction.Logger;
-import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
-import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.SimulatedArena;
-import frc.robot.subsystems.drive.GyroIOSim;
-import static edu.wpi.first.units.Units.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -91,7 +91,7 @@ public class RobotContainer {
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
-    
+
     public RobotContainer() {
         RobotState.getInstance(); // Ensure RobotState is initialized
         switch (Constants.currentMode) {
@@ -136,7 +136,7 @@ public class RobotContainer {
                         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1,
                                 driveSimulation::getSimulatedDriveTrainPose));
                 objectDetection = new ObjectDetection(new ObjectDetectionIO() {
-        });
+                });
                 shooter = new Shooter(new ShooterIO() {
                 }, () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
@@ -159,7 +159,7 @@ public class RobotContainer {
                 hopper = new Hopper(new HopperIO() {
                 });
 
-                vision = new Vision( new VisionIO() {
+                vision = new Vision(new VisionIO() {
                 }, new VisionIO() {
                 });
                 objectDetection = new ObjectDetection(new ObjectDetectionIO() {
@@ -236,7 +236,8 @@ public class RobotContainer {
                 .onTrue(
                         Commands.runOnce(
                                 () -> drive.setPose(
-                                        new Pose2d(RobotState.getInstance().getPose().getTranslation(), Rotation2d.kZero)),
+                                        new Pose2d(RobotState.getInstance().getPose().getTranslation(),
+                                                Rotation2d.kZero)),
                                 drive)
                                 .ignoringDisable(true));
     }
@@ -261,9 +262,11 @@ public class RobotContainer {
                 superStructure.goToState(WantedState.INTAKE_CALIBRATE_OUT));
     }
 
+    /** Reset the simulation field. */
     public void resetSimulationField() {
-        if (Constants.currentMode != Constants.Mode.SIM)
+        if (Constants.currentMode != Constants.Mode.SIM) {
             return;
+        }
 
         driveSimulation.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()));
         SimulatedArena.getInstance().resetFieldForAuto();
@@ -271,8 +274,9 @@ public class RobotContainer {
 
     /** Update the simulation. */
     public void updateSimulation() {
-        if (Constants.currentMode != Constants.Mode.SIM)
+        if (Constants.currentMode != Constants.Mode.SIM) {
             return;
+        }
 
         SimulatedArena.getInstance().simulationPeriodic();
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());

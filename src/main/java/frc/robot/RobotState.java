@@ -22,7 +22,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.subsystems.objectDetection.ObjectDetection.FuelPoseEstimate;
+import frc.robot.subsystems.objectdetection.ObjectDetection.FuelPoseEstimate;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.poseEst.OdometrySwerveDrivePoseEstimator;
 import frc.robot.subsystems.vision.Vision.IndividualTagEstimate;
@@ -74,6 +74,7 @@ public class RobotState {
     /**
      * Gets the _odometry_ pose at the specified timestamp. This does not include vision compensation, so it will drift
      * over time. This should only be used for delta tracking, not for actual field-relative position.
+     *
      * @param timestamp Timestamp to sample at
      * @return An optional containing the odometry pose at the specified timestamp, or empty if no data is available.
      */
@@ -84,6 +85,7 @@ public class RobotState {
     /**
      * Gets the current _odometry_ pose. This does not include vision compensation, so it will drift over time. This
      * should only be used for delta tracking, not for actual field-relative position.
+     *
      * @return The current odometry pose.
      */
     public Pose2d getOdometryPose() {
@@ -94,6 +96,7 @@ public class RobotState {
      * Gets the odometry-based movement from the specified timestamp. This provides a relative transform, and should
      * only be used for timestamps less than 1.5 seconds in the past. The returned pose transforms our pose at the
      * timestamp to our current one.
+     *
      * @param timestamp Timestamp to sample at
      * @return An optional containing the odometry pose at the specified timestamp, or empty if no data is available.
      */
@@ -116,11 +119,13 @@ public class RobotState {
 
     /** Gets a pose estimate of the robot based on a specific tag if one is available. */
     public Optional<Pose2d> getIndividualTagRobotPose(int tagId) {
-        if(!individualTagPoses.containsKey(tagId)) { return Optional.empty(); }
+        if (!individualTagPoses.containsKey(tagId)) {
+            return Optional.empty();
+        }
         var individualTagData = individualTagPoses.get(tagId);
 
         // If stale, don't use the tag estimate
-        if(Timer.getTimestamp() - individualTagData.timestamp() >= Vision.perTagPersistenceTime.get()) {
+        if (Timer.getTimestamp() - individualTagData.timestamp() >= Vision.perTagPersistenceTime.get()) {
             return Optional.empty();
         }
 
@@ -131,19 +136,28 @@ public class RobotState {
 
     /**
      * Records the observation of an individual tag.
-     * @param timestamp
-     * @param tagId
+     *
+     * @param robotPose The observed robot pose based on the tag.
+     * @param timestamp The timestamp the tag was observed at.
+     * @param ambiguity The ambiguity of the tag observation.
+     * @param tagId The ID of the tag.
      */
     public void addIndividualTagObservation(Pose2d robotPose, double timestamp, double ambiguity, int tagId) {
         // Skip if current data for the tag is newer or it was captured at the same time with lower ambiguity
-        if(individualTagPoses.containsKey(tagId)) {
+        if (individualTagPoses.containsKey(tagId)) {
             var estimate = individualTagPoses.get(tagId);
-            if(estimate.timestamp() > timestamp) { return; }
-            if(timestamp - estimate.timestamp() < 0.05 && estimate.ambiguity() <= ambiguity) { return; }
+            if (estimate.timestamp() > timestamp) {
+                return;
+            }
+            if (timestamp - estimate.timestamp() < 0.05 && estimate.ambiguity() <= ambiguity) {
+                return;
+            }
         }
 
         var movement = getOdometryMovementSince(timestamp);
-        if(movement.isEmpty()) { return; }
+        if (movement.isEmpty()) {
+            return;
+        }
 
         Rotation2d robotRotation = robotPose.transformBy(movement.get().inverse()).getRotation();
 
@@ -162,7 +176,8 @@ public class RobotState {
 
     /**
      * Gets if the robot is currently on the right side of the field.
-     * @return
+     *
+     * @return True if the robot is on the right side of the field.
      */
     @AutoLogOutput(key = "Odometry/IsOnRightSide")
     public boolean isOnRightSide() {
@@ -191,10 +206,11 @@ public class RobotState {
         poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     }
 
+    /** Applies an odometry update based on the current module positions and gyro angle. */
     public void applyOdometryUpdate(double timestamp, SwerveModulePosition[] modulePositions,
         Optional<Rotation2d> gyroRotation) {
         SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
-        for(int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
+        for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
             moduleDeltas[moduleIndex] = new SwerveModulePosition(
                 modulePositions[moduleIndex].distanceMeters - lastModulePositions[moduleIndex].distanceMeters,
                 modulePositions[moduleIndex].angle);
@@ -202,7 +218,7 @@ public class RobotState {
         }
 
         // Update gyro angle
-        if(gyroRotation.isPresent()) {
+        if (gyroRotation.isPresent()) {
             // Use the real gyro angle
             rawGyroRotation = gyroRotation.get();
         } else {
@@ -226,7 +242,8 @@ public class RobotState {
 
     /**
      * Gets the robot's linear velocity in meters per second.
-     * @return
+     *
+     * @return The robot's linear velocity.
      */
     public double getRobotLinearVelocity() {
         return Math.sqrt(Math.pow(robotVelocity.vxMetersPerSecond, 2) + Math.pow(robotVelocity.vyMetersPerSecond, 2));
@@ -237,14 +254,24 @@ public class RobotState {
     }
 
     private Stack<FuelPoseEstimate> fuelPoseEstimates = new Stack<>();
+    
+    /**
+     * Adds a new fuel pose estimate to the stack.
+     *
+     * @param poseEstimate The new fuel pose estimate to add.
+     */
     public void addFuelPose(FuelPoseEstimate poseEstimate) {
         fuelPoseEstimates.push(poseEstimate);
         updateFuelPoseEstimates();
     }
+
+    /** Gets the current stack of fuel pose estimates. */
     public Stack<FuelPoseEstimate> getFuelPoseEstimates() {
         updateFuelPoseEstimates();
         return fuelPoseEstimates;
     }
+    
+    /** Removes outdated fuel pose estimates from the stack. */
     public void updateFuelPoseEstimates() {
         fuelPoseEstimates.removeIf(pe -> Timer.getTimestamp() - pe.timestamp().in(Seconds) > 5.0);
     }
