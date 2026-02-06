@@ -24,14 +24,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
-import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
 import frc.robot.subsystems.objectDetection.ObjectDetection;
 import frc.robot.subsystems.objectDetection.ObjectDetectionConstants;
 import frc.robot.subsystems.objectDetection.ObjectDetectionIO;
@@ -54,8 +51,12 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.subsystems.drive.swerve.SwerveDriveSimulation;
-
+import org.littletonrobotics.junction.Logger;
+import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
+import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.SimulatedArena;
+import frc.robot.subsystems.drive.GyroIOSim;
 import static edu.wpi.first.units.Units.*;
 
 /**
@@ -98,28 +99,10 @@ public class RobotContainer {
                 // a CANcoder
                 drive = new Drive(
                         new GyroIOPigeon2(),
-                        new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
-                        new ModuleIOTalonFXReal(TunerConstants.FrontRight),
-                        new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                        new ModuleIOTalonFXReal(TunerConstants.BackRight));
-
-                // The ModuleIOTalonFXS implementation provides an example implementation for
-                // TalonFXS controller connected to a CANdi with a PWM encoder. The
-                // implementations
-                // of ModuleIOTalonFX, ModuleIOTalonFXS, and ModuleIOSpark (from the Spark
-                // swerve
-                // template) can be freely intermixed to support alternative hardware
-                // arrangements.
-                // Please see the AdvantageKit template documentation for more information:
-                // https://docs.advantagekit.org/getting-started/template-projects/talonfx-swerve-template#custom-module-implementations
-                //
-                // drive =
-                // new Drive(
-                // new GyroIOPigeon2(),
-                // new ModuleIOTalonFXS(TunerConstants.FrontLeft),
-                // new ModuleIOTalonFXS(TunerConstants.FrontRight),
-                // new ModuleIOTalonFXS(TunerConstants.BackLeft),
-                // new ModuleIOTalonFXS(TunerConstants.BackRight));
+                        new ModuleIOTalonFXReal(DriveConstants.frontLeftConfig),
+                        new ModuleIOTalonFXReal(DriveConstants.frontRightConfig),
+                        new ModuleIOTalonFXReal(DriveConstants.backLeftConfig),
+                        new ModuleIOTalonFXReal(DriveConstants.backRightConfig));
                 intake = new Intake(new IntakeIOReal());
                 hopper = new Hopper(new HopperIOReal());
                 vision = new Vision(

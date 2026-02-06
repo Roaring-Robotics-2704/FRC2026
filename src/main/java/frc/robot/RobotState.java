@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.poseEst.OdometrySwerveDrivePoseEstimator;
+import frc.robot.subsystems.vision.Vision.IndividualTagEstimate;
 
 /**
  * A singleton class that holds the global state of the robot. This holds state that doesn't directly control mechanisms and

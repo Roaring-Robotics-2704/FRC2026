@@ -29,6 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
 
 /** Collection of drive commands. */
 public class DriveCommands {
@@ -268,7 +270,7 @@ public class DriveCommands {
                                             for (int i = 0; i < 4; i++) {
                                                 wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
                                             }
-                                            double wheelRadius = (state.gyroDelta * Drive.DRIVE_BASE_RADIUS)
+                                            double wheelRadius = (state.gyroDelta * DriveConstants.driveBaseRadiusMeters)
                                                     / wheelDelta;
 
                                             NumberFormat formatter = new DecimalFormat("#0.000");
