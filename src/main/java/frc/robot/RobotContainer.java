@@ -47,6 +47,9 @@ import frc.robot.subsystems.superstructure.intake.IntakeIOReal;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.superstructure.shooter.ShooterIO;
 import frc.robot.subsystems.superstructure.shooter.ShooterIOGreyT;
+import frc.robot.subsystems.superstructure.climber.Climber;
+import frc.robot.subsystems.superstructure.climber.ClimberConstants;
+import frc.robot.subsystems.superstructure.climber.ClimberIO;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 //import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -71,6 +74,7 @@ public class RobotContainer {
     private final Hopper hopper;
     private final Intake intake;
     private final Shooter shooter;
+    private final Climber climber;
 
     private final Vision vision;
     private final ObjectDetection objectDetection;
@@ -119,6 +123,7 @@ public class RobotContainer {
                 // new ModuleIOTalonFXS(TunerConstants.BackRight));
                 intake = new Intake(new IntakeIOReal());
                 hopper = new Hopper(new HopperIOReal());
+                climber = new Climber(new ClimberIO());
                 vision = new Vision(
                         drive::addVisionMeasurement,
                         new VisionIOPhotonVision(camera0Name, robotToCamera0),
@@ -175,7 +180,7 @@ public class RobotContainer {
         }
 
         // Set up superstructure
-        superStructure = new SuperStructure(intake, hopper, shooter);
+        superStructure = new SuperStructure(intake, hopper, shooter,climber);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -261,7 +266,10 @@ public class RobotContainer {
                                         new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                                 drive)
                                 .ignoringDisable(true));
+
+        controller.leftBumper().onTrue(superStructure.goToState(null));// TO DO add climber to superstructure
     }
+
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.

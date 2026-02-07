@@ -1,8 +1,17 @@
 package frc.robot.subsystems.superstructure.climber;
+import  edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Climber {
+
+public class Climber extends SubsystemBase {
+
     private final ClimberIO io = new ClimberIO();
-// rotate hooks parallel to ground
+public Climber(ClimberIO climberIO) {
+        //TODO Auto-generated constructor stub
+        private ClimberState currentstate = ClimberState.IN;
+
+
+    }
+    // rotate hooks parallel to ground
     public void rotateHooksDown(){
         if (io.getHookPosition() < ClimberConstants.HOOK_TARGET_DEGREES) {
             io.setHookSpeed(ClimberConstants.HOOK_SPEED);

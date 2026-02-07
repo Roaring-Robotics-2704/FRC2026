@@ -10,6 +10,9 @@ import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.intake.Intake.IntakeState;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.superstructure.shooter.Shooter.ShooterState;
+import frc.robot.subsystems.superstructure.climber.Climber;
+import frc.robot.subsystems.superstructure.climber.ClimberConstants;
+import frc.robot.subsystems.superstructure.climber.ClimberIO;
 
 /**
  * SuperStructure subsystem for controlling the robot's superstructure
@@ -23,12 +26,14 @@ public class SuperStructure extends SubsystemBase {
     private final Intake intake;
     private final Hopper hopper;
     private final Shooter shooter;
+    private final Climber climber;
 
     /** Creates a new SuperStructure. */
-    public SuperStructure(Intake intake, Hopper hopper, Shooter shooter) {
+    public SuperStructure(Intake intake, Hopper hopper, Shooter shooter,Climber climber) {
         this.hopper = hopper;
         this.shooter = shooter;
         this.intake = intake;
+        this.climber = climber;
     }
 
     @Override
