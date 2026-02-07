@@ -182,19 +182,19 @@ task(eventDeploy) {
 createVersionFile.dependsOn(eventDeploy)
 
 // Spotless formatting
-project.compileJava.dependsOn(spotlessApply)
-spotless {
-    java {
-        target fileTree(".") {
-            include "**/*.java"
-            exclude "**/build/**", "**/build-*/**"
-        }
-        toggleOffOn()
-        googleJavaFormat()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
+//project.compileJava.dependsOn(spotlessApply)
+//spotless {
+  //  java {
+    //    target fileTree(".") {
+      //      include "**/*.java"
+        //    exclude "**/build/**", "**/build-*/**"
+        //}
+        //toggleOffOn()
+       // googleJavaFormat()
+       // removeUnusedImports()
+        //trimTrailingWhitespace()
+        //endWithNewline()
+   // }
     groovyGradle {
         target fileTree(".") {
             include "**/*.gradle"
