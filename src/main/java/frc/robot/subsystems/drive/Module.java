@@ -1,63 +1,75 @@
-// Copyright (c) 2021-2026 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-
 package frc.robot.subsystems.drive;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import frc.robot.util.tunables.LoggedTunableNumber;
+
+import static edu.wpi.first.units.Units.Meters;
+
 import org.littletonrobotics.junction.Logger;
 
-/** Represents a single swerve module of the drivetrain. */
 public class Module {
+    private static final LoggedTunableNumber driveP = new LoggedTunableNumber("Drive/DriveP");
+    private static final LoggedTunableNumber driveD = new LoggedTunableNumber("Drive/DriveD");
+
+    private static final LoggedTunableNumber driveS = new LoggedTunableNumber("Drive/DriveS");
+    private static final LoggedTunableNumber driveV = new LoggedTunableNumber("Drive/DriveV");
+    private static final LoggedTunableNumber driveA = new LoggedTunableNumber("Drive/DriveA");
+
+    private static final LoggedTunableNumber turnP = new LoggedTunableNumber("Drive/TurnP");
+    private static final LoggedTunableNumber turnD = new LoggedTunableNumber("Drive/TurnD");
+
+    static {
+        driveP.initDefault(DriveConstants.driveGains.kP);
+        driveD.initDefault(DriveConstants.driveGains.kD);
+
+        driveS.initDefault(DriveConstants.driveGains.kS);
+        driveV.initDefault(DriveConstants.driveGains.kV);
+        driveA.initDefault(DriveConstants.driveGains.kA);
+
+        turnP.initDefault(DriveConstants.steerGains.kP);
+        turnD.initDefault(DriveConstants.steerGains.kD);
+    }
+
     private final ModuleIO io;
     private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
-    private final int index;
-    private final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
+    private final String name;
 
     private final Alert driveDisconnectedAlert;
     private final Alert turnDisconnectedAlert;
     private final Alert turnEncoderDisconnectedAlert;
     private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
 
-    /** Creates a new Module with the given IO, index, and constants. */
-    public Module(
-            ModuleIO io,
-            int index,
-            SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants) {
+    public Module(ModuleIO io, String name) {
+        this.name = name;
         this.io = io;
-        this.index = index;
-        this.constants = constants;
-        driveDisconnectedAlert = new Alert(
-                "Disconnected drive motor on module " + Integer.toString(index) + ".",
-                AlertType.kError);
-        turnDisconnectedAlert = new Alert(
-                "Disconnected turn motor on module " + Integer.toString(index) + ".", AlertType.kError);
-        turnEncoderDisconnectedAlert = new Alert(
-                "Disconnected turn encoder on module " + Integer.toString(index) + ".",
-                AlertType.kError);
+        driveDisconnectedAlert = new Alert("Disconnected drive motor on module " + name + ".", AlertType.kError);
+        turnDisconnectedAlert = new Alert("Disconnected turn motor on module " + name + ".", AlertType.kError);
+        turnEncoderDisconnectedAlert = new Alert("Disconnected turn encoder on module " + name + ".", AlertType.kError);
     }
 
-    /** Updates the module inputs and alerts. */
     public void periodic() {
+        if(driveP.hasChanged(hashCode()) || driveD.hasChanged(hashCode()) ||
+            driveS.hasChanged(hashCode()) || driveV.hasChanged(hashCode()) || driveA.hasChanged(hashCode())) {
+            io.setDrivePID(driveP.get(), 0, driveD.get(), driveS.get(), driveV.get(), driveA.get());
+        }
+        if(turnP.hasChanged(hashCode()) || turnD.hasChanged(hashCode())) {
+            io.setTurnPID(turnP.get(), 0, turnD.get());
+        }
+
         io.updateInputs(inputs);
-        Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
+        Logger.processInputs("Drive/Module" + name, inputs);
 
         // Calculate positions for odometry
         int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
         odometryPositions = new SwerveModulePosition[sampleCount];
         for (int i = 0; i < sampleCount; i++) {
-            double positionMeters = inputs.odometryDrivePositionsRad[i] * constants.WheelRadius;
+            double positionMeters = inputs.odometryDrivePositionsRad[i] * DriveConstants.wheelRadius.in(Meters);
             Rotation2d angle = inputs.odometryTurnPositions[i];
             odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
         }
@@ -68,26 +80,57 @@ public class Module {
         turnEncoderDisconnectedAlert.set(!inputs.turnEncoderConnected);
     }
 
+    private record OptimizePair(SwerveModuleState state, double acceleration) {}
     /**
-     * Runs the module with the specified setpoint state. Mutates the state to
-     * optimize it.
+     * Optimize the module state and 
+     * @param currentAngle
+     * @param accelerationMps2
+     * @return
      */
-    public void runSetpoint(SwerveModuleState state) {
+    private OptimizePair optimizeState(SwerveModuleState state, Rotation2d currentAngle, double accelerationMps2) {
+        var delta = state.angle.minus(currentAngle);
+        if(Math.abs(delta.getDegrees()) > 90.0) {
+            state.speedMetersPerSecond *= -1;
+            state.angle = state.angle.rotateBy(Rotation2d.kPi);
+            accelerationMps2 *= -1;
+        }
+        return new OptimizePair(state, accelerationMps2);
+    }
+
+    /** Runs the module with the specified setpoint state. Mutates the state to optimize it. */
+    public void runSetpoint(SwerveModuleState state, double accelerationMps2) {
         // Optimize velocity setpoint
-        state.optimize(getAngle());
-        state.cosineScale(inputs.turnPosition);
+        var pair = optimizeState(state, getAngle(), accelerationMps2);
+        state = pair.state;
+        accelerationMps2 = pair.acceleration;
+
+        state.cosineScale(inputs.turnAbsolutePosition);
 
         // Apply setpoints
-        io.setDriveVelocity(state.speedMetersPerSecond / constants.WheelRadius);
+        // TODO: Tuning toggle to disable drive wheels
+        io.setDriveVelocity(
+            state.speedMetersPerSecond / DriveConstants.wheelRadius.in(Meters),
+            accelerationMps2 / DriveConstants.wheelRadius.in(Meters)
+        );
         io.setTurnPosition(state.angle);
     }
 
-    /**
-     * Runs the module with the specified output while controlling to zero degrees.
-     */
+    /** Runs the module with the specified output while controlling to zero degrees. */
     public void runCharacterization(double output) {
         io.setDriveOpenLoop(output);
-        io.setTurnPosition(Rotation2d.kZero);
+        io.setTurnPosition(new Rotation2d());
+    }
+
+    /** Characterize robot angular motion. */
+    public void runAngularCharacterization(double output) {
+        io.setDriveOpenLoop(output);
+        io.setTurnPosition(Rotation2d.fromDegrees(switch(name) {
+            case "FrontLeft" -> 135.0;
+            case "FrontRight" -> 45.0;
+            case "BackLeft" -> -135.0;
+            case "BackRight" -> -45.0;
+            default -> 0.0;
+        }));
     }
 
     /** Disables all outputs to motors. */
@@ -98,17 +141,17 @@ public class Module {
 
     /** Returns the current turn angle of the module. */
     public Rotation2d getAngle() {
-        return inputs.turnPosition;
+        return inputs.turnAbsolutePosition;
     }
 
     /** Returns the current drive position of the module in meters. */
     public double getPositionMeters() {
-        return inputs.drivePositionRad * constants.WheelRadius;
+        return inputs.drivePositionRad * DriveConstants.wheelRadius.in(Meters);
     }
 
     /** Returns the current drive velocity of the module in meters per second. */
     public double getVelocityMetersPerSec() {
-        return inputs.driveVelocityRadPerSec * constants.WheelRadius;
+        return inputs.driveVelocityRadPerSec * DriveConstants.wheelRadius.in(Meters);
     }
 
     /** Returns the module position (turn angle and drive position). */
@@ -139,5 +182,14 @@ public class Module {
     /** Returns the module velocity in rotations/sec (Phoenix native units). */
     public double getFFCharacterizationVelocity() {
         return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
+    }
+
+    /** Sets the current limit on the drive motor temporarily for slip current measurement. */
+    public void setSlipMeasurementCurrentLimit(Current limit) {
+        io.setSlipMeasurementCurrentLimit(limit);
+    }
+    /** Returns the drive motor current draw in amps. */
+    public double getSlipMeasurementCurrent() {
+        return inputs.driveCurrentAmps;
     }
 }

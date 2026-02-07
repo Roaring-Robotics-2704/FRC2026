@@ -76,6 +76,12 @@
   "java.format.settings.url": "eclipse-formatter.xml",
   "[xml]": {
     "editor.defaultFormatter": "redhat.vscode-xml"
-  }
+  },
+  "java.project.sourcePaths": [
+    "src/main/java"
+  ],
+  "checkstyle-converter.indentPreference": 4,
+  "editor.tabSize": 4,
+  "checkstyle-converter.changeIncrements": true
 
 }
