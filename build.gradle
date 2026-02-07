@@ -54,7 +54,7 @@ deploy {
                     directory = '/home/lvuser/deploy'
                     // Change to true to delete files on roboRIO that no
                     // longer exist in deploy directory on roboRIO
-                    deleteOldFiles = false
+                    deleteOldFiles = true
                 }
             }
         }
@@ -144,7 +144,7 @@ gversion {
     classPackage = "frc.robot"
     className    = "BuildConstants"
     dateFormat   = "yyyy-MM-dd HH:mm:ss z"
-    timeZone     = "America/Chicago"
+    timeZone     = "America/New_York"
     indent       = "  "
 }
 
@@ -181,6 +181,47 @@ task(eventDeploy) {
 }
 createVersionFile.dependsOn(eventDeploy)
 
+// Spotless formatting
+project.compileJava.dependsOn(spotlessApply)
+spotless {
+    java {
+        target fileTree(".") {
+            include "**/*.java"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        toggleOffOn()
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    groovyGradle {
+        target fileTree(".") {
+            include "**/*.gradle"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        greclipse()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    json {
+        target fileTree(".") {
+            include "**/*.json"
+            exclude "**/build/**", "**/build-*/**", ".wpilib/**"
+        }
+        gson().indentWithSpaces(2)
+    }
+    format "misc", {
+        target fileTree(".") {
+            include "**/*.md", "**/.gitignore"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+}
 
 // Checkstyle configuration - use Google's Java style guide via local config file
 checkstyle {
@@ -191,7 +232,7 @@ checkstyle {
     // If you prefer a local file, replace the next line with: configFile = file("config/checkstyle/google_checks.xml")
     // Use the first JAR file in the checkstyle configuration (handles multiple files / transitive deps)
     //config = resources.text.fromArchiveEntry(configurations.checkstyle.files.find { it.name.endsWith('.jar') }, "google_checks.xml")
-    configFile = file("checkstyle.xml")
+    configFile = file("google_checks.xml")
 }
 
 // Configure Checkstyle task reporting and failure behavior
@@ -202,4 +243,5 @@ tasks.withType(Checkstyle) {
     }
     // Fail the build on violations (change to true/false if you prefer warnings)
     ignoreFailures = false
+
 }

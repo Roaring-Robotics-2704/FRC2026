@@ -6,24 +6,18 @@ package frc.robot.subsystems.superstructure;
 
 /** Add your docs here. */
 public class SuperStructureStates {
-  public enum WantedState {
-    START, // Starting config(All inside robot)
-    IDLE, // Default state
-    INTAKE, // Intake out
-    PASS, // Gentle shooting with intake stowed
-    FEED, // Gentle shooting with intake out
-    SHOOT, // Full shooting position
-    CLIMB, // Climbing position
-  }
-
-  public enum CurrentState {
-    START, // Starting config(All inside robot)
-    IDLE, // Default state
-    INTAKE, // Intake out
-    PASS, // Gentle shooting with intake stowed
-    FEED, // Gentle shooting with intake out
-    SHOOT, // Full shooting position
-    CLIMB, // Climbing position
-    TRANSITIONING, // Moving to wanted state
-  }
+    /** Wanted states for the superstructure. */
+    public enum WantedState {
+        START, // Starting config(All inside robot)
+        IDLE, // Default state
+        INTAKE, // Intake out
+        PASS, // Gentle shooting with intake stowed
+        FEED, // Gentle shooting with intake out
+        SHOOTER_PREP, // Getting ready to shoot
+        SHOOT, // Full shooting position
+        CLIMB, // Climbing position
+        TRANSITIONING, // Moving to wanted state
+        INTAKE_CALIBRATE_IN, // Calibrating intake in
+        INTAKE_CALIBRATE_OUT// Calibrating intake out
+    }
 }
