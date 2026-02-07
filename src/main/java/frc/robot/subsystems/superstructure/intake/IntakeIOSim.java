@@ -39,9 +39,9 @@ import frc.robot.util.SparkUtil;
 
 public class IntakeIOSim implements IntakeIO {
     private SparkFlex rollerMotor;
-    private SparkFlexSim rollerMotorSim = new SparkFlexSim(rollerMotot, ROLLER_MOTOR_TYPE);
+    private SparkFlexSim rollerMotorSim;
     private SparkMax slideMotor;
-    private SparkMaxSim slideMotorSim = new SparkMaxSim(slideMotor, SLIDE_MOTOR_TYPE);
+    private SparkMaxSim slideMotorSim;
     private SparkMaxConfig slideConfig;
 
     /** Instantiates the Real Intake hardware. */
@@ -64,29 +64,30 @@ public class IntakeIOSim implements IntakeIO {
 
         slideConfig.closedLoop.maxMotion.maxAcceleration(SLIDE_MAX_ACCELERATION);
         slideConfig.closedLoop.maxMotion.cruiseVelocity(SLIDE_MAX_VELOCITY);
-
         SparkUtil.tryUntilOk(slideMotor, 5,
                 () -> slideMotor.configure(slideConfig, ResetMode.kResetSafeParameters,
                         PersistMode.kPersistParameters));
 
         SparkFlexConfig rollerConfig = new SparkFlexConfig();
-
         rollerConfig.smartCurrentLimit(ROLLER_CURRENT_LIMIT);
         rollerConfig.idleMode(IdleMode.kCoast);
         SparkUtil.tryUntilOk(rollerMotor, 5,
                 () -> rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters,
                         PersistMode.kPersistParameters));
+
+        slideMotorSim = new SparkMaxSim(slideMotor, SLIDE_MOTOR_TYPE);
+        rollerMotorSim = new SparkFlexSim(rollerMotor, ROLLER_MOTOR_TYPE);
     }
 
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
-        rollerMotorSIM.iterate(rollerMotorSim.getVelocity(), 12, 0.02);
+        rollerMotorSim.iterate(rollerMotorSim.getVelocity(), 12, 0.02);
         slideMotorSim.iterate(slideMotorSim.getVelocity(), 12, 0.02);
-
+    
         inputs.slideAppliedVoltage.mut_replace(slideMotorSim.getAppliedOutput(), Volts);
         inputs.slideCurrentDraw.mut_replace(slideMotorSim.getMotorCurrent(), Amps);
         inputs.slidePosition.mut_replace(slideMotorSim.getPosition(), Inches);
-        //inputs.slideAtPosition = slideMotorSim.getClosedLoopController().isAtSetpoint(); //TODO Fix this for the sim motor
+        inputs.slideAtPosition = slideMotor.getClosedLoopController().isAtSetpoint();
         inputs.slideVelocity.mut_replace(slideMotorSim.getVelocity(), InchesPerSecond);
 
         inputs.rollerAppliedVoltage.mut_replace(rollerMotorSim.getAppliedOutput(), Volts);
