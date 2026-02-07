@@ -43,8 +43,6 @@ public interface ShooterIO { // creates and sets baseline values of robot for lo
     default void setFlywheelVoltage(Voltage voltage) {
     }
     
-    default void setHoodVoltage(Voltage voltage) {
-    }
 
     default void setHoodAngle(Angle angle) {
     }

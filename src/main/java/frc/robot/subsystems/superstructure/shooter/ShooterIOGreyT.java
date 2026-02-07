@@ -147,4 +147,11 @@ public class ShooterIOGreyT implements ShooterIO {
         );
     }
 
+    public TalonFX getFlywheelMotor1() {
+        return flywheelMotor1;
+    }
+    public TalonFX getFlywheelMotor2() {
+        return flywheelMotor2;
+    }
+
 }
