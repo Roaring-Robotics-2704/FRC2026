@@ -1,9 +1,21 @@
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
+import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -24,21 +36,22 @@ import frc.robot.Constants.Mode;
 import frc.robot.RobotState;
 import frc.robot.util.LocalADStarAK;
 
-import java.util.Optional;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
+/** Subsystem for controlling the swerve drive. Contains four modules and a gyro. */
 public class Drive extends SubsystemBase {
     private final RobotState robotState = RobotState.getInstance();
+    private SwerveSetpointGenerator setpointGenerator;
+    ChassisSpeeds currentSpeeds;
+    SwerveModuleState[] currentStates;
+    SwerveSetpoint previousSetpoint;
     
     static final Lock odometryLock = new ReentrantLock();
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
-    private final Alert gyroDisconnectedAlert = new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
+    private final Alert gyroDisconnectedAlert = new Alert(
+        "Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
+    /** Constructs the drive subsystem and its four swerve modules. */
     public Drive(
             GyroIO gyroIO,
             ModuleIO flModuleIO,
@@ -70,6 +83,13 @@ public class Drive extends SubsystemBase {
         PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
             Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
+        setpointGenerator = new SwerveSetpointGenerator(
+            DriveConstants.pathplannerConfig,
+            RadiansPerSecond.of(DriveConstants.maxAngularSpeedRadPerSec));
+        currentSpeeds = RobotState.getInstance().getRobotVelocity();
+        currentStates = this.getModuleStates();
+        previousSetpoint = new SwerveSetpoint(
+            currentSpeeds, currentStates, DriveFeedforwards.zeros(DriveConstants.pathplannerConfig.numModules));
     }
 
     @Override
@@ -77,20 +97,20 @@ public class Drive extends SubsystemBase {
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
-        for(var module : modules) {
+        for (var module : modules) {
             module.periodic();
         }
         odometryLock.unlock();
 
         // Stop moving when disabled
-        if(DriverStation.isDisabled()) {
-            for(var module : modules) {
+        if (DriverStation.isDisabled()) {
+            for (var module : modules) {
                 module.stop();
             }
         }
 
         // Log empty setpoint states when disabled
-        if(DriverStation.isDisabled()) {
+        if (DriverStation.isDisabled()) {
             Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
             Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
         }
@@ -99,10 +119,10 @@ public class Drive extends SubsystemBase {
         double[] sampleTimestamps = modules[0].getOdometryTimestamps(); // All signals are sampled together
         int sampleCount = sampleTimestamps.length;
         var robotState = RobotState.getInstance();
-        for(int i = 0; i < sampleCount; i++) {
+        for (int i = 0; i < sampleCount; i++) {
             // Read wheel positions and deltas from each module
             SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
-            for(int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
+            for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
                 modulePositions[moduleIndex] = modules[moduleIndex].getOdometryPositions()[i];
             }
 
@@ -118,7 +138,8 @@ public class Drive extends SubsystemBase {
     /**
      * Runs the drive at the desired robot-relative velocity with the specified feedforwards.
      *
-     * @param speeds
+     * @param speeds Desired chassis speeds in meters/sec and radians/sec
+     * @param feedforwards Feedforwards to apply to each module in meters/sec^
      */
     public void runVelocityWithFeedforward(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
         runVelocity(speeds, feedforwards.accelerationsMPSSq());
@@ -126,7 +147,8 @@ public class Drive extends SubsystemBase {
 
     /**
      * Runs the drive at the desired robot-relative velocity. Doesn't account for acceleration.
-     * @param speeds
+     *
+     * @param speeds Desired chassis speeds in meters/sec and radians/sec   
      */
     public void runVelocity(ChassisSpeeds speeds) {
         runVelocity(speeds, new double[4]);
@@ -136,21 +158,23 @@ public class Drive extends SubsystemBase {
      * Runs the drive at the desired velocity.
      *
      * @param speeds Speeds in meters/sec
-     * @param accelerations Accelerations **assuming unoptimized module states**.
+     * @param accelerationsMps2 Accelerations **assuming unoptimized module states**.
      */
     @SuppressWarnings("unused")
     public void runVelocity(ChassisSpeeds speeds, double[] accelerationsMps2) {
         // Calculate module setpoints
         speeds = ChassisSpeeds.discretize(speeds, 0.02);
-        SwerveModuleState[] setpointStates = robotState.kinematics.toSwerveModuleStates(speeds);
+        previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, speeds, 0.02);
+        SwerveModuleState[] setpointStates = previousSetpoint.moduleStates();
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.linearFreeSpeed);
 
+        
         // Log unoptimized setpoints and setpoint speeds
         Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
         Logger.recordOutput("SwerveChassisSpeeds/Setpoints", speeds);
 
         // Send setpoints to modules
-        for(int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             modules[i].runSetpoint(setpointStates[i], accelerationsMps2[i]);
         }
 
@@ -160,8 +184,11 @@ public class Drive extends SubsystemBase {
 
     /** Runs the drive in a straight line with the specified drive output. */
     public void runCharacterization(double output) {
-        for(int i = 0; i < 4; i++) modules[i].runCharacterization(output);
+        for (int i = 0; i < 4; i++) { 
+            modules[i].runCharacterization(output);
+        }
     }
+
     /** Runs a particular module in a straight line with the specified drive output. */
     public void runCharacterization(int module, double output) {
         modules[module].runCharacterization(output);
@@ -169,13 +196,18 @@ public class Drive extends SubsystemBase {
 
     /** Runs the drive to rotate with the specified drive output for angular system identification. */
     public void runAngularCharacterization(double output) {
-        for(int i = 0; i < 4; i++) modules[i].runAngularCharacterization(output);
+        for (int i = 0; i < 4; i++) {
+            modules[i].runAngularCharacterization(output);
+        }
     }
 
     /** Sets the current limit on the drive motors temporarily for slip current measurement. */
     public void setSlipMeasurementCurrentLimit(Current limit) {
-        for(int i = 0; i < 4; i++) modules[i].setSlipMeasurementCurrentLimit(limit);
+        for (int i = 0; i < 4; i++) {
+            modules[i].setSlipMeasurementCurrentLimit(limit);
+        }
     }
+
     /** Returns the drive motor current draw of a particular module in amps. */
     public double getSlipMeasurementCurrent(int module) {
         return modules[module].getSlipMeasurementCurrent();
@@ -243,7 +275,8 @@ public class Drive extends SubsystemBase {
 
     /**
      * Resets the odometry to the specified pose. Used at the start of autonomous to tell the robot where it is.
-     * @return
+     *
+     * @param pose The pose to set the robot to.
      */
     public void setPose(Pose2d pose) {
         RobotState.getInstance().setPose(pose, getModulePositions());
