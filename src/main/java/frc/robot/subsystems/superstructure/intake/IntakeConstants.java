@@ -36,6 +36,6 @@ public class IntakeConstants {
     public static final Distance SLIDE_POSITION_TOLERANCE = Inches.of(0.1);
 
     public static final DCMotor ROLLER_MOTOR_TYPE = DCMotor.getNEO(1);
-    public static final DCMotor SLIDE_MOTOR_TYPE = DCMotor.getNeo(1);
+    public static final DCMotor SLIDE_MOTOR_TYPE = DCMotor.getNEO(1);
 
 }
