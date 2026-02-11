@@ -25,7 +25,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
-import frc.robot.subsystems.objectDetection.ObjectDetectionIOInputsAutoLogged;
+import frc.robot.subsystems.objectdetection.ObjectDetectionIOInputsAutoLogged;
 
 /** ObjectDetection subsystem for detecting fuel using a camera. */
 public class ObjectDetection extends SubsystemBase {
