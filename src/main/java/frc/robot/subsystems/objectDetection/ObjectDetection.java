@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.objectdetection;
+package frc.robot.subsystems.objectDetection;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.subsystems.objectdetection.ObjectDetectionConstants.cameraToRobotTransform;
-import static frc.robot.subsystems.objectdetection.ObjectDetectionConstants.fuelHeight;
+import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.cameraToRobotTransform;
+import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.fuelHeight;
 
 import java.util.ArrayList;
 
