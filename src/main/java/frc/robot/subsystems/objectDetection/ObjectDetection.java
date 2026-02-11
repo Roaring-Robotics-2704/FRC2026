@@ -8,8 +8,8 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.cameraToRobotTransform;
-import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.fuelHeight;
+import static frc.robot.subsystems.objectdetection.ObjectDetectionConstants.cameraToRobotTransform;
+import static frc.robot.subsystems.objectdetection.ObjectDetectionConstants.fuelHeight;
 
 import java.util.ArrayList;
 
@@ -25,6 +25,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
+import frc.robot.subsystems.objectDetection.ObjectDetectionIOInputsAutoLogged;
 
 /** ObjectDetection subsystem for detecting fuel using a camera. */
 public class ObjectDetection extends SubsystemBase {
