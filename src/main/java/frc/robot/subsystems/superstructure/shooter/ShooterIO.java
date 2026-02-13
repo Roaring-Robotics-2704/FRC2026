@@ -34,6 +34,8 @@ public interface ShooterIO { // creates and sets baseline values of robot for lo
 
         public boolean atTargetVelocity = false;
         public boolean atTargetAngle = false;
+
+        public MutAngularVelocity targetFlywheelVelocity = DegreesPerSecond.mutable(0);
     }
 
     default void updateInputs(ShooterIOInputs inputs) {

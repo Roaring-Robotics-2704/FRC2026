@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Shooter extends SubsystemBase {
 
     private ShooterState currentState = ShooterState.STATIONARY;
-    private ShooterState desiredState = ShooterState.STATIONARY;
+    private ShooterState desiredState = ShooterState.IDLE;
 
     private Distance distance;
     private Angle hoodAngle;

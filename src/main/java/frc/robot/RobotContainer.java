@@ -53,6 +53,7 @@ import frc.robot.subsystems.superstructure.intake.IntakeIOReal;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.superstructure.shooter.ShooterIO;
 import frc.robot.subsystems.superstructure.shooter.ShooterIOGreyT;
+import frc.robot.subsystems.superstructure.shooter.ShooterIOSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 //import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -137,8 +138,7 @@ public class RobotContainer {
                                 driveSimulation::getSimulatedDriveTrainPose));
                 objectDetection = new ObjectDetection(new ObjectDetectionIO() {
                 });
-                shooter = new Shooter(new ShooterIO() {
-                }, () -> Feet.of(0)); // TODO: Add distance supplier
+                shooter = new Shooter(new ShooterIOSim(), () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
 
             default:
@@ -227,7 +227,7 @@ public class RobotContainer {
                                 () -> Rotation2d.kZero));
 
         controller.leftTrigger().onTrue(superStructure.goToState(WantedState.INTAKE));
-        controller.rightTrigger().onTrue(superStructure.goToState(WantedState.SHOOT));
+        controller.rightTrigger().onTrue(superStructure.goToState(WantedState.SHOOT)).onFalse(superStructure.goToState(WantedState.IDLE));
 
         // Reset gyro to 0 deg when B button is pressed
 

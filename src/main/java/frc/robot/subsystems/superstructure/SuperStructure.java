@@ -91,7 +91,7 @@ public class SuperStructure extends SubsystemBase {
                 default:
                     throw new IllegalStateException("Unexpected value: " + wantedState);
             }
-            if (hopper.isAtWantedState() && shooter.isAtWantedState()) {
+            if (hopper.isAtWantedState() && shooter.isAtWantedState() && intake.atDesiredState()) { //TODO: Add timer to override
                 currentState = wantedState;
             }
         }
