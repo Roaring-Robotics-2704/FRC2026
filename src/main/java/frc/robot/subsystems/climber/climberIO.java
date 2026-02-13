@@ -1,27 +1,29 @@
-//package frc.robot.subsystems.climber;
-//mport com.revrobotics.spark.SparkMax;
+package frc.robot.subsystems.climber;
 
-//import org.littletonrobotics.junction.AutoLog;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Volts;
 
-//import com.revrobotics.AbsoluteEncoder;
-//import com.revrobotics.spark.SparkLowLevel.MotorType;
-//import com.revrobotics.spark.SparkBase;
-//import edu.wpi.first.wpilibj.motorcontrol.Spark;
-//import edu.wpi.first.units.measure.Voltage;
+import org.littletonrobotics.junction.AutoLog;
 
-//public class climberIO {
-  //  @AutoLog
-    //class ClimberInputs {
-      //  public double climberHeight = 0.0;
-       // public double climberAppliedvotls=0.0;
-        //public double ClimberCurrentAmps = 0.0;
-    //}
-     //void updateInputs (ClimberInputs inputs){}
-     //void runVolts (Voltage volts){}
-     //;
-     //void stop(){};
+import edu.wpi.first.units.measure.MutCurrent;
+import edu.wpi.first.units.measure.MutVoltage;
+
+public interface ClimberIO {
+
+
+    @AutoLog
+    class ClimberIOInputs {
+        public int climberHolePosition = 0;
+        public MutVoltage climberAppliedVolts = Volts.mutable(0);
+        public MutCurrent climberCurrentAmps = Amps.mutable(0);
+    }
+
+    default void updateInputs(ClimberIOInputs inputs) {}
+    default void runVolts (Voltage volts){}
+     ;
+     void stop(){};
      
 
 
 
-//}
+}
