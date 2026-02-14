@@ -6,8 +6,8 @@ package frc.robot.subsystems.superstructure.shooter;
 
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_IDLE_RPM;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TARGET_RPM;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_IDLE;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TARGET;
 
 import java.util.function.Supplier;
 
@@ -56,12 +56,12 @@ public class Shooter extends SubsystemBase {
                     ;
                     break;
                 case IDLE:
-                    io.setFlywheelVelocity(SHOOTER_IDLE_RPM);
+                    io.setFlywheelVelocity(SHOOTER_IDLE);
                     io.setHoodAngle(MIN_ANGLE);
                     break;
                 case SHOOTING:
                     io.setHoodAngle(hoodAngle);
-                    io.setFlywheelVelocity(SHOOTER_TARGET_RPM);
+                    io.setFlywheelVelocity(SHOOTER_TARGET);
                     break;
                 default:
                     break;

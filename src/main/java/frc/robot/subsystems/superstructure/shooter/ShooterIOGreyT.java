@@ -20,7 +20,7 @@ import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOT
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KP;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KS;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KV;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TOLERANCE_RPM;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TOLERANCE;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.StatusSignalCollection;
@@ -111,7 +111,7 @@ public class ShooterIOGreyT implements ShooterIO {
         inputs.flywheelCurrentAmps.mut_replace(flywheelCurrentAmpsSignal.getValue());
 
         inputs.hoodAngle.mut_replace(getHoodServoPosition());
-        inputs.atTargetVelocity = flywheelMotor1.getClosedLoopError().getValue() < SHOOTER_TOLERANCE_RPM;
+        inputs.atTargetVelocity = flywheelMotor1.getClosedLoopError().getValue() < SHOOTER_TOLERANCE.in(RotationsPerSecond);
         inputs.atTargetAngle = hoodServo1.isFinished() && hoodServo2.isFinished();
         inputs.targetFlywheelVelocity.mut_replace(flywheelMotor1.getClosedLoopReference().getValueAsDouble(), RotationsPerSecond);
     }
@@ -149,11 +149,5 @@ public class ShooterIOGreyT implements ShooterIO {
         );
     }
 
-    public TalonFX getFlywheelMotor1() {
-        return flywheelMotor1;
-    }
-    public TalonFX getFlywheelMotor2() {
-        return flywheelMotor2;
-    }
 
 }
