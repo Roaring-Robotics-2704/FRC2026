@@ -19,6 +19,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -31,12 +32,12 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.objectDetection.ObjectDetection;
-import frc.robot.subsystems.objectDetection.ObjectDetectionConstants;
-import frc.robot.subsystems.objectDetection.ObjectDetectionIO;
-import frc.robot.subsystems.objectDetection.ObjectDetectionIOReal;
+import frc.robot.subsystems.objectdetection.ObjectDetection;
+import frc.robot.subsystems.objectdetection.ObjectDetectionConstants;
+import frc.robot.subsystems.objectdetection.ObjectDetectionIO;
+import frc.robot.subsystems.objectdetection.ObjectDetectionIOReal;
 import frc.robot.subsystems.superstructure.SuperStructure;
-import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
+import frc.robot.subsystems.superstructure.SuperStructureConstants.SuperStructureStates;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.HopperIO;
 import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
@@ -123,12 +124,17 @@ public class RobotContainer {
                 // new ModuleIOTalonFXS(TunerConstants.BackRight));
                 intake = new Intake(new IntakeIOReal());
                 hopper = new Hopper(new HopperIOReal());
-                climber = new Climber(new ClimberIO());
+                climber = new Climber(new ClimberIO() {});
                 vision = new Vision(
                         drive::addVisionMeasurement,
                         new VisionIOPhotonVision(camera0Name, robotToCamera0),
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
-                objectDetection = new ObjectDetection(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName, ObjectDetectionConstants.cameraToRobotTransform), drive::getPose);
+                objectDetection = new ObjectDetection(
+                    new ObjectDetectionIOReal(
+                        ObjectDetectionConstants.cameraName,
+                        ObjectDetectionConstants.cameraToRobotTransform
+                    ),
+                    drive::getPose);
                 shooter = new Shooter(new ShooterIOGreyT(), () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
 
@@ -143,6 +149,7 @@ public class RobotContainer {
                         new ModuleIOSim(TunerConstants.BackRight));
                 intake = new Intake(new IntakeIO() {});
                 hopper = new Hopper(new HopperIOSim());
+                climber = new Climber(new ClimberIO() {});
 
                 vision = new Vision(
                         drive::addVisionMeasurement,
@@ -168,14 +175,14 @@ public class RobotContainer {
                         });
                 intake = new Intake(new IntakeIO() {});
                 hopper = new Hopper(new HopperIO() {});
+                climber = new Climber(new ClimberIO() {});
 
                 vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
                 }, new VisionIO() {});
                 objectDetection = new ObjectDetection(new ObjectDetectionIO() {}, drive::getPose);
 
 
-                shooter = new Shooter(new ShooterIO() {
-                }, () -> Feet.of(0)); // TODO: Add distance supplier
+                shooter = new Shooter(new ShooterIO() {}, Robot); // TODO: Add distance supplier
                 break;
         }
 
@@ -253,8 +260,8 @@ public class RobotContainer {
                                 () -> -controller.getLeftX(),
                                 () -> Rotation2d.kZero));
 
-        controller.leftTrigger().onTrue(superStructure.goToState(WantedState.INTAKE));
-        controller.rightTrigger().onTrue(superStructure.goToState(WantedState.SHOOT));
+        controller.leftTrigger().onTrue(superStructure.goToState(SuperStructureStates.INTAKE));
+        controller.rightTrigger().onTrue(superStructure.goToState(SuperStructureStates.SHOOT));
 
         // Reset gyro to 0 deg when B button is pressed
 
@@ -287,7 +294,7 @@ public class RobotContainer {
      * @return the command to run in calibration
      */
     public Command getCalibrationCommand() {
-        return Commands.sequence(superStructure.goToState(WantedState.INTAKE_CALIBRATE_IN),
-            superStructure.goToState(WantedState.INTAKE_CALIBRATE_OUT));
+        return Commands.sequence(superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_IN),
+            superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_OUT));
     }
 }

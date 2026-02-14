@@ -7,15 +7,18 @@ package frc.robot.subsystems.superstructure.shooter;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_IDLE_RPM;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TARGET_RPM;
 
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.solvers.BasicTunedCalc;
+import frc.robot.util.solvers.SolverIO;
 
 /** The shooter subsystem. */
 public class Shooter extends SubsystemBase {
@@ -23,27 +26,30 @@ public class Shooter extends SubsystemBase {
     private ShooterState currentState = ShooterState.STATIONARY;
     private ShooterState desiredState = ShooterState.STATIONARY;
 
-    private Distance distance;
     private Angle hoodAngle;
+    private AngularVelocity flywheelVelocity;
+
 
     private final ShooterIO io;
-    private final Supplier<Distance> distanceSupplier;
+    private final Supplier<Pose2d> robotPoseSupplier;
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+    private final SolverIO solver;
 
-    public Shooter(ShooterIO io, Supplier<Distance> distanceSupplier) {
+    public Shooter(ShooterIO io, Supplier<Pose2d> robotPoseSupplier, SolverIO solver) {
         this.io = io;
-        this.distanceSupplier = distanceSupplier;
+        this.robotPoseSupplier = robotPoseSupplier;
+        this.solver = solver;
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Shooter", inputs);
-        distance = distanceSupplier.get();
-        Logger.recordOutput("Shooter/DistanceToTarget", distance);
-        hoodAngle = HoodAngleCalc.getInstance().getHoodAngle(distance);
-        Logger.recordOutput("Shooter/HoodAngle", hoodAngle);
+        hoodAngle = solver.getShootingSolution(robotPoseSupplier.get()).hoodAngle();
+        flywheelVelocity = solver.getShootingSolution(robotPoseSupplier.get()).flywheelVelocity();
+        Logger.recordOutput("Shooter/CalculatedHoodAngle", hoodAngle);
+        Logger.recordOutput("Shooter/CalculatedFlywheelVelocity", flywheelVelocity);
 
         Logger.recordOutput("Shooter/DesiredState", desiredState.toString());
         Logger.recordOutput("Shooter/CurrentState", currentState.toString());
@@ -61,7 +67,7 @@ public class Shooter extends SubsystemBase {
                     break;
                 case SHOOTING:
                     io.setHoodAngle(hoodAngle);
-                    io.setFlywheelVelocity(SHOOTER_TARGET_RPM);
+                    io.setFlywheelVelocity(flywheelVelocity);
                     break;
                 default:
                     break;
@@ -98,7 +104,7 @@ public class Shooter extends SubsystemBase {
      * @return true if the current state matches the desired state, false otherwise.
      */
 
-    public boolean isAtWantedState() {
+    public boolean isAtDesiredState() {
         return currentState == desiredState;
     }
 

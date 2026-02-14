@@ -1,26 +1,27 @@
 package frc.robot.subsystems.superstructure;
 
+import static frc.robot.subsystems.objectdetection.ObjectDetectionConstants.cameraName;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
+import frc.robot.subsystems.superstructure.SuperStructureConstants.SuperStructureStates;
+import frc.robot.subsystems.superstructure.climber.Climber;
+import frc.robot.subsystems.superstructure.climber.Climber.ClimberState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.Hopper.HopperState;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.intake.Intake.IntakeState;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.superstructure.shooter.Shooter.ShooterState;
-import frc.robot.subsystems.superstructure.climber.Climber;
-import frc.robot.subsystems.superstructure.climber.ClimberConstants;
-import frc.robot.subsystems.superstructure.climber.ClimberIO;
 
 /**
  * SuperStructure subsystem for controlling the robot's superstructure
  * mechanisms.
  */
 public class SuperStructure extends SubsystemBase {
-    private WantedState wantedState = WantedState.IDLE;
-    private WantedState currentState = WantedState.IDLE;
+    private SuperStructureStates wantedState = SuperStructureStates.IDLE;
+    private SuperStructureStates currentState = SuperStructureStates.IDLE;
 
     // Subsystems
     private final Intake intake;
@@ -29,7 +30,7 @@ public class SuperStructure extends SubsystemBase {
     private final Climber climber;
 
     /** Creates a new SuperStructure. */
-    public SuperStructure(Intake intake, Hopper hopper, Shooter shooter,Climber climber) {
+    public SuperStructure(Intake intake, Hopper hopper, Shooter shooter, Climber climber) {
         this.hopper = hopper;
         this.shooter = shooter;
         this.intake = intake;
@@ -38,11 +39,7 @@ public class SuperStructure extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (currentState == WantedState.TRANSITIONING) {
-            // Here would be the logic to check if the superstructure has reached the wanted
-            // state
-            // For now, we will assume it reaches the wanted state immediately for
-            // simplicity
+        if (currentState != wantedState) {
             switch (wantedState) {
                 case START:
                     intake.setDesiredState(IntakeState.INSIDE);
@@ -78,10 +75,17 @@ public class SuperStructure extends SubsystemBase {
                     hopper.setDesiredState(HopperState.FEEDING);
                     shooter.setDesiredState(ShooterState.SHOOTING);
                     break;
+                case CLIMB_PREP:
+                    intake.setDesiredState(IntakeState.INSIDE);
+                    hopper.setDesiredState(HopperState.IDLE);
+                    shooter.setDesiredState(ShooterState.STATIONARY);
+                    climber.setDesiredState(ClimberState.OUTSIDE_UP);
+                    break;
                 case CLIMB:
                     intake.setDesiredState(IntakeState.INSIDE);
                     hopper.setDesiredState(HopperState.IDLE);
                     shooter.setDesiredState(ShooterState.STATIONARY);
+                    climber.setDesiredState(ClimberState.OUTSIDE_DOWN);
                     break;
                 case INTAKE_CALIBRATE_IN:
                     intake.setDesiredState(IntakeState.CALIBRATE_IN);
@@ -93,7 +97,7 @@ public class SuperStructure extends SubsystemBase {
                 default:
                     throw new IllegalStateException("Unexpected value: " + wantedState);
             }
-            if (hopper.isAtWantedState() && shooter.isAtWantedState()) {
+            if (hopper.isAtDesiredState() && shooter.isAtDesiredState()) {
                 currentState = wantedState;
             }
         }
@@ -111,16 +115,12 @@ public class SuperStructure extends SubsystemBase {
      * periodic/control logic will act upon to reach the requested configuration.
      *
      * @param state
-     *            the desired WantedState to transition to
+     *            the desired SuperStructureStates to transition to
      */
-    public void setWantedState(WantedState state) {
+    public void setDesiredState(SuperStructureStates state) {
         // Only change if different than what is it at, or what it is going to
-        if (state == WantedState.TRANSITIONING) {
-            throw new IllegalArgumentException(
-                    "Cannot set wanted state to TRANSITIONING directly.");
-        } else if (state != currentState || state != wantedState) {
+        if (state != currentState || state != wantedState) {
             this.wantedState = state;
-            currentState = WantedState.TRANSITIONING;
         }
     }
 
@@ -137,25 +137,25 @@ public class SuperStructure extends SubsystemBase {
      *            the WantedState to transition to
      * @return a Command that performs the state transition
      */
-    public Command goToState(WantedState state) {
+    public Command goToState(SuperStructureStates state) {
         return Commands.sequence(
-                Commands.runOnce(() -> setWantedState(state), this),
-                Commands.waitUntil(this::isAtWantedState)).finallyDo(() -> setWantedState(WantedState.IDLE));
+                Commands.runOnce(() -> setDesiredState(state), this),
+                Commands.waitUntil(this::isAtDesiredState));
     }
 
-    public WantedState getWantedState() {
+    public SuperStructureStates getWantedState() {
         return this.wantedState;
     }
 
-    public void setCurrentState(WantedState state) {
+    public void setCurrentState(SuperStructureStates state) {
         this.currentState = state;
     }
 
-    public WantedState getCurrentState() {
+    public SuperStructureStates getCurrentState() {
         return this.currentState;
     }
 
-    public boolean isAtWantedState() {
+    public boolean isAtDesiredState() {
         return this.currentState == this.wantedState;
     }
 }

@@ -35,8 +35,6 @@ public class ShooterConstants {
     public static final double SHOOTER_KA = 0.0;
     public static final double SHOOTER_KS = 0.0;
 
-    public static final AngularVelocity SHOOTER_TARGET_RPM = 
-        RotationsPerSecond.of(2800); // add these if we need them, desired speed
     public static final AngularVelocity SHOOTER_IDLE_RPM = 
         RotationsPerSecond.of(1000); // add these if we need them, idle speed
     public static final double SHOOTER_TOLERANCE_RPM = 0.0; // add these if we need them, at speed

@@ -4,48 +4,31 @@ import  edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
 
-    private final ClimberIO io = new ClimberIO();
-public Climber(ClimberIO climberIO) {
-        //TODO Auto-generated constructor stub
-        private ClimberState currentstate = ClimberState.IN;
+    private final ClimberIO io;
+
+    private ClimberState currentState = ClimberState.INSIDE;
+    private ClimberState desiredState = ClimberState.INSIDE;
+
+    public Climber(ClimberIO climberIO) {
+        this.io = climberIO;
+    }
 
 
-    }
-    // rotate hooks parallel to ground
-    public void rotateHooksDown(){
-        if (io.getHookPosition() < ClimberConstants.HOOK_TARGET_DEGREES) {
-            io.setHookSpeed(ClimberConstants.HOOK_SPEED);
-        }
-        else{
-            io.stopHook();
-        }
-    }
-// stop hooks
-    public void stopHooks(){
-        io.stopHook();
+    public void setDesiredState(ClimberState state) {
+        this.desiredState = state;
     }
 
-//raise climber
-    public void extendClimber(){
-        if (io.getHookPosition() < ClimberConstants.EXTENDED_HEIGHT){
-            io.setTelescopeSpeed(ClimberConstants.TELESCOPE_SPEED);
-        }
-        else{
-            io.stopTelescope();
-        }
+    public boolean isAtDesiredState() {
+        return currentState == desiredState;
     }
 
-//bring climber back down
-    public void retractClimber(){
-        if (io.getHookPosition() > ClimberConstants.RETRACTED_HEIGHT){
-            io.setTelescopeSpeed(-ClimberConstants.TELESCOPE_SPEED);
-        }
-        else{
-            io.stopTelescope();
-        }
+
+    public enum ClimberState {
+        INSIDE,
+        OUTSIDE_UP,
+        OUTSIDE_DOWN
     }
-    public void stopTelescope(){
-        io.stopTelescope();
-    }
+
+    
 
 }
