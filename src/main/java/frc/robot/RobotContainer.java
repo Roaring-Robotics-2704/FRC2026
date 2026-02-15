@@ -37,7 +37,7 @@ import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
-import frc.robot.subsystems.objectdetection.FuelPoseEstimate;
+import frc.robot.subsystems.objectdetection.FuelPoseEstimator;
 import frc.robot.subsystems.objectdetection.ObjectDetectionConstants;
 import frc.robot.subsystems.objectdetection.ObjectDetectionIO;
 import frc.robot.subsystems.objectdetection.ObjectDetectionIOReal;
@@ -78,7 +78,7 @@ public class RobotContainer {
     private final Shooter shooter;
 
     private final Vision vision;
-    private final FuelPoseEstimate objectDetection;
+    private final FuelPoseEstimator objectDetection;
 
     // SuperStructure
     private final SuperStructure superStructure;
@@ -111,7 +111,7 @@ public class RobotContainer {
                 vision = new Vision(
                         new VisionIOPhotonVision(camera0Name, robotToCamera0),
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
-                objectDetection = new FuelPoseEstimate(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
+                objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
                         ObjectDetectionConstants.cameraToRobotTransform));
                 shooter = new Shooter(new ShooterIOGreyT(), () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
@@ -136,7 +136,7 @@ public class RobotContainer {
                                 driveSimulation::getSimulatedDriveTrainPose),
                         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1,
                                 driveSimulation::getSimulatedDriveTrainPose));
-                objectDetection = new FuelPoseEstimate(new ObjectDetectionIO() {
+                objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                 });
                 shooter = new Shooter(new ShooterIOSim(), () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
@@ -162,7 +162,7 @@ public class RobotContainer {
                 vision = new Vision(new VisionIO() {
                 }, new VisionIO() {
                 });
-                objectDetection = new FuelPoseEstimate(new ObjectDetectionIO() {
+                objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                 });
 
                 shooter = new Shooter(new ShooterIO() {

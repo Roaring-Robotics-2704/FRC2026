@@ -28,7 +28,7 @@ import frc.robot.RobotState;
 import frc.robot.subsystems.objectdetection.ObjectDetectionIOInputsAutoLogged;
 
 /** ObjectDetection subsystem for detecting fuel using a camera. */
-public class FuelPoseEstimate extends SubsystemBase {
+public class FuelPoseEstimator extends SubsystemBase {
     private final ObjectDetectionIO io;
     private final ObjectDetectionIOInputsAutoLogged inputs = new ObjectDetectionIOInputsAutoLogged();
     private Angle cameraAngley = cameraToRobotTransform.getRotation().getMeasureX();
@@ -36,7 +36,7 @@ public class FuelPoseEstimate extends SubsystemBase {
     private Distance cameraHeight = cameraToRobotTransform.getTranslation().getMeasureZ();
 
     /** Creates a new ObjectDetection. */
-    public FuelPoseEstimate(ObjectDetectionIO io) {
+    public FuelPoseEstimator(ObjectDetectionIO io) {
         this.io = io;
     }
 

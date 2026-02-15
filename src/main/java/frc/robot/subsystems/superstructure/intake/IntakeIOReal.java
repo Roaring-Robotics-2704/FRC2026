@@ -58,7 +58,7 @@ public class IntakeIOReal implements IntakeIO {
 
         slideConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         slideConfig.absoluteEncoder.inverted(false);
-        slideConfig.absoluteEncoder.positionConversionFactor(ENCODER_GEAR_RATIO);
+        slideConfig.absoluteEncoder.positionConversionFactor(ENCODER_GEAR_RATIO*);
 
 
         slideConfig.closedLoop.maxMotion.maxAcceleration(SLIDE_MAX_ACCELERATION);
