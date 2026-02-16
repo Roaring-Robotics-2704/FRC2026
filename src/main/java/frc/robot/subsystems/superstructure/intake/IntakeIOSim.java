@@ -60,7 +60,7 @@ public class IntakeIOSim implements IntakeIO {
 
     @Override
     public void setPosition(Distance position) {
-        slideMotorSim.useSimpleDCMotorController().
+        slideMotorSim.useSimpleDCMotorController().requestVoltage(null);
     }
     
     @Override
@@ -71,7 +71,7 @@ public class IntakeIOSim implements IntakeIO {
 
     @Override
     public void resetSlideEncoder(Distance position) {
-        slideMotorSim.setEncoderPosition(position.in(Meters));
+;
         
     }
 }
