@@ -37,10 +37,10 @@ import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
-import frc.robot.subsystems.objectdetection.FuelPoseEstimator;
-import frc.robot.subsystems.objectdetection.ObjectDetectionConstants;
-import frc.robot.subsystems.objectdetection.ObjectDetectionIO;
-import frc.robot.subsystems.objectdetection.ObjectDetectionIOReal;
+import frc.robot.subsystems.objectDetection.FuelPoseEstimator;
+import frc.robot.subsystems.objectDetection.ObjectDetectionConstants;
+import frc.robot.subsystems.objectDetection.ObjectDetectionIO;
+import frc.robot.subsystems.objectDetection.ObjectDetectionIOReal;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
@@ -195,8 +195,8 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getLeftX(),
+                        () -> controller.getLeftY(),
+                        () -> controller.getLeftX(),
                         () -> -controller.getRightX()));
         vision.setDefaultCommand(vision.idle());
         objectDetection.setDefaultCommand(objectDetection.idle());
