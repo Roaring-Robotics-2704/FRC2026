@@ -38,8 +38,7 @@ public class IntakeIOSim implements IntakeIO {
 
     IntakeSimulation intakeSim;
     /** Instantiates the Real Intake hardware. */
-    public IntakeIOSim(AbstractDriveTrainSimulation driveSim) {
-        intakeSim = new IntakeSimulation//("Fuel", driveSim, new Rectangle(20, 20), 10);
+    public IntakeIOSim() {
     }
 
     @Override
@@ -61,7 +60,7 @@ public class IntakeIOSim implements IntakeIO {
 
     @Override
     public void setPosition(Distance position) {
-        slideMotorSim.useMotorController()
+        slideMotorSim.useSimpleDCMotorController().
     }
     
     @Override

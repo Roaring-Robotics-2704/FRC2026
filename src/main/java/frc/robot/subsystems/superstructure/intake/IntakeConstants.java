@@ -4,10 +4,10 @@
 
 package frc.robot.subsystems.superstructure.intake;
 
-import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Distance;
-
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 /** Add your docs here. */
@@ -35,6 +35,8 @@ public class IntakeConstants {
 
 
     public static final Distance SLIDE_POSITION_TOLERANCE = Inches.of(0.1);
+
+    public static final Mass SLIDE_MASS = Pounds.of(12); //TODO: Update this value
 
     public static final DCMotor ROLLER_MOTOR_TYPE = DCMotor.getNEO(1);
     public static final DCMotor SLIDE_MOTOR_TYPE = DCMotor.getNEO(1);
