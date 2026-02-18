@@ -18,46 +18,53 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.util.SparkUtil;
 
 /** Real implementation of the hopper. */
 public class HopperIOSim implements HopperIO {
 
-    SparkMax hopperMotor = new SparkMax(HOPPER_MOTOR_ID, SparkMax.MotorType.kBrushless);
-    SparkMaxSim hopperMotorSim = new SparkMaxSim(hopperMotor, HOPPER_MOTOR_TYPE);
+    Voltage targetVoltage = Volts.of(0);
+    // SparkMax hopperMotor = new SparkMax(HOPPER_MOTOR_ID, SparkMax.MotorType.kBrushless);
+    // SparkMaxSim hopperMotorSim;
 
     /** Instantiates the Real Hopper hardware. */
     public HopperIOSim() {
-        SparkMaxConfig hopperConfig = new SparkMaxConfig();
-        hopperConfig.idleMode(IdleMode.kCoast);
-        hopperConfig.smartCurrentLimit(HOPPER_CURRENT_LIMIT);
-        SparkUtil.tryUntilOk(hopperMotor, 5,
-            () -> hopperMotor.configure(hopperConfig,
-                ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters)
-        );
+        // SparkMaxConfig hopperConfig = new SparkMaxConfig();
+        // hopperConfig.idleMode(IdleMode.kCoast);
+        // hopperConfig.smartCurrentLimit(HOPPER_CURRENT_LIMIT);
+        // SparkUtil.tryUntilOk(hopperMotor, 5,
+        //     () -> hopperMotor.configure(hopperConfig,
+        //         ResetMode.kResetSafeParameters,
+        //         PersistMode.kPersistParameters)
+        // );
+        // hopperMotorSim = new SparkMaxSim(hopperMotor, HOPPER_MOTOR_TYPE);
+        // hopperMotorSim.enable();
         
     }
 
     @Override
     public void updateInputs(HopperIOInputs inputs) {
-        hopperMotorSim.iterate(hopperMotorSim.getVelocity(), 12, 0.02);
-        inputs.currentDraw.mut_replace(Amps.of(hopperMotorSim.getMotorCurrent()));
-        inputs.appliedVoltage.mut_replace(Volts.of(hopperMotorSim.getAppliedOutput()));
-        inputs.motorVelocity.mut_replace(RotationsPerSecond.of(
-            hopperMotorSim.getVelocity()
-        ));
+        // hopperMotorSim.iterate(hopperMotorSim.getVelocity(), 12, 0.02);
+        // inputs.currentDraw.mut_replace(Amps.of(hopperMotorSim.getMotorCurrent()));
+        // inputs.appliedVoltage.mut_replace(Volts.of(hopperMotorSim.getAppliedOutput()));
+        // inputs.motorVelocity.mut_replace(RotationsPerSecond.of(
+        //     hopperMotorSim.getVelocity()
+        // ));
+        inputs.appliedVoltage.mut_replace(targetVoltage);
     }
 
     @Override
     public void setMotorVoltage(Voltage voltage) {
-        hopperMotorSim.setAppliedOutput(voltage.in(Volts) / 12.0);
+        // hopperMotorSim.setAppliedOutput(MathUtil.clamp(voltage.in(Volts) / 12.0, -1.0, 1.0));
+        targetVoltage = voltage;
     }
 
     @Override
     public void stopMotor() {
-        hopperMotorSim.setAppliedOutput(0.0);
+        targetVoltage = Volts.of(0);
+        // hopperMotorSim.setAppliedOutput(0.0);
     }
 
 }

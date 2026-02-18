@@ -181,7 +181,7 @@ task(eventDeploy) {
 }
 createVersionFile.dependsOn(eventDeploy)
 
-// Checkstyle configuration - use Google's Java style guide via local config file
+//Checkstyle configuration - use Google's Java style guide via local config file
 checkstyle {
     // Pick a stable Checkstyle version; change if you need a newer one
     toolVersion = "10.12.0"
@@ -195,7 +195,7 @@ checkstyle {
     configFile = file("checkstyle.xml")
 }
 
-// Configure Checkstyle task reporting and failure behavior
+//Configure Checkstyle task reporting and failure behavior
 tasks.withType(Checkstyle) {
     reports {
         xml.required = false

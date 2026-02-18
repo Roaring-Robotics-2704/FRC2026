@@ -15,6 +15,6 @@ public class ObjectDetectionConstants {
 
     public static final String cameraName = "Intake Cam";
     public static final Transform3d cameraToRobotTransform = new Transform3d(0, 0, 0, new Rotation3d(0, 0, 0));
-    public static final Distance fuelHeight = Inches.of(5.91/2); // Half the height of a fuel cell
+    public static final Distance fuelHeight = Inches.of(5.91 / 2); // Half the height of a fuel cell
 
 }
