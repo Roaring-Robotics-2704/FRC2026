@@ -243,15 +243,16 @@ public class DriveConstants {
             .withCustomModuleTranslations(DriveConstants.moduleTranslations)
             .withGyro(COTS.ofPigeon2())
             .withSwerveModule(new SwerveModuleSimulationConfig(
-                    DCMotor.getKrakenX60(1),
-                    DCMotor.getFalcon500(1),
+                    DCMotor.getKrakenX60Foc(1),
+                    DCMotor.getKrakenX44Foc(1),
                     DriveConstants.driveGearRatio,
                     DriveConstants.steerGearRatio,
                     DriveConstants.driveFrictionVoltage,
                     DriveConstants.steerFrictionVoltage,
                     DriveConstants.wheelRadius,
                     DriveConstants.steerInertia,
-                    DriveConstants.wheelCOF));
+                    DriveConstants.wheelCOF))
+            .withBumperSize(Inches.of(30), Inches.of(25));
 
     /**
      * Swerve Drive class utilizing CTR Electronics' Phoenix 6 API with the selected

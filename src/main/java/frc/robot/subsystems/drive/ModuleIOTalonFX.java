@@ -228,4 +228,12 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
             new CurrentLimitsConfigs().withStatorCurrentLimit(current), 0.25
         ));
     }
+
+    public TalonFX getDriveMotor() {
+        return driveTalon;
+    }
+
+    public TalonFX getTurnMotor() {
+        return turnTalon;
+    }
 }

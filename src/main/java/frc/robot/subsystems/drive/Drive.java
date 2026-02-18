@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -9,6 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
@@ -30,6 +32,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -287,4 +290,17 @@ public class Drive extends SubsystemBase {
     private ChassisSpeeds getChassisSpeeds() {
         return robotState.kinematics.toChassisSpeeds(getModuleStates());
     }
+
+    public TalonFX[] getMotors() {
+        List<TalonFX> motors = new java.util.ArrayList<>();
+        for (var module : modules) {
+            for (var motor : module.getMotors()) {
+                if (motor != null) {
+                    motors.add(motor);
+                }
+            }
+        }
+        return motors.toArray(new TalonFX[motors.size()]);
+    }
+    
 }

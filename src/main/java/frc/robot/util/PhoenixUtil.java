@@ -16,9 +16,9 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+
 import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.motorsims.SimulatedBattery;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
 public final class PhoenixUtil {
@@ -50,7 +50,7 @@ public final class PhoenixUtil {
                 AngularVelocity encoderVelocity) {
             talonFXSimState.setRawRotorPosition(encoderAngle);
             talonFXSimState.setRotorVelocity(encoderVelocity);
-            talonFXSimState.setSupplyVoltage(SimulatedBattery.getBatteryVoltage());
+            talonFXSimState.setSupplyVoltage(12);
             return talonFXSimState.getMotorVoltageMeasure();
         }
     }
@@ -83,7 +83,6 @@ public final class PhoenixUtil {
                     - 0.02
                     + i * SimulatedArena.getSimulationDt().in(Seconds);
         }
-
         return odometryTimeStamps;
     }
 

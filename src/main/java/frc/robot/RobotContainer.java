@@ -59,6 +59,7 @@ import frc.robot.subsystems.vision.VisionIO;
 //import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.OrchestraManager;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -119,7 +120,7 @@ public class RobotContainer {
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
                 driveSimulation = new SwerveDriveSimulation(DriveConstants.mapleSimConfig,
-                        new Pose2d(3, 3, new Rotation2d()));
+                        new Pose2d(3, 3, Rotation2d.fromDegrees(360)));
 
                 drive = new Drive(
                         new GyroIOSim(driveSimulation.getGyroSimulation()),
@@ -127,6 +128,7 @@ public class RobotContainer {
                         new ModuleIOTalonFXSim(DriveConstants.frontRightConfig, driveSimulation.getModules()[1]),
                         new ModuleIOTalonFXSim(DriveConstants.backLeftConfig, driveSimulation.getModules()[2]),
                         new ModuleIOTalonFXSim(DriveConstants.backRightConfig, driveSimulation.getModules()[3]));
+                
                 intake = new Intake(new IntakeIO() {
                 });
                 hopper = new Hopper(new HopperIOSim());
@@ -178,8 +180,14 @@ public class RobotContainer {
 
         DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
 
+        OrchestraManager.getInstance().addToOrchestra(drive.getMotors());
+        OrchestraManager.getInstance().loadFile("xp");
+        
+        OrchestraManager.getInstance().play();
         // Configure the button bindings
         configureButtonBindings();
+
+        SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
     }
 
     /**
@@ -281,8 +289,6 @@ public class RobotContainer {
         SimulatedArena.getInstance().simulationPeriodic();
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
         Logger.recordOutput(
-                "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-        Logger.recordOutput(
-                "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+                "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
     }
 }

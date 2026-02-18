@@ -7,11 +7,15 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import frc.robot.util.tunables.LoggedTunableNumber;
 
 import static edu.wpi.first.units.Units.Meters;
 
 import org.littletonrobotics.junction.Logger;
+
+import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 public class Module {
     private static final LoggedTunableNumber driveP = new LoggedTunableNumber("Drive/DriveP");
@@ -192,4 +196,9 @@ public class Module {
     public double getSlipMeasurementCurrent() {
         return inputs.driveCurrentAmps;
     }
+
+    public TalonFX[] getMotors() {
+        return new TalonFX[] {io.getDriveMotor(), io.getTurnMotor()};
+    }
+
 }
