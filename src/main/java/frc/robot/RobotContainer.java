@@ -37,10 +37,10 @@ import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
-import frc.robot.subsystems.objectdetection.ObjectDetection;
-import frc.robot.subsystems.objectdetection.ObjectDetectionConstants;
-import frc.robot.subsystems.objectdetection.ObjectDetectionIO;
-import frc.robot.subsystems.objectdetection.ObjectDetectionIOReal;
+import frc.robot.subsystems.objectDetection.FuelPoseEstimator;
+import frc.robot.subsystems.objectDetection.ObjectDetectionConstants;
+import frc.robot.subsystems.objectDetection.ObjectDetectionIO;
+import frc.robot.subsystems.objectDetection.ObjectDetectionIOReal;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
@@ -53,11 +53,13 @@ import frc.robot.subsystems.superstructure.intake.IntakeIOReal;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.superstructure.shooter.ShooterIO;
 import frc.robot.subsystems.superstructure.shooter.ShooterIOGreyT;
+import frc.robot.subsystems.superstructure.shooter.ShooterIOSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 //import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.OrchestraManager;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -77,7 +79,7 @@ public class RobotContainer {
     private final Shooter shooter;
 
     private final Vision vision;
-    private final ObjectDetection objectDetection;
+    private final FuelPoseEstimator objectDetection;
 
     // SuperStructure
     private final SuperStructure superStructure;
@@ -110,7 +112,7 @@ public class RobotContainer {
                 vision = new Vision(
                         new VisionIOPhotonVision(camera0Name, robotToCamera0),
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
-                objectDetection = new ObjectDetection(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
+                objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
                         ObjectDetectionConstants.cameraToRobotTransform));
                 shooter = new Shooter(new ShooterIOGreyT(), () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
@@ -118,7 +120,7 @@ public class RobotContainer {
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
                 driveSimulation = new SwerveDriveSimulation(DriveConstants.mapleSimConfig,
-                        new Pose2d(3, 3, new Rotation2d()));
+                        new Pose2d(3, 3, Rotation2d.fromDegrees(360)));
 
                 drive = new Drive(
                         new GyroIOSim(driveSimulation.getGyroSimulation()),
@@ -126,6 +128,7 @@ public class RobotContainer {
                         new ModuleIOTalonFXSim(DriveConstants.frontRightConfig, driveSimulation.getModules()[1]),
                         new ModuleIOTalonFXSim(DriveConstants.backLeftConfig, driveSimulation.getModules()[2]),
                         new ModuleIOTalonFXSim(DriveConstants.backRightConfig, driveSimulation.getModules()[3]));
+                
                 intake = new Intake(new IntakeIO() {
                 });
                 hopper = new Hopper(new HopperIOSim());
@@ -135,10 +138,9 @@ public class RobotContainer {
                                 driveSimulation::getSimulatedDriveTrainPose),
                         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1,
                                 driveSimulation::getSimulatedDriveTrainPose));
-                objectDetection = new ObjectDetection(new ObjectDetectionIO() {
+                objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                 });
-                shooter = new Shooter(new ShooterIO() {
-                }, () -> Feet.of(0)); // TODO: Add distance supplier
+                shooter = new Shooter(new ShooterIOSim(), () -> Feet.of(0)); // TODO: Add distance supplier
                 break;
 
             default:
@@ -162,7 +164,7 @@ public class RobotContainer {
                 vision = new Vision(new VisionIO() {
                 }, new VisionIO() {
                 });
-                objectDetection = new ObjectDetection(new ObjectDetectionIO() {
+                objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                 });
 
                 shooter = new Shooter(new ShooterIO() {
@@ -178,8 +180,14 @@ public class RobotContainer {
 
         DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
 
+        OrchestraManager.getInstance().addToOrchestra(drive.getMotors());
+        OrchestraManager.getInstance().loadFile("xp");
+        
+        OrchestraManager.getInstance().play();
         // Configure the button bindings
         configureButtonBindings();
+
+        SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
     }
 
     /**
@@ -195,8 +203,8 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getLeftX(),
+                        () -> controller.getLeftY(),
+                        () -> controller.getLeftX(),
                         () -> -controller.getRightX()));
         vision.setDefaultCommand(vision.idle());
         objectDetection.setDefaultCommand(objectDetection.idle());
@@ -227,7 +235,7 @@ public class RobotContainer {
                                 () -> Rotation2d.kZero));
 
         controller.leftTrigger().onTrue(superStructure.goToState(WantedState.INTAKE));
-        controller.rightTrigger().onTrue(superStructure.goToState(WantedState.SHOOT));
+        controller.rightTrigger().onTrue(superStructure.goToState(WantedState.SHOOT)).onFalse(superStructure.goToState(WantedState.IDLE));
 
         // Reset gyro to 0 deg when B button is pressed
 
@@ -281,8 +289,6 @@ public class RobotContainer {
         SimulatedArena.getInstance().simulationPeriodic();
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
         Logger.recordOutput(
-                "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-        Logger.recordOutput(
-                "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+                "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
     }
 }

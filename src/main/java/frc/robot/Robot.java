@@ -100,6 +100,8 @@ public class Robot extends LoggedRobot {
                 Logger.setReplaySource(new WPILOGReader(logPath));
                 Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_replay")));
                 break;
+            default:
+                throw new IllegalStateException("Unexpected mode: " + Constants.currentMode);
         }
 
         if(Constants.useSuperDangerousRTThreadPriority) Logger.addDataReceiver(new ThreadPriorityDummyLogReceiver());
@@ -204,8 +206,8 @@ public class Robot extends LoggedRobot {
         autonomousCommand = robotContainer.getAutonomousCommand();
 
         // schedule the autonomous command (example)
-        if(autonomousCommand != null) {
-            autonomousCommand.schedule();
+        if (autonomousCommand != null) {
+            CommandScheduler.getInstance().schedule(autonomousCommand);
         }
     }
 
@@ -220,7 +222,7 @@ public class Robot extends LoggedRobot {
         // teleop starts running. If you want the autonomous to
         // continue until interrupted by another command, remove
         // this line or comment it out.
-        if(autonomousCommand != null) {
+        if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
     }
@@ -242,7 +244,9 @@ public class Robot extends LoggedRobot {
 
     /** This function is called once when the robot is first started up. */
     @Override
-    public void simulationInit() {}
+    public void simulationInit() {
+        robotContainer.resetSimulationField();
+    }
 
     /** This function is called periodically whilst in simulation. */
     @Override

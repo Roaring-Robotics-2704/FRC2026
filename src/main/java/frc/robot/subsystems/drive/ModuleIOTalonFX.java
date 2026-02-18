@@ -63,9 +63,9 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     ) {
         this.constants = constants;
 
-        driveTalon = new TalonFX(constants.DriveMotorId, DriveConstants.drivetrainConstants.CANBusName);
-        turnTalon = new TalonFX(constants.SteerMotorId, DriveConstants.drivetrainConstants.CANBusName);
-        cancoder = new CANcoder(constants.EncoderId, DriveConstants.drivetrainConstants.CANBusName);
+        driveTalon = new TalonFX(constants.DriveMotorId, DriveConstants.CANBus);
+        turnTalon = new TalonFX(constants.SteerMotorId, DriveConstants.CANBus);
+        cancoder = new CANcoder(constants.EncoderId, DriveConstants.CANBus);
 
         configureMotors();
 
@@ -227,5 +227,13 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         tryUntilOk(5, () -> driveTalon.getConfigurator().apply(
             new CurrentLimitsConfigs().withStatorCurrentLimit(current), 0.25
         ));
+    }
+
+    public TalonFX getDriveMotor() {
+        return driveTalon;
+    }
+
+    public TalonFX getTurnMotor() {
+        return turnTalon;
     }
 }

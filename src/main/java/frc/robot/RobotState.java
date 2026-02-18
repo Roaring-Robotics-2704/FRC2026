@@ -22,7 +22,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.subsystems.objectdetection.ObjectDetection.FuelPoseEstimate;
+import frc.robot.subsystems.objectDetection.FuelPoseEstimator.FuelPoseEstimate;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.poseEst.OdometrySwerveDrivePoseEstimator;
@@ -276,4 +276,5 @@ public class RobotState {
     public void updateFuelPoseEstimates() {
         fuelPoseEstimates.removeIf(pe -> Timer.getTimestamp() - pe.timestamp().in(Seconds) > 5.0);
     }
+
 }

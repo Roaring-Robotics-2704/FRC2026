@@ -122,12 +122,12 @@ public class DriveConstants {
     // the
     // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     public static final Slot0Configs steerGains = new Slot0Configs()
-            .withKP(325).withKI(0).withKD(0.8).withKS(0.1).withKV(1.59).withKA(0)
+            .withKP(100).withKI(0).withKD(0.5).withKS(0.1).withKV(2.49).withKA(0)
             .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     // When using closed-loop control, the drive motor uses the control
     // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
     public static final Slot0Configs driveGains = new Slot0Configs()
-            .withKP(3.0).withKI(0).withKD(0).withKS(0).withKV(0.124);
+            .withKP(0.1).withKI(0).withKD(0).withKS(0).withKV(0.124);
 
     /**
      * The closed-loop output type to use for the steer motors; this affects their
@@ -169,15 +169,15 @@ public class DriveConstants {
 
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus
-    public static final CANBus CANBus = new CANBus("Default Name", "./logs/example.hoot");
+    public static final CANBus CANBus = new CANBus("Drivetrain", "./logs/example.hoot");
 
     // Effective free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot
-    public static final LinearVelocity linearFreeSpeed = MetersPerSecond.of(4.73); // "Magic" number from max speed
+    public static final LinearVelocity linearFreeSpeed = MetersPerSecond.of(5.85); // "Magic" number from max speed
                                                                                    // measurement
 
-    public static final Distance trackWidth = Inches.of(17.75);
-    public static final Distance wheelBase = Inches.of(16);
+    public static final Distance trackWidth = Inches.of(12.5 * 2);
+    public static final Distance wheelBase = Inches.of(9.75 * 2);
     public static final double driveBaseRadius = Math.hypot(trackWidth.in(Meters) / 2.0, wheelBase.in(Meters) / 2.0);
 
     public static final double maxSpeedMetersPerSec = linearFreeSpeed.in(MetersPerSecond);
@@ -185,13 +185,13 @@ public class DriveConstants {
 
     // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
     // This may need to be tuned to your individual robot
-    private static final double coupleRatio = 3.5714285714285716;
+    private static final double coupleRatio = 3.375;
 
-    public static final double driveGearRatio = 6.746031746031747;
-    public static final double steerGearRatio = 12.8;
+    public static final double driveGearRatio = 5.2734375;
+    public static final double steerGearRatio = 26;
     public static final Distance wheelRadius = Inches.of(2);
 
-    private static final int pigeonId = 9;
+    private static final int pigeonId = 13;
 
     // These are only used for simulation
     public static final MomentOfInertia steerInertia = KilogramSquareMeters.of(0.004);
@@ -205,15 +205,15 @@ public class DriveConstants {
             .withPigeon2Id(pigeonId)
             .withPigeon2Configs(pigeonConfigs);
 
-    public static final SwerveModuleConfig frontLeftConfig = new SwerveModuleConfig(10, 11, 12,
-            Rotations.of(-0.042236328125), trackWidth.div(2.0), wheelBase.div(2.0), true);
-    public static final SwerveModuleConfig frontRightConfig = new SwerveModuleConfig(20, 21, 22,
-            Rotations.of(0.157958984375), trackWidth.div(-2.0), wheelBase.div(2.0), false);
-    public static final SwerveModuleConfig backLeftConfig = new SwerveModuleConfig(40, 41, 42,
-            Rotations.of(-0.431396484375), trackWidth.div(2.0), wheelBase.div(-2.0), true);
-    public static final SwerveModuleConfig backRightConfig = new SwerveModuleConfig(30, 31, 32,
-            Rotations.of(-0.030517578125), trackWidth.div(-2.0), wheelBase.div(-2.0), false);
-
+    public static final SwerveModuleConfig frontLeftConfig = new SwerveModuleConfig(1, 5, 9,
+            Rotations.of(-0.290771484375), trackWidth.div(2.0), wheelBase.div(2.0), false);
+    public static final SwerveModuleConfig frontRightConfig = new SwerveModuleConfig(2, 6, 11,
+            Rotations.of(-0.212158203125), trackWidth.div(-2.0), wheelBase.div(2.0), true);
+    public static final SwerveModuleConfig backLeftConfig = new SwerveModuleConfig(3, 7, 10,
+            Rotations.of(0.119873046875), trackWidth.div(2.0), wheelBase.div(-2.0), false);
+    public static final SwerveModuleConfig backRightConfig = new SwerveModuleConfig(4, 8, 12,
+            Rotations.of(0.41943359375), trackWidth.div(-2.0), wheelBase.div(-2.0), true);
+    
     public static final ArrayList<SwerveModuleConfig> moduleConfigs = new ArrayList<>(Arrays.asList(
             frontLeftConfig,
             frontRightConfig,
@@ -243,15 +243,16 @@ public class DriveConstants {
             .withCustomModuleTranslations(DriveConstants.moduleTranslations)
             .withGyro(COTS.ofPigeon2())
             .withSwerveModule(new SwerveModuleSimulationConfig(
-                    DCMotor.getKrakenX60(1),
-                    DCMotor.getFalcon500(1),
+                    DCMotor.getKrakenX60Foc(1),
+                    DCMotor.getKrakenX44Foc(1),
                     DriveConstants.driveGearRatio,
                     DriveConstants.steerGearRatio,
                     DriveConstants.driveFrictionVoltage,
                     DriveConstants.steerFrictionVoltage,
                     DriveConstants.wheelRadius,
                     DriveConstants.steerInertia,
-                    DriveConstants.wheelCOF));
+                    DriveConstants.wheelCOF))
+            .withBumperSize(Inches.of(30), Inches.of(25));
 
     /**
      * Swerve Drive class utilizing CTR Electronics' Phoenix 6 API with the selected

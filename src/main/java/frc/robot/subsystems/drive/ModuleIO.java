@@ -5,6 +5,8 @@ import edu.wpi.first.units.measure.Current;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+
 public interface ModuleIO {
     @AutoLog
     class ModuleIOInputs {
@@ -49,4 +51,12 @@ public interface ModuleIO {
 
     /** Temporarily override the drive motor current limit for slip current characterization. */
     public default void setSlipMeasurementCurrentLimit(Current current) {}
+
+    public default TalonFX getDriveMotor() {
+        return null;
+    }
+
+    public default TalonFX getTurnMotor() {
+        return null;
+    }
 }

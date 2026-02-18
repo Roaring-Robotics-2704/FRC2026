@@ -12,15 +12,15 @@ public final class Constants {
      * value of "simMode" to switch between "sim" (physics sim) and "replay" (log replay from a file).  
      * This is automatically updated by Justfile commands if they are used.
      */
-    public static final Mode simMode = Mode.REPLAY;
+    public static final Mode simMode = Mode.SIM;
     /** If the robot should log data to files in simulation. */
-    public static final boolean logInSimulation = false;
+    public static final boolean logInSimulation = true;
 
     /**
      * Whether to use NetworkTables instead of RLog for AdvantageScope logging. RLog _significantly_ reduces lag in
      * AdvantageScope.
      */
-    public static final boolean useNTLogs = false;
+    public static final boolean useNTLogs = true;
 
     /** If the robot is in "tuning mode". When in tuning mode, tunable constants are added to NetworkTables. */
     public static boolean tuningMode = true;
@@ -48,7 +48,7 @@ public final class Constants {
      * there are spooky issues going on with the robot, disabling this (if enabled) is a good first step. Only use this
      * as a last resort. Here be dragons.
      */
-    public static boolean useSuperDangerousRTThreadPriority = true;
+    public static boolean useSuperDangerousRTThreadPriority = false;
 
     public static final double voltageCompensation = 12.0;
 }

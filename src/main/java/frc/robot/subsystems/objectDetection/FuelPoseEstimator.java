@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.objectdetection;
+package frc.robot.subsystems.objectDetection;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.subsystems.objectdetection.ObjectDetectionConstants.cameraToRobotTransform;
-import static frc.robot.subsystems.objectdetection.ObjectDetectionConstants.fuelHeight;
+import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.cameraToRobotTransform;
+import static frc.robot.subsystems.objectDetection.ObjectDetectionConstants.fuelHeight;
 
 import java.util.ArrayList;
 
@@ -25,9 +25,10 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
+import frc.robot.subsystems.objectDetection.ObjectDetectionIOInputsAutoLogged;
 
 /** ObjectDetection subsystem for detecting fuel using a camera. */
-public class ObjectDetection extends SubsystemBase {
+public class FuelPoseEstimator extends SubsystemBase {
     private final ObjectDetectionIO io;
     private final ObjectDetectionIOInputsAutoLogged inputs = new ObjectDetectionIOInputsAutoLogged();
     private Angle cameraAngley = cameraToRobotTransform.getRotation().getMeasureX();
@@ -35,7 +36,7 @@ public class ObjectDetection extends SubsystemBase {
     private Distance cameraHeight = cameraToRobotTransform.getTranslation().getMeasureZ();
 
     /** Creates a new ObjectDetection. */
-    public ObjectDetection(ObjectDetectionIO io) {
+    public FuelPoseEstimator(ObjectDetectionIO io) {
         this.io = io;
     }
 
@@ -106,6 +107,6 @@ public class ObjectDetection extends SubsystemBase {
      * @param pose The pose of the fuel cell.
      * @param timestamp The timestamp of the estimate.
      */
-    public static record  FuelPoseEstimate(Pose2d pose, Time timestamp) {
+    public static record FuelPoseEstimate(Pose2d pose, Time timestamp) {
     }
 }

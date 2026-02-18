@@ -66,10 +66,8 @@ public class Hopper extends SubsystemBase {
     private final HopperIOInputsAutoLogged inputs = new HopperIOInputsAutoLogged();
     private HopperState currentState = HopperState.IDLE;
     private HopperState desiredState = HopperState.IDLE;
-    private SlewRateLimiter voltageSlewRateLimiter = new SlewRateLimiter(HOPPER_VOLTAGE_RAMP_RATE);
 
     Double targetVolts;
-    Double rampedVolts;
 
 
     /**
@@ -101,30 +99,10 @@ public class Hopper extends SubsystemBase {
                     break;
             }
 
-            // Ramp toward the target each scheduler run and command the ramped value
-            rampedVolts = voltageSlewRateLimiter.calculate(targetVolts);
-            hopperIO.setMotorVoltage(Volts.of(rampedVolts));
-
-            // Only leave TRANSITIONING once we're effectively at the setpoint
-            final double EPS_V = 0.01; // volts tolerance
-            if (Math.abs(rampedVolts - targetVolts) <= EPS_V) {
-                // Ensure final commanded value is the exact setpoint (or stopped)
-                switch (desiredState) {
-                    case IDLE:
-                        hopperIO.stopMotor();
-                        break;
-                    case FEEDING:
-                        hopperIO.setMotorVoltage(HOPPER_VOLTAGE);
-                        break;
-                    case REVERSING:
-                        hopperIO.setMotorVoltage(Volts.of(-HOPPER_VOLTAGE.in(Volts)));
-                        break;
-                    default:
-                        hopperIO.stopMotor();
-                        break;
-                }
-
+            hopperIO.setMotorVoltage(Volts.of(targetVolts));
+            if (inputs.appliedVoltage.in(Volts) == targetVolts) {
                 currentState = desiredState;
+
             }
         }
         // This method will be called once per scheduler run

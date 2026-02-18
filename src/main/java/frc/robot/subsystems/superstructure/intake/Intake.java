@@ -85,8 +85,10 @@ public class Intake extends SubsystemBase {
             } else if (inputs.slideAtPosition) {
                 currentState = desiredState;
             }
+            
         }
-
+        Logger.recordOutput("Intake/CurrentState", currentState);
+        Logger.recordOutput("Intake/DesiredState", desiredState);
     }
 
     public void setDesiredState(IntakeState state) {
