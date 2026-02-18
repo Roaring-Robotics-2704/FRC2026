@@ -80,13 +80,13 @@ public class SuperStructure extends SubsystemBase {
                     intake.setDesiredState(IntakeState.INSIDE);
                     hopper.setDesiredState(HopperState.IDLE);
                     shooter.setDesiredState(ShooterState.STATIONARY);
-                    climber.setDesiredState(ClimberState.OUTSIDE_UP);
+                    climber.setDesiredState(ClimberState.TOP);
                     break;
                 case CLIMB:
                     intake.setDesiredState(IntakeState.INSIDE);
                     hopper.setDesiredState(HopperState.IDLE);
                     shooter.setDesiredState(ShooterState.STATIONARY);
-                    climber.setDesiredState(ClimberState.OUTSIDE_DOWN);
+                    climber.setDesiredState(ClimberState.MIDDLE);
                     break;
                 case INTAKE_CALIBRATE_IN:
                     intake.setDesiredState(IntakeState.CALIBRATE_IN);

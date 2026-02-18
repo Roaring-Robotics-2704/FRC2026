@@ -18,6 +18,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotState;
 import frc.robot.util.solvers.BasicTunedCalc;
 import frc.robot.util.solvers.SolverIO;
 
@@ -32,14 +33,12 @@ public class Shooter extends SubsystemBase {
 
 
     private final ShooterIO io;
-    private final Supplier<Pose2d> robotPoseSupplier;
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
     private final SolverIO solver;
 
-    public Shooter(ShooterIO io, Supplier<Pose2d> robotPoseSupplier, SolverIO solver) {
+    public Shooter(ShooterIO io, SolverIO solver) {
         this.io = io;
-        this.robotPoseSupplier = robotPoseSupplier;
         this.solver = solver;
     }
 
@@ -47,8 +46,8 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Shooter", inputs);
-        hoodAngle = solver.getShootingSolution(robotPoseSupplier.get()).hoodAngle();
-        flywheelVelocity = solver.getShootingSolution(robotPoseSupplier.get()).flywheelVelocity();
+        hoodAngle = solver.getShootingSolution(RobotState.getInstance().getOdometryPose()).hoodAngle();
+        flywheelVelocity = solver.getShootingSolution(RobotState.getInstance().getOdometryPose()).flywheelVelocity();
         Logger.recordOutput("Shooter/CalculatedHoodAngle", hoodAngle);
         Logger.recordOutput("Shooter/CalculatedFlywheelVelocity", flywheelVelocity);
 

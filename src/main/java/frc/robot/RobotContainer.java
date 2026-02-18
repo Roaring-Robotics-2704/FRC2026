@@ -23,7 +23,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -44,6 +43,8 @@ import frc.robot.subsystems.objectDetection.ObjectDetectionIO;
 import frc.robot.subsystems.objectDetection.ObjectDetectionIOReal;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructureConstants.SuperStructureStates;
+import frc.robot.subsystems.superstructure.climber.Climber;
+import frc.robot.subsystems.superstructure.climber.ClimberIO;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.HopperIO;
 import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
@@ -61,6 +62,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.OrchestraManager;
+import frc.robot.util.solvers.BasicTunedCalc;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -117,7 +119,7 @@ public class RobotContainer {
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
                 objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
                         ObjectDetectionConstants.cameraToRobotTransform));
-                shooter = new Shooter(new ShooterIOGreyT(), () -> Feet.of(0)); // TODO: Add distance supplier
+                shooter = new Shooter(new ShooterIOGreyT(), new BasicTunedCalc()); // TODO: Add distance supplier
                 break;
 
             case SIM:
@@ -144,7 +146,7 @@ public class RobotContainer {
                                 driveSimulation::getSimulatedDriveTrainPose));
                 objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                 });
-                shooter = new Shooter(new ShooterIOSim(), () -> Feet.of(0)); // TODO: Add distance supplier
+                shooter = new Shooter(new ShooterIOSim(), new BasicTunedCalc()); // TODO: Add distance supplier
                 break;
 
             default:
@@ -171,12 +173,14 @@ public class RobotContainer {
                 objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                 });
 
-                shooter = new Shooter(new ShooterIO() {}, Robot); // TODO: Add distance supplier
+                climber = new Climber(new ClimberIO() {});
+
+                shooter = new Shooter(new ShooterIO() {}, new BasicTunedCalc()); // TODO: Add distance supplier
                 break;
         }
 
         // Set up superstructure
-        superStructure = new SuperStructure(intake, hopper, shooter,climber);
+        superStructure = new SuperStructure(intake, hopper, shooter, climber);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

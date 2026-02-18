@@ -19,7 +19,7 @@ public class BasicTunedCalc implements SolverIO {
 
     private int rotationsPerMinute = 2800;
 
-    private BasicTunedCalc() {
+    public BasicTunedCalc() {
         // Example data points (distance in meters, angle in degrees)
         hoodAngleMap.put(1.0, 10.0);
         hoodAngleMap.put(2.0, 20.0);
