@@ -42,7 +42,9 @@ import frc.robot.subsystems.objectDetection.ObjectDetectionConstants;
 import frc.robot.subsystems.objectDetection.ObjectDetectionIO;
 import frc.robot.subsystems.objectDetection.ObjectDetectionIOReal;
 import frc.robot.subsystems.superstructure.SuperStructure;
-import frc.robot.subsystems.superstructure.SuperStructureStates.WantedState;
+import frc.robot.subsystems.superstructure.SuperStructureConstants.SuperStructureStates;
+import frc.robot.subsystems.superstructure.climber.Climber;
+import frc.robot.subsystems.superstructure.climber.ClimberIO;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.HopperIO;
 import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
@@ -60,6 +62,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.OrchestraManager;
+import frc.robot.util.solvers.BasicTunedCalc;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -77,6 +80,7 @@ public class RobotContainer {
     private final Hopper hopper;
     private final Intake intake;
     private final Shooter shooter;
+    private final Climber climber;
 
     private final Vision vision;
     private final FuelPoseEstimator objectDetection;
@@ -109,12 +113,13 @@ public class RobotContainer {
                         new ModuleIOTalonFXReal(DriveConstants.backRightConfig));
                 intake = new Intake(new IntakeIOReal());
                 hopper = new Hopper(new HopperIOReal());
+                climber = new Climber(new ClimberIO() {});
                 vision = new Vision(
                         new VisionIOPhotonVision(camera0Name, robotToCamera0),
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
                 objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
                         ObjectDetectionConstants.cameraToRobotTransform));
-                shooter = new Shooter(new ShooterIOGreyT(), () -> Feet.of(0)); // TODO: Add distance supplier
+                shooter = new Shooter(new ShooterIOGreyT(), new BasicTunedCalc()); // TODO: Add distance supplier
                 break;
 
             case SIM:
@@ -132,6 +137,7 @@ public class RobotContainer {
                 intake = new Intake(new IntakeIO() {
                 });
                 hopper = new Hopper(new HopperIOSim());
+                climber = new Climber(new ClimberIO() {});
 
                 vision = new Vision(
                         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0,
@@ -140,7 +146,7 @@ public class RobotContainer {
                                 driveSimulation::getSimulatedDriveTrainPose));
                 objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                 });
-                shooter = new Shooter(new ShooterIOSim(), () -> Feet.of(0)); // TODO: Add distance supplier
+                shooter = new Shooter(new ShooterIOSim(), new BasicTunedCalc()); // TODO: Add distance supplier
                 break;
 
             default:
@@ -167,13 +173,14 @@ public class RobotContainer {
                 objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                 });
 
-                shooter = new Shooter(new ShooterIO() {
-                }, () -> Feet.of(0)); // TODO: Add distance supplier
+                climber = new Climber(new ClimberIO() {});
+
+                shooter = new Shooter(new ShooterIO() {}, new BasicTunedCalc()); // TODO: Add distance supplier
                 break;
         }
 
         // Set up superstructure
-        superStructure = new SuperStructure(intake, hopper, shooter);
+        superStructure = new SuperStructure(intake, hopper, shooter, climber);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -234,8 +241,8 @@ public class RobotContainer {
                                 () -> -controller.getLeftX(),
                                 () -> Rotation2d.kZero));
 
-        controller.leftTrigger().onTrue(superStructure.goToState(WantedState.INTAKE));
-        controller.rightTrigger().onTrue(superStructure.goToState(WantedState.SHOOT)).onFalse(superStructure.goToState(WantedState.IDLE));
+        controller.leftTrigger().onTrue(superStructure.goToState(SuperStructureStates.INTAKE));
+        controller.rightTrigger().onTrue(superStructure.goToState(SuperStructureStates.SHOOT));
 
         // Reset gyro to 0 deg when B button is pressed
 
@@ -248,7 +255,10 @@ public class RobotContainer {
                                                 Rotation2d.kZero)),
                                 drive)
                                 .ignoringDisable(true));
+
+        controller.leftBumper().onTrue(superStructure.goToState(null));// TO DO add climber to superstructure
     }
+
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -266,8 +276,8 @@ public class RobotContainer {
      * @return the command to run in calibration
      */
     public Command getCalibrationCommand() {
-        return Commands.sequence(superStructure.goToState(WantedState.INTAKE_CALIBRATE_IN),
-                superStructure.goToState(WantedState.INTAKE_CALIBRATE_OUT));
+        return Commands.sequence(superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_IN),
+                superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_OUT));
     }
 
     /** Reset the simulation field. */
