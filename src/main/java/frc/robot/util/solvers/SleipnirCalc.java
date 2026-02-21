@@ -151,7 +151,7 @@ public class SleipnirCalc implements SolverIO {
             problem.subjectTo(eq(p.col(0), shooterPos));
 
             // Require initial velocity is below max:
-            // vx^2 + vy^2 + vz^2 ≤ v_max^2
+            // vx^2 + vy^2 + vz^2 <= v_max^2
             Variable vxDiff = vx.get(0).minus(robotVx);
             Variable vyDiff = vy.get(0).minus(robotVy);
             Variable vzDiff = vz.get(0).minus(robotVz);
