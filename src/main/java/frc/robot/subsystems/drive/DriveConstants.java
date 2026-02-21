@@ -317,11 +317,11 @@ public class DriveConstants {
          *            250 Hz on CAN FD, and 100 Hz on CAN 2.0.
          * @param odometryStandardDeviation
          *            The standard deviation for odometry calculation in the form [x, y,
-         *            theta]ᵀ,
+         *            theta]^T,
          *            with units in meters and radians
          * @param visionStandardDeviation
          *            The standard deviation for vision calculation in the form [x, y,
-         *            theta]ᵀ, with
+         *            theta]^T, with
          *            units in meters and radians
          * @param modules
          *            Constants for each specific module
