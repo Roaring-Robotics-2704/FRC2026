@@ -285,7 +285,7 @@ public class RobotContainer {
             superStructure.goToState(SuperStructureStates.INTAKE),
             superStructure.goToState(SuperStructureStates.SHOOT),
             superStructure.goToState(SuperStructureStates.CLIMB)
-        )
+        );
     }
 
     /** Reset the simulation field. */
