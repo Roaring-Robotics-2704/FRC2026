@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
@@ -114,7 +115,7 @@ public final class PhoenixUtil {
      * impact on constants used on real
      * robot hardware.</h4>
      */
-    public static SwerveModuleConstants<?, ?, ?> regulateModuleConstantForSimulation(
+    public static SwerveModuleConstants regulateModuleConstantForSimulation(
             SwerveModuleConstants<?, ?, ?> moduleConstants) {
         // Skip regulation if running on a real robot
         if (RobotBase.isReal()) {
