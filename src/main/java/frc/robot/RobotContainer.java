@@ -237,7 +237,7 @@ public class RobotContainer {
             superStructure.goToState(SuperStructureStates.SHOOTER_PREP),
             superStructure.goToState(SuperStructureStates.SHOOT),
             Commands.waitUntil(() -> !controller.rightTrigger().getAsBoolean())
-        ));
+        ).finallyDo(()->superStructure.setDesiredState(SuperStructureStates.IDLE)));
 
         controller.a().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx"));
 

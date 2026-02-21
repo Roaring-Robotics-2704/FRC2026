@@ -66,6 +66,7 @@ public class OrchestraManager {
 
     public Command playOrchestraCommand(String songName) {
         return Commands.sequence(
+            Commands.runOnce(this::stop).ignoringDisable(true),
             Commands.runOnce(() -> loadFile(songName)).ignoringDisable(true),
             Commands.runOnce(this::play).ignoringDisable(true),
             Commands.waitUntil(() -> !orchestra.isPlaying()).ignoringDisable(true)

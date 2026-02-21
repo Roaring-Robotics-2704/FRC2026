@@ -6,6 +6,8 @@ package frc.robot.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
@@ -31,7 +33,7 @@ public class Kicker extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (kickerMotor.getOutputCurrent() > 20) {
+        if (Math.abs(kickerMotor.getEncoder().getVelocity()) < 0.05 && desiredVoltage != Volts.of(0)) {
             if (!timer.isRunning()) {
                 timer.reset();
                 timer.start();
@@ -43,6 +45,12 @@ public class Kicker extends SubsystemBase {
             timer.stop();
             kickerMotor.setVoltage(desiredVoltage);
         }
+        Logger.recordOutput("Kicker/Current", kickerMotor.getOutputCurrent());
+        Logger.recordOutput("Kicker/DesiredVoltage", kickerMotor.getAppliedOutput());
+        Logger.recordOutput("Kicker/Velocity", kickerMotor.getEncoder().getVelocity());
+        Logger.recordOutput("Kicker/Timer", timer.get());
+        Logger.recordOutput("Kicker/IsTimerRunning", timer.isRunning());
+        
     }
 
     public void setKickerVoltage(double voltage) {

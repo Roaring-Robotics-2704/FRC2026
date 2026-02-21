@@ -59,7 +59,7 @@ public class SuperStructure extends SubsystemBase {
                 case INTAKE:
                     kicker.setKickerVoltage(-1);
                     intake.setDesiredState(IntakeState.DEPLOYED_ON);
-                    hopper.setDesiredState(HopperState.REVERSING);
+                    hopper.setDesiredState(HopperState.IDLE);
                     // shooter.setDesiredState(ShooterState.IDLE);
                     break;
                 case PASS:
@@ -113,7 +113,7 @@ public class SuperStructure extends SubsystemBase {
             //         && intake.atDesiredState() && climber.isAtDesiredState()) {
             //     currentState = wantedState;
             // }
-            if (hopper.isAtDesiredState() ) {
+            if (hopper.isAtDesiredState()) {
                 currentState = wantedState;
                 
             }
