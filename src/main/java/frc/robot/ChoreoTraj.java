@@ -55,16 +55,16 @@ public record ChoreoTraj(
 	public static final ChoreoTraj ShootCollectPass = new ChoreoTraj(
 	    "ShootCollectPass",
 	    OptionalInt.empty(),
-	    4.4044,
-	    new Pose2d(3.085, 0.752, Rotation2d.fromRadians(1.215)),
+	    5.93692,
+	    new Pose2d(3.607, 4.035, Rotation2d.fromRadians(0)),
 	    new Pose2d(5.71, 5.843, Rotation2d.fromRadians(-3.131))
 	);
 	public static final ChoreoTraj ShootCollectShoot = new ChoreoTraj(
 	    "ShootCollectShoot",
 	    OptionalInt.empty(),
-	    3.88987,
-	    new Pose2d(2.755, 6.052, Rotation2d.fromRadians(-0.824)),
-	    new Pose2d(2.867, 5.602, Rotation2d.fromRadians(-0.728))
+	    5.05192,
+	    new Pose2d(3.607, 4.035, Rotation2d.fromRadians(0)),
+	    new Pose2d(2.809, 5.055, Rotation2d.fromRadians(-0.524))
 	);
 
     /**
