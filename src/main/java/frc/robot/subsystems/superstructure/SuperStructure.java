@@ -109,9 +109,13 @@ public class SuperStructure extends SubsystemBase {
                 default:
                     throw new IllegalStateException("Unexpected value: " + wantedState);
             }
-            if (hopper.isAtDesiredState() && shooter.isAtDesiredState()
-                    && intake.atDesiredState() && climber.isAtDesiredState()) {
+            // if (hopper.isAtDesiredState() && shooter.isAtDesiredState()
+            //         && intake.atDesiredState() && climber.isAtDesiredState()) {
+            //     currentState = wantedState;
+            // }
+            if (hopper.isAtDesiredState() ) {
                 currentState = wantedState;
+                
             }
         }
         Logger.recordOutput("SuperStructure/Current State", currentState.toString());

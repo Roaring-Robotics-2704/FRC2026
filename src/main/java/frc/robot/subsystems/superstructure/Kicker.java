@@ -12,11 +12,13 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.SparkUtil;
 
 public class Kicker extends SubsystemBase {
     Voltage desiredVoltage = Volts.of(0);
+    Timer timer = new Timer();
     /** Creates a new Kicker. */
     SparkMax kickerMotor = new SparkMax(31, SparkMax.MotorType.kBrushless);
 
@@ -30,8 +32,15 @@ public class Kicker extends SubsystemBase {
     @Override
     public void periodic() {
         if (kickerMotor.getOutputCurrent() > 20) {
+            if (!timer.isRunning()) {
+                timer.reset();
+                timer.start();
+            }
+            kickerMotor.setVoltage(-1);
+        } else if (timer.isRunning() && timer.get() < 1) {
             kickerMotor.setVoltage(-1);
         } else {
+            timer.stop();
             kickerMotor.setVoltage(desiredVoltage);
         }
     }
