@@ -12,8 +12,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 
 /** Add your docs here. */
 public class IntakeConstants {
-    public static final int ROLLER_MOTOR_ID = 10;
-    public static final int SLIDE_MOTOR_ID = 11;
+    public static final int ROLLER_MOTOR_ID = 97;
+    public static final int SLIDE_MOTOR_ID = 96;
 
     public static final int ROLLER_CURRENT_LIMIT = 20;
     public static final int SLIDE_CURRENT_LIMIT = 20;

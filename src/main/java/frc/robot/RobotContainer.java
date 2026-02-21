@@ -41,6 +41,7 @@ import frc.robot.subsystems.objectDetection.FuelPoseEstimator;
 import frc.robot.subsystems.objectDetection.ObjectDetectionConstants;
 import frc.robot.subsystems.objectDetection.ObjectDetectionIO;
 import frc.robot.subsystems.objectDetection.ObjectDetectionIOReal;
+import frc.robot.subsystems.superstructure.Kicker;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructureConstants.SuperStructureStates;
 import frc.robot.subsystems.superstructure.climber.Climber;
@@ -49,6 +50,7 @@ import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.HopperIO;
 import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
 import frc.robot.subsystems.superstructure.hopper.HopperIOSim;
+import frc.robot.subsystems.superstructure.hopper.Hopper.HopperState;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
 import frc.robot.subsystems.superstructure.intake.IntakeIOReal;
@@ -79,6 +81,7 @@ public class RobotContainer {
     private final Drive drive;
     private SwerveDriveSimulation driveSimulation = null;
     private final Hopper hopper;
+    private final Kicker kicker = new Kicker();
     private final Intake intake;
     private final Shooter shooter;
     private final Climber climber;
@@ -120,7 +123,7 @@ public class RobotContainer {
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
                 objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
                         ObjectDetectionConstants.cameraToRobotTransform));
-                shooter = new Shooter(new ShooterIOGreyT(), new SleipnirCalc());
+                shooter = new Shooter(new ShooterIOGreyT(), new BasicTunedCalc());
                 break;
 
             case SIM:
@@ -147,7 +150,7 @@ public class RobotContainer {
                                 driveSimulation::getSimulatedDriveTrainPose));
                 objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                     });
-                shooter = new Shooter(new ShooterIOSim(), new SleipnirCalc());
+                shooter = new Shooter(new ShooterIOSim(), new BasicTunedCalc());
                 break;
 
             default:
@@ -176,12 +179,12 @@ public class RobotContainer {
 
                 climber = new Climber(new ClimberIO() {});
 
-                shooter = new Shooter(new ShooterIO() {}, new SleipnirCalc());
+                shooter = new Shooter(new ShooterIO() {}, new BasicTunedCalc());
                 break;
         }
 
         // Set up superstructure
-        superStructure = new SuperStructure(intake, hopper, shooter, climber);
+        superStructure = new SuperStructure(intake, hopper, kicker, shooter, climber);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -189,13 +192,10 @@ public class RobotContainer {
         DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
 
         OrchestraManager.getInstance().addToOrchestra(drive.getMotors());
-        OrchestraManager.getInstance().loadFile("xp");
-        
-        OrchestraManager.getInstance().play();
+
         // Configure the button bindings
         configureButtonBindings();
 
-        SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
     }
 
     /**
@@ -217,47 +217,33 @@ public class RobotContainer {
         vision.setDefaultCommand(vision.idle());
         objectDetection.setDefaultCommand(objectDetection.idle());
 
-        // Lock to 0 deg when A button is held
-        controller
-                .a()
-                .whileTrue(
-                        DriveCommands.joystickDriveAtAngle(
-                                drive,
-                                () -> -controller.getLeftY(),
-                                () -> -controller.getLeftX(),
-                                () -> Rotation2d.kZero));
+        // // Lock to 0 deg when A button is held
+        // controller
+        //         .a()
+        //         .whileTrue(
+        //                 DriveCommands.joystickDriveAtAngle(
+        //                         drive,
+        //                         () -> -controller.getLeftY(),
+        //                         () -> -controller.getLeftX(),
+        //                         () -> Rotation2d.kZero));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
         // Reset gyro to 0 deg when B button is pressed
-
-        // Lock to 0 deg when A button is held
-        controller
-                .a()
-                .whileTrue(
-                        DriveCommands.joystickDriveAtAngle(
-                                drive,
-                                () -> -controller.getLeftY(),
-                                () -> -controller.getLeftX(),
-                                () -> Rotation2d.kZero));
-
-        controller.leftTrigger().onTrue(superStructure.goToState(SuperStructureStates.INTAKE));
-        controller.rightTrigger().onTrue(superStructure.goToState(SuperStructureStates.SHOOT));
+        controller.leftTrigger().whileTrue(superStructure.goToStateWithIdle(SuperStructureStates.INTAKE));
+        
+        controller.rightTrigger().whileTrue(Commands.sequence(
+            superStructure.goToState(SuperStructureStates.SHOOTER_PREP),
+            superStructure.goToState(SuperStructureStates.SHOOT),
+            Commands.waitUntil(() -> !controller.rightTrigger().getAsBoolean())
+        ));
 
         // Reset gyro to 0 deg when B button is pressed
 
-        controller
-                .b()
-                .onTrue(
-                        Commands.runOnce(
-                                () -> drive.setPose(
-                                        new Pose2d(RobotState.getInstance().getPose().getTranslation(),
-                                                Rotation2d.kZero)),
-                                drive)
-                                .ignoringDisable(true));
 
     }
+    
 
 
     /**

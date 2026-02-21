@@ -102,7 +102,6 @@ public class Hopper extends SubsystemBase {
             hopperIO.setMotorVoltage(Volts.of(targetVolts));
             if (inputs.appliedVoltage.in(Volts) == targetVolts) {
                 currentState = desiredState;
-
             }
         }
         // This method will be called once per scheduler run

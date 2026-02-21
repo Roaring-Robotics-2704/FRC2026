@@ -27,12 +27,14 @@ public class SuperStructure extends SubsystemBase {
     // Subsystems
     private final Intake intake;
     private final Hopper hopper;
+    private final Kicker kicker;
     private final Shooter shooter;
     private final Climber climber;
 
     /** Creates a new SuperStructure. */
-    public SuperStructure(Intake intake, Hopper hopper, Shooter shooter, Climber climber) {
+    public SuperStructure(Intake intake, Hopper hopper, Kicker kicker, Shooter shooter, Climber climber) {
         this.hopper = hopper;
+        this.kicker = kicker;
         this.shooter = shooter;
         this.intake = intake;
         this.climber = climber;
@@ -45,44 +47,53 @@ public class SuperStructure extends SubsystemBase {
                 case START:
                     intake.setDesiredState(IntakeState.INSIDE);
                     hopper.setDesiredState(HopperState.IDLE);
+                    kicker.setKickerVoltage(0);
                     shooter.setDesiredState(ShooterState.STATIONARY);
                     break;
                 case IDLE:
+                    kicker.setKickerVoltage(-1);
                     intake.setDesiredState(IntakeState.STOWED);
                     hopper.setDesiredState(HopperState.IDLE);
                     shooter.setDesiredState(ShooterState.IDLE);
                     break;
                 case INTAKE:
+                    kicker.setKickerVoltage(-1);
                     intake.setDesiredState(IntakeState.DEPLOYED_ON);
                     hopper.setDesiredState(HopperState.REVERSING);
                     // shooter.setDesiredState(ShooterState.IDLE);
                     break;
                 case PASS:
+                    kicker.setKickerVoltage(12);
                     intake.setDesiredState(IntakeState.STOWED);
                     hopper.setDesiredState(HopperState.FEEDING);
                     shooter.setDesiredState(ShooterState.SHOOTING);
                     break;
                 case FEED:
+                    kicker.setKickerVoltage(12);
                     intake.setDesiredState(IntakeState.DEPLOYED_ON);
                     hopper.setDesiredState(HopperState.FEEDING);
                     shooter.setDesiredState(ShooterState.SHOOTING);
                     break;
                 case SHOOTER_PREP:
+                    kicker.setKickerVoltage(-1);
                     hopper.setDesiredState(HopperState.IDLE);
                     shooter.setDesiredState(ShooterState.SHOOTING);
                     break;
                 case SHOOT:
+                    kicker.setKickerVoltage(12);
                     intake.setDesiredState(IntakeState.STOWED);
                     hopper.setDesiredState(HopperState.FEEDING);
                     shooter.setDesiredState(ShooterState.SHOOTING);
                     break;
                 case CLIMB_PREP:
+                    kicker.setKickerVoltage(-1);
                     intake.setDesiredState(IntakeState.INSIDE);
                     hopper.setDesiredState(HopperState.IDLE);
                     shooter.setDesiredState(ShooterState.STATIONARY);
                     climber.setDesiredState(ClimberState.TOP);
                     break;
                 case CLIMB:
+                    kicker.setKickerVoltage(-1);
                     intake.setDesiredState(IntakeState.INSIDE);
                     hopper.setDesiredState(HopperState.IDLE);
                     shooter.setDesiredState(ShooterState.STATIONARY);
@@ -98,7 +109,8 @@ public class SuperStructure extends SubsystemBase {
                 default:
                     throw new IllegalStateException("Unexpected value: " + wantedState);
             }
-            if (hopper.isAtDesiredState() && shooter.isAtDesiredState()) {
+            if (hopper.isAtDesiredState() && shooter.isAtDesiredState()
+                    && intake.atDesiredState() && climber.isAtDesiredState()) {
                 currentState = wantedState;
             }
         }
@@ -144,6 +156,12 @@ public class SuperStructure extends SubsystemBase {
         return Commands.sequence(
                 Commands.runOnce(() -> setDesiredState(state), this),
                 Commands.waitUntil(this::isAtDesiredState));
+    }
+
+    public Command goToStateWithIdle(SuperStructureStates state) {
+        return Commands.sequence(
+                Commands.runOnce(() -> setDesiredState(state), this),
+                Commands.waitUntil(this::isAtDesiredState)).finallyDo(() -> setDesiredState(SuperStructureStates.IDLE));
     }
 
     public SuperStructureStates getWantedState() {
