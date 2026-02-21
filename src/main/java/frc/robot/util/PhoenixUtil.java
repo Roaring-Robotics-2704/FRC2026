@@ -21,12 +21,15 @@ import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
+/** Utility class for Phoenix-related functions and simulations. */
 public final class PhoenixUtil {
     /** Attempts to run the command until no error is produced. */
     public static void tryUntilOk(int maxAttempts, Supplier<StatusCode> command) {
         for (int i = 0; i < maxAttempts; i++) {
             var error = command.get();
-            if (error.isOK()) break;
+            if (error.isOK()) {
+                break;
+            }
         }
     }
 
@@ -91,23 +94,32 @@ public final class PhoenixUtil {
      *
      * <h2>Regulates the {@link SwerveModuleConstants} for a single module.</h2>
      *
-     * <p>This method applies specific adjustments to the {@link SwerveModuleConstants} for simulation purposes. These
-     * changes have no effect on real robot operations and address known simulation bugs:
+     * <p>
+     * This method applies specific adjustments to the {@link SwerveModuleConstants}
+     * for simulation purposes. These
+     * changes have no effect on real robot operations and address known simulation
+     * bugs:
      *
      * <ul>
-     *   <li><strong>Inverted Drive Motors:</strong> Prevents drive PID issues caused by inverted configurations.
-     *   <li><strong>Non-zero CanCoder Offsets:</strong> Fixes potential module state optimization issues.
-     *   <li><strong>Steer Motor PID:</strong> Adjusts PID values tuned for real robots to improve simulation
-     *       performance.
+     * <li><strong>Inverted Drive Motors:</strong> Prevents drive PID issues caused
+     * by inverted configurations.
+     * <li><strong>Non-zero CanCoder Offsets:</strong> Fixes potential module state
+     * optimization issues.
+     * <li><strong>Steer Motor PID:</strong> Adjusts PID values tuned for real
+     * robots to improve simulation
+     * performance.
      * </ul>
      *
-     * <h4>Note:This function is skipped when running on a real robot, ensuring no impact on constants used on real
+     * <h4>Note:This function is skipped when running on a real robot, ensuring no
+     * impact on constants used on real
      * robot hardware.</h4>
      */
-    public static SwerveModuleConstants regulateModuleConstantForSimulation(
+    public static SwerveModuleConstants<?, ?, ?> regulateModuleConstantForSimulation(
             SwerveModuleConstants<?, ?, ?> moduleConstants) {
         // Skip regulation if running on a real robot
-        if (RobotBase.isReal()) return moduleConstants;
+        if (RobotBase.isReal()) {
+            return moduleConstants;
+        }
 
         // Apply simulation-specific adjustments to module constants
         return moduleConstants

@@ -24,13 +24,13 @@ import frc.robot.util.PoseUtil;
 
 /** Add your docs here. */
 public class BasicTunedCalc implements SolverIO {
-    private static BasicTunedCalc instance;
     private InterpolatingDoubleTreeMap hoodAngleMap = new InterpolatingDoubleTreeMap();
 
     private Pose2d blueHubPose = new Pose2d(4.625, 4.03, Rotation2d.fromDegrees(0));
     
     private int rotationsPerMinute = 2800;
 
+    /** Basic interpolated map for shooter calculations. */
     public BasicTunedCalc() {
         // Example data points (distance in meters, angle in degrees)
         hoodAngleMap.put(1.0, 10.0);

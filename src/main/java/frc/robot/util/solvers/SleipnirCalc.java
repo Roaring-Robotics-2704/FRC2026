@@ -26,15 +26,13 @@ import com.pathplanner.lib.util.FlippingUtil;
 /**
  * Sleipnir-based trajectory optimization solver for shooting calculations.
  *
- * <p>
- * Finds the initial velocity, pitch, and yaw for a game piece to hit the target
+ * <p>Finds the initial velocity, pitch, and yaw for a game piece to hit the target
  * that minimizes
  * initial velocity. Uses direct transcription of flight dynamics including air
  * resistance (drag and
  * Magnus effect).
  *
- * <p>
- * Ported from SolverCalc.cpp (Sleipnir C++ example).
+ * <p>Ported from SolverCalc.cpp (Sleipnir C++ example).
  */
 public class SleipnirCalc implements SolverIO {
 
@@ -91,23 +89,24 @@ public class SleipnirCalc implements SolverIO {
 
         try (Problem problem = new Problem()) {
             // Duration decision variable
-            Variable T = problem.decisionVariable();
-            problem.subjectTo(ge(T, 0.0));
-            T.setValue(1.0);
-            Variable dt = T.div((double) N);
+            // Duration decision variable (Google Java style: lowerCamelCase)
+            Variable totalTime = problem.decisionVariable();
+            // Alias for existing references that expect 'T'
+            totalTime.setValue(1.0);
+            Variable dt = totalTime.div((double) N);
 
             // Ball state in field frame: [x, y, z, vx, vy, vz] x N
             VariableMatrix X = problem.decisionVariable(6, N);
 
             VariableBlock p = X.block(0, 0, 3, N);
-            VariableBlock p_x = X.row(0);
-            VariableBlock p_y = X.row(1);
-            VariableBlock p_z = X.row(2);
+            VariableBlock px = X.row(0);
+            VariableBlock py = X.row(1);
+            VariableBlock pz = X.row(2);
 
             VariableBlock v = X.block(3, 0, 3, N);
-            VariableBlock v_x = X.row(3);
-            VariableBlock v_y = X.row(4);
-            VariableBlock v_z = X.row(5);
+            VariableBlock vx = X.row(3);
+            VariableBlock vy = X.row(4);
+            VariableBlock vz = X.row(5);
 
             // v0 relative to shooter
             SimpleMatrix shooterVel = new SimpleMatrix(3, 1, true, new double[] { shooterVx, shooterVy, shooterVz });
@@ -118,9 +117,9 @@ public class SleipnirCalc implements SolverIO {
             // Position: linear interpolation between shooter and target
             for (int k = 0; k < N; k++) {
                 double t = (double) k / N;
-                p_x.get(k).setValue(lerp(shooterX, TARGET_X, t));
-                p_y.get(k).setValue(lerp(shooterY, TARGET_Y, t));
-                p_z.get(k).setValue(lerp(shooterZ, TARGET_Z, t));
+                px.get(k).setValue(lerp(shooterX, TARGET_X, t));
+                py.get(k).setValue(lerp(shooterY, TARGET_Y, t));
+                pz.get(k).setValue(lerp(shooterZ, TARGET_Z, t));
             }
 
             // Velocity: max initial velocity toward target
@@ -153,11 +152,11 @@ public class SleipnirCalc implements SolverIO {
 
             // Require initial velocity is below max:
             // vx² + vy² + vz² ≤ v_max²
-            Variable vxDiff = v_x.get(0).minus(robotVx);
-            Variable vyDiff = v_y.get(0).minus(robotVy);
-            Variable vzDiff = v_z.get(0).minus(robotVz);
-            Variable v2sum = Variable.pow(vxDiff, 2.0).plus(Variable.pow(vyDiff, 2.0)).plus(Variable.pow(vzDiff, 2.0));
-            problem.subjectTo(le(v2sum, MAX_INITIAL_VELOCITY * MAX_INITIAL_VELOCITY));
+            Variable vxDiff = vx.get(0).minus(robotVx);
+            Variable vyDiff = vy.get(0).minus(robotVy);
+            Variable vzDiff = vz.get(0).minus(robotVz);
+            Variable v2Sum = Variable.pow(vxDiff, 2.0).plus(Variable.pow(vyDiff, 2.0)).plus(Variable.pow(vzDiff, 2.0));
+            problem.subjectTo(le(v2Sum, MAX_INITIAL_VELOCITY * MAX_INITIAL_VELOCITY));
 
             // Keep-out region (cylinder with conic bowl around target)
             double x_c = TARGET_X;
@@ -166,9 +165,9 @@ public class SleipnirCalc implements SolverIO {
             double tanAngle = Math.tan(CONE_ANGLE);
 
             for (int k = 0; k < N; k++) {
-                Variable x = p_x.get(k);
-                Variable y = p_y.get(k);
-                Variable z = p_z.get(k);
+                Variable x = px.get(k);
+                Variable y = py.get(k);
+                Variable z = pz.get(k);
 
                 Variable x2 = Variable.pow(x.minus(x_c), 2.0);
                 Variable y2 = Variable.pow(y.minus(y_c), 2.0);
@@ -186,18 +185,18 @@ public class SleipnirCalc implements SolverIO {
             // Dynamics constraints - RK4 integration
             Variable h = dt;
             for (int k = 0; k < N - 1; k++) {
-                VariableBlock x_k = X.col(k);
-                VariableBlock x_k1 = X.col(k + 1);
+                VariableBlock xk = X.col(k);
+                VariableBlock xk1 = X.col(k + 1);
 
-                VariableMatrix k1 = dynamics(new VariableMatrix(x_k));
-                VariableMatrix k2 = dynamics(new VariableMatrix(x_k).plus(k1.times(h.div(2.0))));
-                VariableMatrix k3 = dynamics(new VariableMatrix(x_k).plus(k2.times(h.div(2.0))));
-                VariableMatrix k4 = dynamics(new VariableMatrix(x_k).plus(k3.times(h)));
+        VariableMatrix k1 = dynamics(new VariableMatrix(xk));
+        VariableMatrix k2 = dynamics(new VariableMatrix(xk).plus(k1.times(h.div(2.0))));
+        VariableMatrix k3 = dynamics(new VariableMatrix(xk).plus(k2.times(h.div(2.0))));
+        VariableMatrix k4 = dynamics(new VariableMatrix(xk).plus(k3.times(h)));
 
-                VariableMatrix rhs = new VariableMatrix(x_k)
-                        .plus(
-                                k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4).times(h.div(6.0)));
-                problem.subjectTo(eq(x_k1, rhs));
+        VariableMatrix rhs = new VariableMatrix(xk)
+            .plus(
+                k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4).times(h.div(6.0)));
+        problem.subjectTo(eq(xk1, rhs));
             }
 
             // Require final position is at target
@@ -205,7 +204,7 @@ public class SleipnirCalc implements SolverIO {
             problem.subjectTo(eq(p.col(N - 1), targetPos));
 
             // Require final velocity is downward
-            problem.subjectTo(lt(v_z.get(N - 1), 0.0));
+            problem.subjectTo(lt(vz.get(N - 1), 0.0));
 
             // Minimize initial velocity magnitude
             problem.minimize(v0WrtShooter.T().times(v0WrtShooter));
