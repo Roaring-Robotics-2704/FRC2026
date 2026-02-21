@@ -63,6 +63,7 @@ import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.OrchestraManager;
 import frc.robot.util.solvers.BasicTunedCalc;
+import frc.robot.util.solvers.SleipnirCalc;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -119,7 +120,7 @@ public class RobotContainer {
                         new VisionIOPhotonVision(camera1Name, robotToCamera1));
                 objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
                         ObjectDetectionConstants.cameraToRobotTransform));
-                shooter = new Shooter(new ShooterIOGreyT(), new BasicTunedCalc()); // TODO: Add distance supplier
+                shooter = new Shooter(new ShooterIOGreyT(), new SleipnirCalc());
                 break;
 
             case SIM:
@@ -145,8 +146,8 @@ public class RobotContainer {
                         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1,
                                 driveSimulation::getSimulatedDriveTrainPose));
                 objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
-                });
-                shooter = new Shooter(new ShooterIOSim(), new BasicTunedCalc()); // TODO: Add distance supplier
+                    });
+                shooter = new Shooter(new ShooterIOSim(), new SleipnirCalc());
                 break;
 
             default:
@@ -175,7 +176,7 @@ public class RobotContainer {
 
                 climber = new Climber(new ClimberIO() {});
 
-                shooter = new Shooter(new ShooterIO() {}, new BasicTunedCalc()); // TODO: Add distance supplier
+                shooter = new Shooter(new ShooterIO() {}, new SleipnirCalc());
                 break;
         }
 
@@ -256,7 +257,6 @@ public class RobotContainer {
                                 drive)
                                 .ignoringDisable(true));
 
-        controller.leftBumper().onTrue(superStructure.goToState(null));// TO DO add climber to superstructure
     }
 
 

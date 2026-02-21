@@ -18,6 +18,8 @@ public class SuperStructureConstants {
         CLIMB_PREP, // Climbing preperationposition
         CLIMB, // Climbing position
         INTAKE_CALIBRATE_IN, // Calibrating intake in
-        INTAKE_CALIBRATE_OUT// Calibrating intake out
+        INTAKE_CALIBRATE_OUT, // Calibrating intake out
+        TEST1, // Test state for checking robot after matches
+        TEST2 // Test state for checking robot after matches
     }
 }
