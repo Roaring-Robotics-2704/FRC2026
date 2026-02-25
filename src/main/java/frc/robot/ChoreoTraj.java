@@ -24,12 +24,12 @@ public record ChoreoTraj(
     Pose2d initialPoseBlue,
     Pose2d endPoseBlue
 ) {
-    public static final ChoreoTraj CollectDepoClimb = new ChoreoTraj(
-	    "CollectDepoClimb",
+    public static final ChoreoTraj ShootDepotClimb = new ChoreoTraj(
+	    "ShootDepotClimb",
 	    OptionalInt.empty(),
-	    2.79728,
-	    new Pose2d(3.538, 5.972, Rotation2d.fromRadians(3.142)),
-	    new Pose2d(1.635, 3.892, Rotation2d.fromRadians(1.571))
+	    2.46106,
+	    new Pose2d(3.607, 4.035, Rotation2d.fromRadians(0)),
+	    new Pose2d(1.624, 3.893, Rotation2d.fromRadians(1.571))
 	);
 	public static final ChoreoTraj MinMovementShoot = new ChoreoTraj(
 	    "MinMovementShoot",
@@ -66,18 +66,26 @@ public record ChoreoTraj(
 	    new Pose2d(3.607, 4.035, Rotation2d.fromRadians(0)),
 	    new Pose2d(2.809, 5.055, Rotation2d.fromRadians(-0.524))
 	);
+	public static final ChoreoTraj ShootDepotShoot = new ChoreoTraj(
+	    "ShootDepotShoot",
+	    OptionalInt.empty(),
+	    2.53567,
+	    new Pose2d(3.607, 4.035, Rotation2d.fromRadians(0)),
+	    new Pose2d(1.75, 4.035, Rotation2d.fromRadians(0))
+	);
 
     /**
      * A map between trajectory names and their corresponding data.
      * This allows for trajectory data to be looked up with strings during runtime.
      */
     public static final Map<String, ChoreoTraj> ALL_TRAJECTORIES = Map.ofEntries(
-    	Map.entry("CollectDepoClimb", CollectDepoClimb),
+    	Map.entry("ShootDepotClimb", ShootDepotClimb),
 		Map.entry("MinMovementShoot", MinMovementShoot),
 		Map.entry("ShootAndClimb", ShootAndClimb),
 		Map.entry("ShootCollectClimb", ShootCollectClimb),
 		Map.entry("ShootCollectPass", ShootCollectPass),
-		Map.entry("ShootCollectShoot", ShootCollectShoot)
+		Map.entry("ShootCollectShoot", ShootCollectShoot),
+		Map.entry("ShootDepotShoot", ShootDepotShoot)
     );
 
     /**
