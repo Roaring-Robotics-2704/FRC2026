@@ -46,10 +46,10 @@ public class SleipnirCalc implements SolverIO {
     private static final double CONE_ANGLE = Math.PI / 4.0; // rad
 
     // Physics constants
-    private static final double G = 9.806; // m/s²
-    private static final double RHO = 1.204; // air density kg/m³
+    private static final double G = 9.806; // m/s^2
+    private static final double RHO = 1.204; // air density kg/m^3
     private static final double BALL_RADIUS = Inches.of(5.91).in(Meters) / 12; // m
-    private static final double BALL_AREA = Math.PI * BALL_RADIUS * BALL_RADIUS; // m²
+    private static final double BALL_AREA = Math.PI * BALL_RADIUS * BALL_RADIUS; // m^2
     private static final double BALL_MASS = Pounds.of(0.5).in(Kilograms); // kg
     private static final double C_D = 0.5; // drag coefficient
     private static final double C_L = 0.5; // lift coefficient
@@ -151,7 +151,7 @@ public class SleipnirCalc implements SolverIO {
             problem.subjectTo(eq(p.col(0), shooterPos));
 
             // Require initial velocity is below max:
-            // vx² + vy² + vz² ≤ v_max²
+            // vx^2 + vy^2 + vz^2 <= v_max^2
             Variable vxDiff = vx.get(0).minus(robotVx);
             Variable vyDiff = vy.get(0).minus(robotVy);
             Variable vzDiff = vz.get(0).minus(robotVz);
@@ -248,7 +248,7 @@ public class SleipnirCalc implements SolverIO {
     private static VariableMatrix dynamics(VariableMatrix x) {
         VariableBlock vel = x.get(new Slice(3, 6), Slice.__);
 
-        // v^2 = v · v (scalar)
+        // v^2 = v * v (scalar)
         Variable v2 = vel.T().times(vel).get(0, 0);
         // |v|
         Variable vNorm = Variable.sqrt(v2);

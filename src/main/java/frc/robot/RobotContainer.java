@@ -280,6 +280,14 @@ public class RobotContainer {
                 superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_OUT));
     }
 
+    public Command getTestCommand() {
+        return Commands.sequence(
+            superStructure.goToState(SuperStructureStates.INTAKE),
+            superStructure.goToState(SuperStructureStates.SHOOT),
+            superStructure.goToState(SuperStructureStates.CLIMB)
+        );
+    }
+
     /** Reset the simulation field. */
     public void resetSimulationField() {
         if (Constants.currentMode != Constants.Mode.SIM) {
