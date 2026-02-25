@@ -3,6 +3,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.function.Consumer;
@@ -25,6 +26,7 @@ import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.objectDetection.FuelPoseEstimator.FuelPoseEstimate;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.util.FuelFinder;
 import frc.robot.util.poseEst.OdometrySwerveDrivePoseEstimator;
 import frc.robot.subsystems.vision.Vision.IndividualTagEstimate;
 
@@ -267,9 +269,10 @@ public class RobotState {
     }
 
     /** Gets the current stack of fuel pose estimates. */
-    public Stack<FuelPoseEstimate> getFuelPoseEstimates() {
+    public List<FuelPoseEstimate> getFuelPoseEstimates() {
         updateFuelPoseEstimates();
-        return fuelPoseEstimates;
+        List<FuelPoseEstimate> estimates = fuelPoseEstimates.stream().toList();
+        return estimates;
     }
     
     /** Removes outdated fuel pose estimates from the stack. */
@@ -277,4 +280,11 @@ public class RobotState {
         fuelPoseEstimates.removeIf(pe -> Timer.getTimestamp() - pe.timestamp().in(Seconds) > 5.0);
     }
 
+    /** Gets the optimal fuel group based on the densest cluster of fuel poses. */
+    public Pose2d getOptimalFuelGroup() {
+        if (fuelPoseEstimates.isEmpty()) {
+            return null;
+        }
+        return FuelFinder.findDensestCluster(getFuelPoseEstimates().stream().map(FuelPoseEstimate::pose).toList());
+    }
 }

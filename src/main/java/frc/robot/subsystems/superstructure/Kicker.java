@@ -33,7 +33,7 @@ public class Kicker extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (Math.abs(kickerMotor.getEncoder().getVelocity()) < 0.05 && desiredVoltage != Volts.of(0)) {
+        if (Math.abs(kickerMotor.getEncoder().getVelocity()) < 0.0005 && desiredVoltage != Volts.of(0)) {
             if (!timer.isRunning()) {
                 timer.reset();
                 timer.start();

@@ -14,6 +14,7 @@ import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
@@ -42,7 +43,7 @@ public class BasicTunedCalc implements SolverIO {
 
 
     @Override
-    public ShootingSolution getShootingSolution(Pose2d robotPose, ChassisSpeeds robotVelocity) {
+    public ShootingSolution getShootingSolution(Pose2d robotPose, Twist2d robotVelocity) {
         Distance distance = Meters.of(PoseUtil.distance(robotPose, blueHubPose));
         Angle hoodAngle = Degrees.of(hoodAngleMap.get(distance.in(Meters)));
         double dx = blueHubPose.getX() - robotPose.getX();

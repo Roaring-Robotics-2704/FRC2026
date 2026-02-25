@@ -239,7 +239,7 @@ public class RobotContainer {
             Commands.waitUntil(() -> !controller.rightTrigger().getAsBoolean())
         ).finallyDo(()->superStructure.setDesiredState(SuperStructureStates.IDLE)));
 
-        controller.a().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx"));
+        // controller.a().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx"));
 
         // Reset gyro to 0 deg when B button is pressed
 

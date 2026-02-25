@@ -202,9 +202,9 @@ public class Robot extends LoggedRobot {
     public void disabledInit() {
         robotContainer.resetSimulationField();
 
-        OrchestraManager.getInstance().loadFile("xp");
+        // OrchestraManager.getInstance().loadFile("xp");
         
-        OrchestraManager.getInstance().play();
+        // OrchestraManager.getInstance().play();
     }
 
     /** This function is called periodically when disabled. */
