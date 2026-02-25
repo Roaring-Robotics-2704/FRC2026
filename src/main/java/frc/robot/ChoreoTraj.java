@@ -24,14 +24,7 @@ public record ChoreoTraj(
     Pose2d initialPoseBlue,
     Pose2d endPoseBlue
 ) {
-    public static final ChoreoTraj ShootDepotClimb = new ChoreoTraj(
-	    "ShootDepotClimb",
-	    OptionalInt.empty(),
-	    2.46106,
-	    new Pose2d(3.607, 4.035, Rotation2d.fromRadians(0)),
-	    new Pose2d(1.624, 3.893, Rotation2d.fromRadians(1.571))
-	);
-	public static final ChoreoTraj MinMovementShoot = new ChoreoTraj(
+    public static final ChoreoTraj MinMovementShoot = new ChoreoTraj(
 	    "MinMovementShoot",
 	    OptionalInt.empty(),
 	    0.65901,
@@ -48,9 +41,9 @@ public record ChoreoTraj(
 	public static final ChoreoTraj ShootCollectClimb = new ChoreoTraj(
 	    "ShootCollectClimb",
 	    OptionalInt.empty(),
-	    6.27028,
+	    5.7208,
 	    new Pose2d(3.607, 4.035, Rotation2d.fromRadians(0)),
-	    new Pose2d(1.577, 5.643, Rotation2d.fromRadians(0))
+	    new Pose2d(1.657, 3.955, Rotation2d.fromRadians(1.571))
 	);
 	public static final ChoreoTraj ShootCollectPass = new ChoreoTraj(
 	    "ShootCollectPass",
@@ -66,6 +59,13 @@ public record ChoreoTraj(
 	    new Pose2d(3.607, 4.035, Rotation2d.fromRadians(0)),
 	    new Pose2d(2.809, 5.055, Rotation2d.fromRadians(-0.524))
 	);
+	public static final ChoreoTraj ShootDepotClimb = new ChoreoTraj(
+	    "ShootDepotClimb",
+	    OptionalInt.empty(),
+	    2.46106,
+	    new Pose2d(3.607, 4.035, Rotation2d.fromRadians(0)),
+	    new Pose2d(1.624, 3.893, Rotation2d.fromRadians(1.571))
+	);
 	public static final ChoreoTraj ShootDepotShoot = new ChoreoTraj(
 	    "ShootDepotShoot",
 	    OptionalInt.empty(),
@@ -79,12 +79,12 @@ public record ChoreoTraj(
      * This allows for trajectory data to be looked up with strings during runtime.
      */
     public static final Map<String, ChoreoTraj> ALL_TRAJECTORIES = Map.ofEntries(
-    	Map.entry("ShootDepotClimb", ShootDepotClimb),
-		Map.entry("MinMovementShoot", MinMovementShoot),
+    	Map.entry("MinMovementShoot", MinMovementShoot),
 		Map.entry("ShootAndClimb", ShootAndClimb),
 		Map.entry("ShootCollectClimb", ShootCollectClimb),
 		Map.entry("ShootCollectPass", ShootCollectPass),
 		Map.entry("ShootCollectShoot", ShootCollectShoot),
+		Map.entry("ShootDepotClimb", ShootDepotClimb),
 		Map.entry("ShootDepotShoot", ShootDepotShoot)
     );
 
