@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
 import frc.robot.util.solvers.BasicTunedCalc;
 import frc.robot.util.solvers.SolverIO;
+import frc.robot.util.solvers.SolverIO.ShootingSolution;
 
 /** The shooter subsystem. */
 public class Shooter extends SubsystemBase {
@@ -36,6 +38,7 @@ public class Shooter extends SubsystemBase {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
     private final SolverIO solver;
+    private Rotation2d robotAngle = Rotation2d.fromDegrees(0    );
 
     public Shooter(ShooterIO io, SolverIO solver) {
         this.io = io;
@@ -46,12 +49,14 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Shooter", inputs);
-        hoodAngle = solver.getShootingSolution(
-            RobotState.getInstance().getOdometryPose(), RobotState.getInstance().getRobotVelocity().toTwist2d(0.02)).hoodAngle();
-        flywheelVelocity = solver.getShootingSolution(
-            RobotState.getInstance().getOdometryPose(), RobotState.getInstance().getRobotVelocity().toTwist2d(0.02)).flywheelVelocity();
+        ShootingSolution solution = solver.getShootingSolution();
+        hoodAngle = solution.hoodAngle();
+        flywheelVelocity = solution.flywheelVelocity();
+        robotAngle = solution.robotAngle();
+
         Logger.recordOutput("Shooter/CalculatedHoodAngle", hoodAngle);
         Logger.recordOutput("Shooter/CalculatedFlywheelVelocity", flywheelVelocity);
+        Logger.recordOutput("Shooter/CalculatedRobotAngle", robotAngle);
 
         Logger.recordOutput("Shooter/DesiredState", desiredState.toString());
         Logger.recordOutput("Shooter/CurrentState", currentState.toString());
@@ -113,6 +118,10 @@ public class Shooter extends SubsystemBase {
     /** Possible states for the shooter subsystem. */
     public enum ShooterState {
         STATIONARY, IDLE, SHOOTING
+    }
+
+    public Rotation2d getWantedRobotAngle() {
+        return robotAngle;
     }
 
 }

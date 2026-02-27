@@ -38,11 +38,5 @@ public class SleipnirCalc implements SolverIO {
     private static final double kBallRadius = 0.0762; // m (3 inches)
     private static final double kBallMass = 0.227; // kg (0.5 lbs)
 
-    @Override
-    public ShootingSolution getShootingSolution(Pose2d robotPose, Twist2d robotVelocity) {
-        Problem problem = new Problem();
-        return null;
-    }
-        
 
 }

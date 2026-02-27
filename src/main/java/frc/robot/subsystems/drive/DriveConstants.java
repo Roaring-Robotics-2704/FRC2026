@@ -194,8 +194,8 @@ public class DriveConstants {
     private static final int pigeonId = 13;
 
     // These are only used for simulation
-    public static final MomentOfInertia steerInertia = KilogramSquareMeters.of(0.004);
-    public static final MomentOfInertia driveInertia = KilogramSquareMeters.of(0.025);
+    public static final MomentOfInertia steerInertia = KilogramSquareMeters.of(0.05);
+    public static final MomentOfInertia driveInertia = KilogramSquareMeters.of(0.05);
     // Simulated voltage necessary to overcome friction
     public static final Voltage steerFrictionVoltage = Volts.of(0.2);
     public static final Voltage driveFrictionVoltage = Volts.of(0.2);

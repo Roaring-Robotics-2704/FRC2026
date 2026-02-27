@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 /** Add your docs here. */
 public interface SolverIO {
 
-    default ShootingSolution getShootingSolution(Pose2d robotPose, Twist2d robotVelocity) {
+    default ShootingSolution getShootingSolution() {
         return new ShootingSolution(RPM.of(0), Degrees.of(0), Rotation2d.kZero);
     }
 

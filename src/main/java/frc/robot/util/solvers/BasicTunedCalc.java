@@ -6,6 +6,7 @@ package frc.robot.util.solvers;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.util.FlippingUtil;
@@ -19,8 +20,8 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.Robot;
+import frc.robot.RobotState;
 import frc.robot.util.PoseUtil;
 
 /** Add your docs here. */
@@ -43,9 +44,12 @@ public class BasicTunedCalc implements SolverIO {
 
 
     @Override
-    public ShootingSolution getShootingSolution(Pose2d robotPose, Twist2d robotVelocity) {
+    public ShootingSolution getShootingSolution() {
+        Pose2d robotPose = RobotState.getInstance().getOdometryPose();
         Distance distance = Meters.of(PoseUtil.distance(robotPose, blueHubPose));
         Angle hoodAngle = Degrees.of(hoodAngleMap.get(distance.in(Meters)));
+
+        Pose2d robotPoseLookAhead = RobotState.getInstance().getLookaheadPose(distance.in(Feet) * 0.1);
         double dx = blueHubPose.getX() - robotPose.getX();
         double dy = blueHubPose.getY() - robotPose.getY();
         Rotation2d targetAngle = new Rotation2d(Math.atan2(dy, dx));

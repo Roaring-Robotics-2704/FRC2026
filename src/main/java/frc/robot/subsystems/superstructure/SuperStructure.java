@@ -1,11 +1,15 @@
 package frc.robot.subsystems.superstructure;
 
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.SuperStructureConstants.SuperStructureStates;
 import frc.robot.subsystems.superstructure.climber.Climber;
 import frc.robot.subsystems.superstructure.climber.Climber.ClimberState;
@@ -182,5 +186,13 @@ public class SuperStructure extends SubsystemBase {
 
     public boolean isAtDesiredState() {
         return this.currentState == this.wantedState;
+    }
+
+    public Command driveCommand(
+            Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
+        return Commands.either(
+                DriveCommands.joystickDrive(drive, xSupplier, ySupplier, omegaSupplier),
+                DriveCommands.joystickDriveAtAngle(drive, xSupplier, ySupplier, shooter::getWantedRobotAngle),
+                () -> wantedState == SuperStructureStates.SHOOT);
     }
 }
