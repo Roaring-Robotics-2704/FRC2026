@@ -4,19 +4,19 @@
 
 package frc.robot.subsystems.superstructure.intake;
 
-import static edu.wpi.first.units.Units.*;
-
+import edu.wpi.first.math.system.plant.DCMotor;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Pounds;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.math.system.plant.DCMotor;
 
 /** Add your docs here. */
 public class IntakeConstants {
-    public static final int ROLLER_MOTOR_ID = 97;
-    public static final int SLIDE_MOTOR_ID = 96;
+    public static final int ROLLER_MOTOR_ID = 21;
+    public static final int SLIDE_MOTOR_ID = 20;
 
-    public static final int ROLLER_CURRENT_LIMIT = 20;
-    public static final int SLIDE_CURRENT_LIMIT = 20;
+    public static final int ROLLER_CURRENT_LIMIT = 40;
+    public static final int SLIDE_CURRENT_LIMIT = 40;
 
     public static final Distance SLIDE_MAX_DISTANCE = Inches.mutable(12);
 

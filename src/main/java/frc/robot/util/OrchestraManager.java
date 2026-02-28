@@ -19,14 +19,13 @@ public class OrchestraManager {
     private OrchestraManager() {
         orchestra = new Orchestra();
     }
-    /** Returns the singleton instance of the OrchestraManager. */
+
     public static OrchestraManager getInstance() {
         if (orchestraManager == null) {
             orchestraManager = new OrchestraManager();
         }
         return orchestraManager;
     }
-
     /** Adds instruments to the orchestra. */
     public void addToOrchestra(TalonFX... objects) {
         for (TalonFX obj : objects) {

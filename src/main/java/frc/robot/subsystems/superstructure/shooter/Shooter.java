@@ -4,24 +4,15 @@
 
 package frc.robot.subsystems.superstructure.shooter;
 
-import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_IDLE;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TARGET;
-
-import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotState;
-import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.util.solvers.BasicTunedCalc;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_IDLE;
 import frc.robot.util.solvers.SolverIO;
 import frc.robot.util.solvers.SolverIO.ShootingSolution;
 import frc.robot.util.tunables.LoggedTunableNumber;
@@ -101,7 +92,7 @@ public class Shooter extends SubsystemBase {
                     break;
                 case SHOOTING:
                     io.setHoodAngle(hoodAngle);
-                    io.setFlywheelVelocity(SHOOTER_TARGET);
+                    io.setFlywheelVelocity(ShooterConstants.SHOOTER_TARGET);
                     break;
                 default:
                     break;

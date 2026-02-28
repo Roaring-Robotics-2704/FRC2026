@@ -4,23 +4,22 @@
 
 package frc.robot.subsystems.superstructure.climber;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Pounds;
-
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Pounds;
 import edu.wpi.first.units.measure.Distance;
 
 /** Add your docs here. */
 public class ClimberConstants {
   public static final int CLIMBER_MOTOR_ID = 41;
-  public static final int CLIMBER_STALL_CURRENT_LIMIT = 40;
-  public static final int CLIMBER_FREE_CURRENT_LIMIT = 40;
+  public static final int CLIMBER_STALL_CURRENT_LIMIT = 80;
+  public static final int CLIMBER_FREE_CURRENT_LIMIT = 80;
 
   public static final Distance CLIMBER_PULLEY_CIRCUMFERENCE =
       Inches.of(0.75 * Math.PI); // Assuming a 3 inch diameter pulley

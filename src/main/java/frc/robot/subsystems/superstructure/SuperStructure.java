@@ -1,15 +1,11 @@
 package frc.robot.subsystems.superstructure;
 
 
-import java.util.function.DoubleSupplier;
-
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.DriveCommands;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.SuperStructureConstants.SuperStructureStates;
 import frc.robot.subsystems.superstructure.climber.Climber;
 import frc.robot.subsystems.superstructure.climber.Climber.ClimberState;
@@ -52,7 +48,7 @@ public class SuperStructure extends SubsystemBase {
                     intake.setDesiredState(IntakeState.INSIDE);
                     hopper.setDesiredState(HopperState.IDLE);
                     kicker.setKickerVoltage(-1);
-                    shooter.setDesiredState(ShooterState.STATIONARY);
+                    shooter.setDesiredState(ShooterState.IDLE);
                     break;
                 case IDLE:
                     kicker.setKickerVoltage(-1);
@@ -162,8 +158,7 @@ public class SuperStructure extends SubsystemBase {
      */
     public Command goToState(SuperStructureStates state) {
         return Commands.sequence(
-                Commands.runOnce(() -> setDesiredState(state), this),
-                Commands.waitUntil(this::isAtDesiredState));
+                Commands.runOnce(() -> setDesiredState(state), this));
     }
 
     public Command goToStateWithIdle(SuperStructureStates state) {
@@ -188,11 +183,11 @@ public class SuperStructure extends SubsystemBase {
         return this.currentState == this.wantedState;
     }
 
-    public Command driveCommand(
-            Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
-        return Commands.either(
-                DriveCommands.joystickDrive(drive, xSupplier, ySupplier, omegaSupplier),
-                DriveCommands.joystickDriveAtAngle(drive, xSupplier, ySupplier, shooter::getWantedRobotAngle),
-                () -> wantedState == SuperStructureStates.SHOOT);
-    }
+    // public Command driveCommand(
+    //         Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
+    //     return Commands.either(
+    //             DriveCommands.joystickDrive(drive, xSupplier, ySupplier, omegaSupplier),
+    //             DriveCommands.joystickDriveAtAngle(drive, xSupplier, ySupplier, shooter::getWantedRobotAngle),
+    //             () -> wantedState == SuperStructureStates.SHOOT);
+    // }
 }

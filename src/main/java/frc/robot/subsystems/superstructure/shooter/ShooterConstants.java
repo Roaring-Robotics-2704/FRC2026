@@ -18,8 +18,8 @@ public class ShooterConstants {
 
     public static final Voltage MAX_SHOOTER_VOLTAGE = Volts.of(12); // max # of voltage in shooter, change dummy value later
 
-    public static final int FLYWHEEL_MOTOR_ONE = 998; // sets motor CAN ID, this is a dummy motor id, change this later
-    public static final int FLYWHEEL_MOTOR_TWO = 999; // sets motor CAN ID, this is a dummy motor id, change this later
+    public static final int FLYWHEEL_MOTOR_ONE = 22; // sets motor CAN ID, this is a dummy motor id, change this later
+    public static final int FLYWHEEL_MOTOR_TWO = 23; // sets motor CAN ID, this is a dummy motor id, change this later
 
     public static final int HOOD_SERVO1_PORT = 9; // sets servo port #, this is a dummy encoder #, change this later
 
@@ -38,7 +38,7 @@ public class ShooterConstants {
         RotationsPerSecond.of(1000); // add these if we need them, idle speed
     public static final AngularVelocity SHOOTER_TOLERANCE = RotationsPerSecond.of(0.0);    
     // GET REAL VALUES FOR FOLLOWING:
-    public static final Angle MIN_ANGLE = Degrees.of(19.867954); // lowest angle shooter can reach
-    public static final Angle MAX_ANGLE = Degrees.of(30.125930); // largest angle shooter can reach
+    public static final Angle MIN_ANGLE = Degrees.of(28.048335); // lowest angle shooter can reach
+    public static final Angle MAX_ANGLE = Degrees.of(59.874070); // largest angle shooter can reach
 }
 

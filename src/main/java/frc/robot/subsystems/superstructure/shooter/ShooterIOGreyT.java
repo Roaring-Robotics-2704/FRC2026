@@ -38,6 +38,7 @@ import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOT
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KS;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KV;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TOLERANCE;
+import frc.robot.util.OrchestraManager;
 import frc.robot.util.PhoenixUtil;
 
 /** Add your docs here. */
@@ -51,6 +52,8 @@ public class ShooterIOGreyT implements ShooterIO {
     private TalonFX flywheelMotor1;
     private TalonFX flywheelMotor2;
 
+    private double targetFlywheelVelocity = 0.0;
+
     /** Instantiates the GreyT Shooter hardware. */
     private LinearServo hoodServo1 = new LinearServo(HOOD_SERVO1_PORT, 50, 6);
 
@@ -60,7 +63,7 @@ public class ShooterIOGreyT implements ShooterIO {
         flywheelMotor2 = new TalonFX(FLYWHEEL_MOTOR_TWO);
 
         MotorOutputConfigs motorOutput = new MotorOutputConfigs()
-                .withNeutralMode(NeutralModeValue.Coast).withInverted(InvertedValue.Clockwise_Positive);
+                .withNeutralMode(NeutralModeValue.Coast).withInverted(InvertedValue.CounterClockwise_Positive);
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(CURRENT_LIMIT)
                 .withStatorCurrentLimitEnable(true);
@@ -70,7 +73,6 @@ public class ShooterIOGreyT implements ShooterIO {
                 .withKV(SHOOTER_KV)
                 .withKA(SHOOTER_KA)
                 .withKS(SHOOTER_KS);
-
         TalonFXConfiguration config = new TalonFXConfiguration()
                 .withMotorOutput(
                         motorOutput)
@@ -95,6 +97,7 @@ public class ShooterIOGreyT implements ShooterIO {
 
         statusSignals.setUpdateFrequencyForAll(Hertz.of(50));
         ParentDevice.optimizeBusUtilizationForAll(flywheelMotor1, flywheelMotor2);
+        OrchestraManager.getInstance().addToOrchestra(flywheelMotor1,flywheelMotor2);
     }
 
     @Override
@@ -108,7 +111,7 @@ public class ShooterIOGreyT implements ShooterIO {
         inputs.hoodAngle.mut_replace(getHoodServoPosition());
         inputs.atTargetVelocity = flywheelMotor1.getClosedLoopError().getValue() < SHOOTER_TOLERANCE.in(RotationsPerSecond);
         inputs.atTargetAngle = hoodServo1.isFinished();
-        inputs.targetFlywheelVelocity.mut_replace(flywheelMotor1.getClosedLoopReference().getValueAsDouble(), RotationsPerSecond);
+        inputs.targetFlywheelVelocity.mut_replace(targetFlywheelVelocity , RotationsPerSecond);
     }
 
     /**
@@ -121,6 +124,8 @@ public class ShooterIOGreyT implements ShooterIO {
     public void setFlywheelVelocity(AngularVelocity velocity) {
         flywheelMotor1.setControl(new VelocityDutyCycle(velocity));
         flywheelMotor2.setControl(new Follower(flywheelMotor1.getDeviceID(), MotorAlignmentValue.Opposed));
+
+        targetFlywheelVelocity = velocity.in(RotationsPerSecond);
 
     }
 

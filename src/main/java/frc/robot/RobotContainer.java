@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveTuningCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -30,10 +31,6 @@ import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
-import frc.robot.subsystems.objectDetection.FuelPoseEstimator;
-import frc.robot.subsystems.objectDetection.ObjectDetectionConstants;
-import frc.robot.subsystems.objectDetection.ObjectDetectionIO;
-import frc.robot.subsystems.objectDetection.ObjectDetectionIOReal;
 import frc.robot.subsystems.superstructure.Kicker;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructureConstants.SuperStructureStates;
@@ -79,7 +76,7 @@ public class RobotContainer {
     private final Climber climber;
 
     private final Vision vision;
-    private final FuelPoseEstimator objectDetection;
+    // private final FuelPoseEstimator objectDetection;
 
     // SuperStructure
     private final SuperStructure superStructure;
@@ -112,8 +109,8 @@ public class RobotContainer {
                 climber = new Climber(new ClimberIO() {});
                 vision = new Vision(
                         new VisionIOPhotonVision(camera0Name, robotToCamera0));
-                objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
-                        ObjectDetectionConstants.cameraToRobotTransform));
+                // objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
+                //         ObjectDetectionConstants.cameraToRobotTransform));
                 shooter = new Shooter(new ShooterIOGreyT(), new BasicTunedCalc());
                 break;
 
@@ -137,8 +134,8 @@ public class RobotContainer {
                 vision = new Vision(
                         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0,
                                 driveSimulation::getSimulatedDriveTrainPose));
-                objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
-                    });
+                // objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
+                //     });
                 shooter = new Shooter(new ShooterIOSim(), new BasicTunedCalc());
                 break;
 
@@ -162,8 +159,8 @@ public class RobotContainer {
 
                 vision = new Vision(new VisionIO() {
                 });
-                objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
-                });
+                // objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
+                // });
 
                 climber = new Climber(new ClimberIO() {});
 
@@ -179,7 +176,6 @@ public class RobotContainer {
 
         DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
 
-        OrchestraManager.getInstance().addToOrchestra(drive.getMotors());
 
         // Configure the button bindings
         configureButtonBindings();
@@ -197,13 +193,13 @@ public class RobotContainer {
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(
-                superStructure.driveCommand(
+                DriveCommands.joystickDrive(
                         drive,
-                        () -> controller.getLeftY(),
-                        () -> controller.getLeftX(),
-                        () -> -controller.getRightX()));
+                        () -> controller.getLeftY()*0.5,
+                        () -> controller.getLeftX()*0.5,
+                        () -> -controller.getRightX()*0.5));
         vision.setDefaultCommand(vision.idle());
-        objectDetection.setDefaultCommand(objectDetection.idle());
+        // objectDetection.setDefaultCommand(objectDetection.idle());
 
         // // Lock to 0 deg when A button is held
         // controller
@@ -219,15 +215,14 @@ public class RobotContainer {
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
         // Reset gyro to 0 deg when B button is pressed
-        controller.leftTrigger().whileTrue(superStructure.goToStateWithIdle(SuperStructureStates.INTAKE));
+        controller.leftTrigger().whileTrue(superStructure.goToState(SuperStructureStates.INTAKE)).onFalse(superStructure.goToState(SuperStructureStates.IDLE));
         
         controller.rightTrigger().whileTrue(Commands.sequence(
-            superStructure.goToState(SuperStructureStates.SHOOTER_PREP),
-            superStructure.goToState(SuperStructureStates.SHOOT),
+            Commands.run(()->superStructure.setDesiredState(SuperStructureStates.SHOOT)),
             Commands.waitUntil(() -> !controller.rightTrigger().getAsBoolean())
         ).finallyDo(()->superStructure.setDesiredState(SuperStructureStates.IDLE)));
 
-        // controller.a().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx"));
+        controller.a().onTrue(OrchestraManager.getInstance().playOrchestraCommand("rickroll").ignoringDisable(true));
 
         // Reset gyro to 0 deg when B button is pressed
 

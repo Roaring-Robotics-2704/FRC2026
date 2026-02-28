@@ -57,7 +57,8 @@ public class IntakeIOReal implements IntakeIO {
         slideConfig.closedLoop.pid(SLIDE_POSITION_KP, SLIDE_POSITION_KI, SLIDE_POSITION_KD);
 
         slideConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
-        slideConfig.absoluteEncoder.inverted(false);
+        slideConfig.absoluteEncoder.inverted(true);
+        slideConfig.inverted(true);
         slideConfig.absoluteEncoder.positionConversionFactor(ENCODER_GEAR_RATIO);
 
 
