@@ -33,18 +33,18 @@ public class Kicker extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (Math.abs(kickerMotor.getEncoder().getVelocity()) < 0.0005 && desiredVoltage != Volts.of(0)) {
-            if (!timer.isRunning()) {
-                timer.reset();
-                timer.start();
-            }
-            kickerMotor.setVoltage(-1);
-        } else if (timer.isRunning() && timer.get() < 1) {
-            kickerMotor.setVoltage(-1);
-        } else {
-            timer.stop();
-            kickerMotor.setVoltage(desiredVoltage);
-        }
+        // if (Math.abs(kickerMotor.getEncoder().getVelocity()) < 0.0005 && desiredVoltage != Volts.of(0)) {
+        //     if (!timer.isRunning()) {
+        //         timer.reset();
+        //         timer.start();
+        //     }
+        //     kickerMotor.setVoltage(-1);
+        // } else if (timer.isRunning() && timer.get() < 1) {
+        //     kickerMotor.setVoltage(-1);
+        // } else {
+        //     timer.stop();
+        kickerMotor.setVoltage(desiredVoltage);
+        // }
         Logger.recordOutput("Kicker/Current", kickerMotor.getOutputCurrent());
         Logger.recordOutput("Kicker/DesiredVoltage", kickerMotor.getAppliedOutput());
         Logger.recordOutput("Kicker/Velocity", kickerMotor.getEncoder().getVelocity());

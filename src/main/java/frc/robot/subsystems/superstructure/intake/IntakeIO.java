@@ -4,15 +4,13 @@
 
 package frc.robot.subsystems.superstructure.intake;
 
+import org.littletonrobotics.junction.AutoLog;
+
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-
-
-import org.littletonrobotics.junction.AutoLog;
-
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutCurrent;
@@ -66,6 +64,10 @@ public interface IntakeIO {
     }
 
     default void resetSlideEncoder(Distance position) {
+        // Default to nothing for replay
+    }
+
+    default void setPID(double kP, double kD, double kS, double kV, double kA) {
         // Default to nothing for replay
     }
 

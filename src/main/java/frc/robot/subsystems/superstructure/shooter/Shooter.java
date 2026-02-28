@@ -20,9 +20,11 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
+import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.solvers.BasicTunedCalc;
 import frc.robot.util.solvers.SolverIO;
 import frc.robot.util.solvers.SolverIO.ShootingSolution;
+import frc.robot.util.tunables.LoggedTunableNumber;
 
 /** The shooter subsystem. */
 public class Shooter extends SubsystemBase {
@@ -33,20 +35,45 @@ public class Shooter extends SubsystemBase {
     private Angle hoodAngle;
     private AngularVelocity flywheelVelocity;
 
-
     private final ShooterIO io;
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
     private final SolverIO solver;
+
+    private static final LoggedTunableNumber shootP = new LoggedTunableNumber("Shooter/ShootP");
+    private static final LoggedTunableNumber shootD = new LoggedTunableNumber("Shooter/ShootD");
+
+    private static final LoggedTunableNumber shootS = new LoggedTunableNumber("Shooter/ShootS");
+    private static final LoggedTunableNumber shootV = new LoggedTunableNumber("Shooter/ShootV");
+    private static final LoggedTunableNumber shootA = new LoggedTunableNumber("Shooter/ShootA");
+
+
+
+    static {
+        shootP.initDefault(ShooterConstants.SHOOTER_KP);
+        shootD.initDefault(ShooterConstants.SHOOTER_KD);
+
+        shootS.initDefault(ShooterConstants.SHOOTER_KS);
+        shootV.initDefault(ShooterConstants.SHOOTER_KV);
+        shootA.initDefault(ShooterConstants.SHOOTER_KA);
+    }
+
     private Rotation2d robotAngle = Rotation2d.fromDegrees(0    );
 
     public Shooter(ShooterIO io, SolverIO solver) {
         this.io = io;
         this.solver = solver;
+
     }
 
     @Override
     public void periodic() {
+
+        if(shootP.hasChanged(hashCode()) || shootD.hasChanged(hashCode()) ||
+            shootS.hasChanged(hashCode()) || shootV.hasChanged(hashCode()) || shootA.hasChanged(hashCode())) {
+            io.setPID(shootP.get(), 0, shootD.get(), shootS.get(), shootV.get(), shootA.get());
+        }
+
         io.updateInputs(inputs);
         Logger.processInputs("Shooter", inputs);
         ShootingSolution solution = solver.getShootingSolution();
@@ -84,6 +111,7 @@ public class Shooter extends SubsystemBase {
             }
 
         }
+
         // This method will be called once per scheduler run
     }
 

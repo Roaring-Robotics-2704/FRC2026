@@ -4,14 +4,13 @@
 
 package frc.robot.subsystems.superstructure.shooter;
 
+import org.littletonrobotics.junction.AutoLog;
+
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volt;
-
-import org.littletonrobotics.junction.AutoLog;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
@@ -50,6 +49,9 @@ public interface ShooterIO { // creates and sets baseline values of robot for lo
     }
 
     default void setFlywheelVelocity(AngularVelocity velocity) {
+    }
+
+    default void setPID(double kP, double kI, double kD, double kS, double kV, double kA) {
     }
 
     

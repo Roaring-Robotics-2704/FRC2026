@@ -4,11 +4,10 @@
 
 package frc.robot.subsystems.superstructure.shooter;
 
+import edu.wpi.first.math.system.plant.DCMotor;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -22,16 +21,14 @@ public class ShooterConstants {
     public static final int FLYWHEEL_MOTOR_ONE = 998; // sets motor CAN ID, this is a dummy motor id, change this later
     public static final int FLYWHEEL_MOTOR_TWO = 999; // sets motor CAN ID, this is a dummy motor id, change this later
 
-    public static final int HOOD_SERVO1_PORT = 1; // sets servo port #, this is a dummy encoder #, change this later
-    public static final int HOOD_SERVO2_PORT = 2; // sets servo port #, this is a dummy encoder #, change this later
+    public static final int HOOD_SERVO1_PORT = 9; // sets servo port #, this is a dummy encoder #, change this later
 
     public static final int CURRENT_LIMIT = 40; // shooter speed limit, this is a dummy value, change this later
     public static final DCMotor SHOOTER_MOTOR_TYPE = DCMotor.getKrakenX60(2); // change this later if necessary
 
-    public static final double SHOOTER_KP = 10.0; // more error = more power
-    public static final double SHOOTER_KI = 0; // accumulates error
+    public static final double SHOOTER_KP = 0; // more error = more power
     public static final double SHOOTER_KD = 0.0; // predicts ROC of error, change these PID values later as needed
-    public static final double SHOOTER_KV = 5.0; 
+    public static final double SHOOTER_KV = 0; 
     public static final double SHOOTER_KA = 0.0;
     public static final double SHOOTER_KS = 0.0;
 
@@ -41,7 +38,7 @@ public class ShooterConstants {
         RotationsPerSecond.of(1000); // add these if we need them, idle speed
     public static final AngularVelocity SHOOTER_TOLERANCE = RotationsPerSecond.of(0.0);    
     // GET REAL VALUES FOR FOLLOWING:
-    public static final Angle MIN_ANGLE = Degrees.of(0); // lowest angle shooter can reach
-    public static final Angle MAX_ANGLE = Degrees.of(45); // largest angle shooter can reach
+    public static final Angle MIN_ANGLE = Degrees.of(19.867954); // lowest angle shooter can reach
+    public static final Angle MAX_ANGLE = Degrees.of(30.125930); // largest angle shooter can reach
 }
 
