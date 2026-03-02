@@ -32,8 +32,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
 import frc.robot.subsystems.superstructure.Kicker;
-import frc.robot.subsystems.superstructure.SuperStructure;
-import frc.robot.subsystems.superstructure.SuperStructureConstants.SuperStructureStates;
 import frc.robot.subsystems.superstructure.climber.Climber;
 import frc.robot.subsystems.superstructure.climber.ClimberIO;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
@@ -79,7 +77,7 @@ public class RobotContainer {
     // private final FuelPoseEstimator objectDetection;
 
     // SuperStructure
-    private final SuperStructure superStructure;
+    // private final SuperStructure superStructure;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -169,7 +167,7 @@ public class RobotContainer {
         }
 
         // Set up superstructure
-        superStructure = new SuperStructure(intake, hopper, kicker, shooter, climber);
+        // superStructure = new SuperStructure(intake, hopper, kicker, shooter, climber);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -195,35 +193,48 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> controller.getLeftY()*0.5,
-                        () -> controller.getLeftX()*0.5,
-                        () -> -controller.getRightX()*0.5));
+                        () -> controller.getLeftY()*0.7,
+                        () -> controller.getLeftX()*0.7,
+                        () -> -controller.getRightX()*0.7));
         vision.setDefaultCommand(vision.idle());
         // objectDetection.setDefaultCommand(objectDetection.idle());
 
-        // // Lock to 0 deg when A button is held
-        // controller
-        //         .a()
-        //         .whileTrue(
-        //                 DriveCommands.joystickDriveAtAngle(
-        //                         drive,
-        //                         () -> -controller.getLeftY(),
-        //                         () -> -controller.getLeftX(),
-        //                         () -> Rotation2d.kZero));
+        // Lock to 0 deg when A button is held
+        controller
+                .a()
+                .whileTrue(
+                        DriveCommands.joystickDriveAtAngle(
+                                drive,
+                                () -> controller.getLeftY()*0.7,
+                                () -> controller.getLeftX()*0.7,
+                                () -> shooter.getWantedRobotAngle().plus(Rotation2d.kCW_90deg)));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
+        controller.start().onTrue(Commands.runOnce(()->RobotState.getInstance().resetPose(Pose2d.kZero)));
+
         // Reset gyro to 0 deg when B button is pressed
-        controller.leftTrigger().whileTrue(superStructure.goToState(SuperStructureStates.INTAKE)).onFalse(superStructure.goToState(SuperStructureStates.IDLE));
+        // controller.leftTrigger().whileTrue(Commands.run(()->superStructure.setDesiredState(SuperStructureStates.INTAKE)).finallyDo(()->superStructure.setDesiredState(SuperStructureStates.IDLE)));
+        controller.leftTrigger().whileTrue(Commands.parallel(
+            Commands.startEnd(
+                () -> intake.setDesiredState(Intake.IntakeState.DEPLOYED_ON),
+                () -> intake.setDesiredState(Intake.IntakeState.STOWED), intake
+                )
+        ));
+        controller.rightTrigger().whileTrue(Commands.parallel(
+            Commands.startEnd(()->{
+            if (shooter.isAtDesiredState())
+            {kicker.setKickerVoltage(12);}}
+            ,()->kicker.setKickerVoltage(-1), kicker),
+            Commands.startEnd(()->shooter.setDesiredState(Shooter.ShooterState.SHOOTING), ()->shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
+            Commands.startEnd(()->hopper.setDesiredState(Hopper.HopperState.FEEDING), ()->hopper.setDesiredState(Hopper.HopperState.IDLE), hopper)
+        ));
+        // controller.rightTrigger().whileTrue(Commands.run(()->superStructure.setDesiredState(SuperStructureStates.SHOOT)).finallyDo(()->superStructure.setDesiredState(SuperStructureStates.IDLE)));
+
+        controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
+
         
-        controller.rightTrigger().whileTrue(Commands.sequence(
-            Commands.run(()->superStructure.setDesiredState(SuperStructureStates.SHOOT)),
-            Commands.waitUntil(() -> !controller.rightTrigger().getAsBoolean())
-        ).finallyDo(()->superStructure.setDesiredState(SuperStructureStates.IDLE)));
-
-        controller.a().onTrue(OrchestraManager.getInstance().playOrchestraCommand("rickroll").ignoringDisable(true));
-
         // Reset gyro to 0 deg when B button is pressed
 
 
@@ -246,10 +257,10 @@ public class RobotContainer {
      *
      * @return the command to run in calibration
      */
-    public Command getCalibrationCommand() {
-        return Commands.sequence(superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_IN),
-                superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_OUT));
-    }
+    // public Command getCalibrationCommand() {
+    //     return Commands.sequence(superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_IN),
+    //             superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_OUT));
+    // }
 
     /** Reset the simulation field. */
     public void resetSimulationField() {

@@ -6,6 +6,7 @@ package frc.robot.subsystems.superstructure.shooter;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.StatusSignalCollection;
+import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -73,13 +74,15 @@ public class ShooterIOGreyT implements ShooterIO {
                 .withKV(SHOOTER_KV)
                 .withKA(SHOOTER_KA)
                 .withKS(SHOOTER_KS);
+        AudioConfigs audioConfigs = new AudioConfigs().withAllowMusicDurDisable(true).withBeepOnConfig(true).withBeepOnBoot(true);
+
         TalonFXConfiguration config = new TalonFXConfiguration()
                 .withMotorOutput(
                         motorOutput)
                 .withCurrentLimits(
                         currentLimits)
                 .withSlot0(
-                        pidConfigs);
+                        pidConfigs).withAudio(audioConfigs);
 
         PhoenixUtil.tryUntilOk(5, () -> flywheelMotor1.getConfigurator().apply(config));
         PhoenixUtil.tryUntilOk(5, () -> flywheelMotor2.getConfigurator().apply(config));
@@ -144,7 +147,7 @@ public class ShooterIOGreyT implements ShooterIO {
 
     private Angle getHoodServoPosition() {
         return Degrees.of(
-            hoodServo1.getPosition() * (MAX_ANGLE.in(Degrees) - MIN_ANGLE.in(Degrees)) + MIN_ANGLE.in(Degrees)
+           hoodServo1.getPosition() * (MAX_ANGLE.in(Degrees) - MIN_ANGLE.in(Degrees)) + MIN_ANGLE.in(Degrees)
         );
     }
 

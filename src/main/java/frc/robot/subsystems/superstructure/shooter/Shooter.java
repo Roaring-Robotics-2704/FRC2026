@@ -7,7 +7,7 @@ package frc.robot.subsystems.superstructure.shooter;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.RPM;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -82,7 +82,7 @@ public class Shooter extends SubsystemBase {
         if (currentState != desiredState) {
             switch (desiredState) {
                 case STATIONARY:
-                    io.setFlywheelVoltage(Volts.of(0));
+                    io.setFlywheelVelocity(RPM.of(0));
                     io.setHoodAngle(MIN_ANGLE);
                     ;
                     break;

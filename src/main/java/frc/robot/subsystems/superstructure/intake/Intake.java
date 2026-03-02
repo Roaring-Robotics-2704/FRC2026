@@ -4,17 +4,15 @@
 
 package frc.robot.subsystems.superstructure.intake;
 
+import org.littletonrobotics.junction.Logger;
+
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_MAX_DISTANCE;
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.drive.DriveConstants;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_MAX_DISTANCE;
 import frc.robot.util.tunables.LoggedTunableNumber;
 
 /** Intake subsystem for controlling the robot's intake mechanism. */
@@ -57,7 +55,6 @@ public class Intake extends SubsystemBase {
         intakeIO.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
         // This method will be called once per scheduler run
-        if (currentState != desiredState) {
             switch (desiredState) {
                 case INSIDE:
                     intakeIO.setPosition(Inches.zero());
@@ -108,7 +105,7 @@ public class Intake extends SubsystemBase {
                 currentState = desiredState;
             }
             
-        }
+        
         Logger.recordOutput("Intake/CurrentState", currentState);
         Logger.recordOutput("Intake/DesiredState", desiredState);
     }

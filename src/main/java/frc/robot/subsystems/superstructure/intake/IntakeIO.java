@@ -33,6 +33,7 @@ public interface IntakeIO {
         public MutVoltage slideAppliedVoltage = Volts.mutable(0);
         public MutCurrent slideCurrentDraw = Amps.mutable(0);
         public MutDistance slidePosition = Inches.mutable(0);
+        public MutDistance slideSetpoint = Inches.mutable(0);
         public MutLinearVelocity slideVelocity = InchesPerSecond.mutable(0);
         public boolean slideAtPosition = false;
 

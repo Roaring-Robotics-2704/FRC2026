@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems.superstructure;
 
-import static edu.wpi.first.units.Units.Volts;
-
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.PersistMode;
@@ -13,13 +11,14 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.SparkUtil;
 
 public class Kicker extends SubsystemBase {
-    Voltage desiredVoltage = Volts.of(0);
+    Voltage desiredVoltage = Volts.of(-1);
     Timer timer = new Timer();
     /** Creates a new Kicker. */
     SparkMax kickerMotor = new SparkMax(31, SparkMax.MotorType.kBrushless);

@@ -1,13 +1,13 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Seconds;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.function.Consumer;
+
 import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.FlippingUtil;
 
@@ -21,14 +21,15 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.objectDetection.FuelPoseEstimator.FuelPoseEstimate;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.Vision.IndividualTagEstimate;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.FuelFinder;
 import frc.robot.util.poseEst.OdometrySwerveDrivePoseEstimator;
-import frc.robot.subsystems.vision.Vision.IndividualTagEstimate;
 
 /**
  * A singleton class that holds the global state of the robot. This holds state that doesn't directly control mechanisms and
@@ -254,6 +255,10 @@ public class RobotState {
 
     public ChassisSpeeds getFieldVelocity() {
         return ChassisSpeeds.fromRobotRelativeSpeeds(robotVelocity, getRotation());
+    }
+
+    public void resetPose(Pose2d pose) {
+        setPose(pose, lastModulePositions);
     }
 
     private Stack<FuelPoseEstimate> fuelPoseEstimates = new Stack<>();

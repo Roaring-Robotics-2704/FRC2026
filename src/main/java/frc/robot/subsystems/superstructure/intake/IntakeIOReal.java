@@ -56,11 +56,13 @@ public class IntakeIOReal implements IntakeIO {
         slideConfig.closedLoop.feedForward.kA(SLIDE_POSITION_KA);
         slideConfig.closedLoop.pid(SLIDE_POSITION_KP, SLIDE_POSITION_KI, SLIDE_POSITION_KD);
 
-        slideConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+        slideConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+        slideConfig.absoluteEncoder.zeroCentered(true);
         slideConfig.absoluteEncoder.inverted(true);
         slideConfig.inverted(true);
         slideConfig.absoluteEncoder.positionConversionFactor(ENCODER_GEAR_RATIO);
-
+        slideConfig.absoluteEncoder.averageDepth(2);
+        slideConfig.encoder.positionConversionFactor(IntakeConstants.MOTOR_GEAR_RATIO);
 
         slideConfig.closedLoop.maxMotion.maxAcceleration(SLIDE_MAX_ACCELERATION);
         slideConfig.closedLoop.maxMotion.cruiseVelocity(SLIDE_MAX_VELOCITY);
@@ -76,6 +78,8 @@ public class IntakeIOReal implements IntakeIO {
         SparkUtil.tryUntilOk(rollerMotor, 5,
                 () -> rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters,
                         PersistMode.kPersistParameters));
+
+        slideMotor.getEncoder().setPosition(slideMotor.getAbsoluteEncoder().getPosition());
     }
 
     @Override
@@ -83,6 +87,7 @@ public class IntakeIOReal implements IntakeIO {
         inputs.slideAppliedVoltage.mut_replace(slideMotor.getAppliedOutput(), Volts);
         inputs.slideCurrentDraw.mut_replace(slideMotor.getOutputCurrent(), Amps);
         inputs.slidePosition.mut_replace(slideMotor.getEncoder().getPosition(), Inches);
+        inputs.slideSetpoint.mut_replace(slideMotor.getClosedLoopController().getSetpoint(), Inches);
         inputs.slideAtPosition = slideMotor.getClosedLoopController().isAtSetpoint();
         inputs.slideVelocity.mut_replace(slideMotor.getEncoder().getVelocity(), InchesPerSecond);
 

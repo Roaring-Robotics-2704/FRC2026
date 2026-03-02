@@ -6,6 +6,7 @@ package frc.robot.subsystems.superstructure.shooter;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Angle;
@@ -28,14 +29,14 @@ public class ShooterConstants {
 
     public static final double SHOOTER_KP = 0; // more error = more power
     public static final double SHOOTER_KD = 0.0; // predicts ROC of error, change these PID values later as needed
-    public static final double SHOOTER_KV = 0; 
+    public static final double SHOOTER_KV = 0.0105; 
     public static final double SHOOTER_KA = 0.0;
     public static final double SHOOTER_KS = 0.0;
 
     public static final AngularVelocity SHOOTER_TARGET = 
-        RotationsPerSecond.of(2800); // add these if we need them, desired speed
+        RPM.of(2800); // add these if we need them, desired speed
     public static final AngularVelocity SHOOTER_IDLE = 
-        RotationsPerSecond.of(1000); // add these if we need them, idle speed
+        RPM.of(1000); // add these if we need them, idle speed
     public static final AngularVelocity SHOOTER_TOLERANCE = RotationsPerSecond.of(0.0);    
     // GET REAL VALUES FOR FOLLOWING:
     public static final Angle MIN_ANGLE = Degrees.of(28.048335); // lowest angle shooter can reach

@@ -27,7 +27,7 @@ public class VisionConstants {
     /************************/
 
     // AprilTag layout
-    public static AprilTagFieldLayout aprilTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+    public static AprilTagFieldLayout aprilTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
     // Camera names, must match names configured on coprocessor
     public static String camera0Name = "Shooter Cam";
@@ -40,7 +40,7 @@ public class VisionConstants {
     public static final double maxAmbiguity = 0.3;
     public static final double maxZError = 0.75;
     /** The maximum error in an estimate's rotation in degrees. */
-    public static final double maxRotationError = 20;
+    public static final double maxRotationError = 180;
 
     // Standard deviation baselines, for 1 meter distance and 1 tag
     // (Adjusted automatically based on distance and # of tags)

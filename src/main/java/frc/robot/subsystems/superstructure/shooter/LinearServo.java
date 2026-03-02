@@ -25,7 +25,7 @@ public class LinearServo extends Servo {
         super(channel);
         this.length = length;
         this.speed = speed;
-        super.setPeriodMultiplier(PeriodMultiplier.k2X);
+        super.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
     }
 
     /**

@@ -46,7 +46,8 @@ public final class Constants {
      * sending commands, and other issues. However, this has quite visible advantages with reducing loop time
      * inconsistency. Again, if you want to use this functionality, test with it on and understand its consequences! If
      * there are spooky issues going on with the robot, disabling this (if enabled) is a good first step. Only use this
-     * as a last resort. Here be dragons.
+     * as a last resort. Here be dragons
+     * .
      */
     public static boolean useSuperDangerousRTThreadPriority = true;
 
