@@ -7,21 +7,11 @@
 
 package frc.robot;
 
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveTuningCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -51,7 +41,7 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.util.OrchestraManager;
+import frc.robot.util.simUtils.Simulation;
 import frc.robot.util.solvers.BasicTunedCalc;
 
 /**
@@ -65,26 +55,29 @@ import frc.robot.util.solvers.BasicTunedCalc;
  */
 public class RobotContainer {
     // Subsystems
-    private final Drive drive;
-    private SwerveDriveSimulation driveSimulation = null;
-    private final Hopper hopper;
-    private final Kicker kicker = new Kicker();
-    private final Intake intake;
-    private final Shooter shooter;
-    private final Climber climber;
+    public final Drive drive;
+    public final Hopper hopper;
+    public final Kicker kicker = new Kicker();
+    public final Intake intake;
+    public final Shooter shooter;
+    public final Climber climber;
 
-    private final Vision vision;
+    public final Vision vision;
     // private final FuelPoseEstimator objectDetection;
 
     // SuperStructure
     // private final SuperStructure superStructure;
 
     // Controller
-    private final CommandXboxController controller = new CommandXboxController(0);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
+    public boolean noAutoSelected() {
+        var selected = autoChooser.getSendableChooser().getSelected();
+        return selected == null || selected == "None";
+    }
 
+    private final LoggedDashboardChooser<Command> testChooser;
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -114,8 +107,7 @@ public class RobotContainer {
 
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
-                driveSimulation = new SwerveDriveSimulation(DriveConstants.mapleSimConfig,
-                        new Pose2d(3, 3, Rotation2d.fromDegrees(360)));
+                var driveSimulation = Simulation.getInstance().configureSimulation();
 
                 drive = new Drive(
                         new GyroIOSim(driveSimulation.getGyroSimulation()),
@@ -172,75 +164,16 @@ public class RobotContainer {
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-        DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
+        Controls.getInstance().configureControls(this);
 
+        testChooser = new LoggedDashboardChooser<>("Test Command");
+        testChooser.addDefaultOption("Zero module rotations", drive.rezeroModules());
+        DriveTuningCommands.addTuningCommandsToAutoChooser(drive, testChooser);
 
-        // Configure the button bindings
-        configureButtonBindings();
-
-    }
-
-    /**
-     * Use this method to define your button->command mappings. Buttons can be
-     * created by
-     * instantiating a {@link GenericHID} or one of its subclasses ({@link
-     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
-     * it to a {@link
-     * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-     */
-    private void configureButtonBindings() {
-        // Default command, normal field-relative drive
-        drive.setDefaultCommand(
-                DriveCommands.joystickDrive(
-                        drive,
-                        () -> controller.getLeftY()*0.7,
-                        () -> controller.getLeftX()*0.7,
-                        () -> -controller.getRightX()*0.7));
-        vision.setDefaultCommand(vision.idle());
-        // objectDetection.setDefaultCommand(objectDetection.idle());
-
-        // Lock to 0 deg when A button is held
-        controller
-                .a()
-                .whileTrue(
-                        DriveCommands.joystickDriveAtAngle(
-                                drive,
-                                () -> controller.getLeftY()*0.7,
-                                () -> controller.getLeftX()*0.7,
-                                () -> shooter.getWantedRobotAngle().plus(Rotation2d.kCW_90deg)));
-
-        // Switch to X pattern when X button is pressed
-        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
-        controller.start().onTrue(Commands.runOnce(()->RobotState.getInstance().resetPose(Pose2d.kZero)));
-
-        // Reset gyro to 0 deg when B button is pressed
-        // controller.leftTrigger().whileTrue(Commands.run(()->superStructure.setDesiredState(SuperStructureStates.INTAKE)).finallyDo(()->superStructure.setDesiredState(SuperStructureStates.IDLE)));
-        controller.leftTrigger().whileTrue(Commands.parallel(
-            Commands.startEnd(
-                () -> intake.setDesiredState(Intake.IntakeState.DEPLOYED_ON),
-                () -> intake.setDesiredState(Intake.IntakeState.STOWED), intake
-                )
-        ));
-        controller.rightTrigger().whileTrue(Commands.parallel(
-            Commands.startEnd(()->{
-            if (shooter.isAtDesiredState())
-            {kicker.setKickerVoltage(12);}}
-            ,()->kicker.setKickerVoltage(-1), kicker),
-            Commands.startEnd(()->shooter.setDesiredState(Shooter.ShooterState.SHOOTING), ()->shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
-            Commands.startEnd(()->hopper.setDesiredState(Hopper.HopperState.FEEDING), ()->hopper.setDesiredState(Hopper.HopperState.IDLE), hopper)
-        ));
-        // controller.rightTrigger().whileTrue(Commands.run(()->superStructure.setDesiredState(SuperStructureStates.SHOOT)).finallyDo(()->superStructure.setDesiredState(SuperStructureStates.IDLE)));
-
-        controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
-
-        
-        // Reset gyro to 0 deg when B button is pressed
+        if(Constants.isSim) Simulation.getInstance().resetSimulationField();
 
 
     }
-    
-
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -252,35 +185,7 @@ public class RobotContainer {
         return autoChooser.get();
     }
 
-    /**
-     * Use this to pass the calibration command to the main {@link Robot} class.
-     *
-     * @return the command to run in calibration
-     */
-    // public Command getCalibrationCommand() {
-    //     return Commands.sequence(superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_IN),
-    //             superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_OUT));
-    // }
-
-    /** Reset the simulation field. */
-    public void resetSimulationField() {
-        if (Constants.currentMode != Constants.Mode.SIM) {
-            return;
-        }
-
-        driveSimulation.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()));
-        SimulatedArena.getInstance().resetFieldForAuto();
-    }
-
-    /** Update the simulation. */
-    public void updateSimulation() {
-        if (Constants.currentMode != Constants.Mode.SIM) {
-            return;
-        }
-
-        SimulatedArena.getInstance().simulationPeriodic();
-        Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
-        Logger.recordOutput(
-                "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
+    public Command getTestCommand() {
+        return testChooser.get();
     }
 }

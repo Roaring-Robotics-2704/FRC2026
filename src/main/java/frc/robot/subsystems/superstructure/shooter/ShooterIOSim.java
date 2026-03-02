@@ -1,7 +1,6 @@
 package frc.robot.subsystems.superstructure.shooter;
 
-import org.ironmaple.simulation.motorsims.MapleMotorSim;
-import org.ironmaple.simulation.motorsims.SimMotorConfigs;
+
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -25,12 +24,14 @@ import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOT
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KS;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KV;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_MOTOR_TYPE;
+import frc.robot.util.simUtils.SimMotorConfigs;
+import frc.robot.util.simUtils.SimulatedMotor;
 
 public class ShooterIOSim implements ShooterIO {
     Angle hoodAngle = Degrees.zero();
     AngularVelocity flywheelVelocity = RotationsPerSecond.zero();
     LinearSystem<N1, N1, N1> flywheelSystem = LinearSystemId.createFlywheelSystem(SHOOTER_MOTOR_TYPE, 0.001, 1);
-    MapleMotorSim flywheelMotorSim = new MapleMotorSim(
+    SimulatedMotor flywheelMotorSim = new SimulatedMotor(
         new SimMotorConfigs(SHOOTER_MOTOR_TYPE, 1, KilogramSquareMeters.of(0.001), Volts.of(0.5)));
     private FlywheelSim flywheelSim = new FlywheelSim(flywheelSystem, SHOOTER_MOTOR_TYPE, 0.02);
     private PIDController flywheelPID = new PIDController(SHOOTER_KP, 0, SHOOTER_KD);

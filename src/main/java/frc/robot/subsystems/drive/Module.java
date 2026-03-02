@@ -7,15 +7,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import frc.robot.util.tunables.LoggedTunableNumber;
 
 import static edu.wpi.first.units.Units.Meters;
 
 import org.littletonrobotics.junction.Logger;
-
-import com.ctre.phoenix6.Orchestra;
-import com.ctre.phoenix6.hardware.TalonFX;
 
 public class Module {
     private static final LoggedTunableNumber driveP = new LoggedTunableNumber("Drive/DriveP");
@@ -42,12 +38,15 @@ public class Module {
 
     private final ModuleIO io;
     private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
-    private final String name;
+    public final String name;
 
     private final Alert driveDisconnectedAlert;
     private final Alert turnDisconnectedAlert;
     private final Alert turnEncoderDisconnectedAlert;
     private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
+
+    /** The angle at which this module will turn the robot clockwise. */
+    public final Rotation2d spinAngle;
 
     public Module(ModuleIO io, String name) {
         this.name = name;
@@ -55,6 +54,14 @@ public class Module {
         driveDisconnectedAlert = new Alert("Disconnected drive motor on module " + name + ".", AlertType.kError);
         turnDisconnectedAlert = new Alert("Disconnected turn motor on module " + name + ".", AlertType.kError);
         turnEncoderDisconnectedAlert = new Alert("Disconnected turn encoder on module " + name + ".", AlertType.kError);
+
+        this.spinAngle = Rotation2d.fromDegrees(switch(name) {
+            case "FrontLeft" -> 135.0;
+            case "FrontRight" -> 45.0;
+            case "BackLeft" -> -135.0;
+            case "BackRight" -> -45.0;
+            default -> 0.0;
+        });
     }
 
     public void periodic() {
@@ -92,12 +99,12 @@ public class Module {
      * @return
      */
     private OptimizePair optimizeState(SwerveModuleState state, Rotation2d currentAngle, double accelerationMps2) {
-        var delta = state.angle.minus(currentAngle);
-        if(Math.abs(delta.getDegrees()) > 90.0) {
-            state.speedMetersPerSecond *= -1;
-            state.angle = state.angle.rotateBy(Rotation2d.kPi);
-            accelerationMps2 *= -1;
-        }
+        // var delta = state.angle.minus(currentAngle);
+        // if(Math.abs(delta.getDegrees()) > 90.0) {
+        //     state.speedMetersPerSecond *= -1;
+        //     state.angle = state.angle.rotateBy(Rotation2d.kPi);
+        //     accelerationMps2 *= -1;
+        // }
         return new OptimizePair(state, accelerationMps2);
     }
 
@@ -128,13 +135,7 @@ public class Module {
     /** Characterize robot angular motion. */
     public void runAngularCharacterization(double output) {
         io.setDriveOpenLoop(output);
-        io.setTurnPosition(Rotation2d.fromDegrees(switch(name) {
-            case "FrontLeft" -> 135.0;
-            case "FrontRight" -> 45.0;
-            case "BackLeft" -> -135.0;
-            case "BackRight" -> -45.0;
-            default -> 0.0;
-        }));
+        io.setTurnPosition(spinAngle);
     }
 
     /** Disables all outputs to motors. */
@@ -188,6 +189,11 @@ public class Module {
         return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
     }
 
+    /** Gets the zero offset of the module. This is the amount to be added to the encoder. */
+    public Rotation2d getZeroOffset() {
+        return inputs.uncorrectedTurnAbsolute.unaryMinus();
+    }
+
     /** Sets the current limit on the drive motor temporarily for slip current measurement. */
     public void setSlipMeasurementCurrentLimit(Current limit) {
         io.setSlipMeasurementCurrentLimit(limit);
@@ -196,9 +202,4 @@ public class Module {
     public double getSlipMeasurementCurrent() {
         return inputs.driveCurrentAmps;
     }
-
-    public TalonFX[] getMotors() {
-        return new TalonFX[] {io.getDriveMotor(), io.getTurnMotor()};
-    }
-
 }
