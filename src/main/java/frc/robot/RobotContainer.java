@@ -181,11 +181,11 @@ public class RobotContainer {
 
 
         autoFactory = new AutoFactory(
-        RobotState.getInstance().getPose(), // A function that returns the current robot pose
-        RobotState.getInstance().odometry, // A function that resets the current robot pose to the provided Pose2d
-        driveSubsystem::followTrajectory, // The drive subsystem trajectory follower 
+        ()->RobotState.getInstance().getPose(), // A function that returns the current robot pose
+        (Pose2d pose)->RobotState.getInstance().resetPose(pose), // A function that resets the current robot pose to the provided Pose2d
+        drive::followTrajectory, // The drive subsystem trajectory follower 
         true, // If alliance flipping should be enabled 
-        driveSubsystem // The drive subsystem
+        drive // The drive subsystem
         );
 
         if(Constants.isSim) Simulation.getInstance().resetSimulationField();

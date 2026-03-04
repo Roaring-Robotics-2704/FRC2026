@@ -31,6 +31,8 @@ import frc.robot.util.Elastic;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Elastic.Notification;
 import frc.robot.util.Elastic.Notification.NotificationLevel;
+import com.ctre.phoenix6.hardware.TalonFX;
+import java.awt.List;
 
 import java.io.FileWriter;
 import java.util.Optional;
@@ -306,18 +308,7 @@ public class Drive extends SubsystemBase {
         return robotState.kinematics.toChassisSpeeds(getModuleStates());
     }
 
-    public TalonFX[] getMotors() {
-        List<TalonFX> motors = new java.util.ArrayList<>();
-        for (var module : modules) {
-            for (var motor : module.getMotors()) {
-                if (motor != null) {
-                    motors.add(motor);
-                }
-            }
-        }
-        return motors.toArray(new TalonFX[motors.size()]);
-    }
-    
+
 
     public void followTrajectory(SwerveSample sample) {
         // Get the current pose of the robot
