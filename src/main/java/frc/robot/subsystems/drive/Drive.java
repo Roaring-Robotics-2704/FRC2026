@@ -322,6 +322,6 @@ public class Drive extends SubsystemBase {
         );
     
         // Apply the generated speeds
-        runVelocity(speeds);
+        runVelocity(speeds,true);
     }
 }
