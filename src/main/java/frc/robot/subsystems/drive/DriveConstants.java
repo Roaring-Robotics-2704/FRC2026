@@ -27,6 +27,8 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.*;
 
+import edu.wpi.first.math.controller.PIDController;
+
 /**
  * A cleaned up TunerConstants file; most constants correspond to those in
  * TunerConstants.java.
@@ -343,4 +345,10 @@ public class DriveConstants {
                     modules);
         }
     }
+
+
+    // stuff for the auto follower in Choreo
+    public static final PIDController xController = new PIDController(10.0, 0.0, 0.0);
+    public static final PIDController yController = new PIDController(10.0, 0.0, 0.0);
+    public static final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
 }

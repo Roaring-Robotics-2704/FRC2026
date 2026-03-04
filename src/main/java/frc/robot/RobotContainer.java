@@ -20,6 +20,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -89,6 +90,9 @@ public class RobotContainer {
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
+
+    // Choreo auto factory library
+    private final AutoFactory autoFactory;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -188,6 +192,15 @@ public class RobotContainer {
         configureButtonBindings();
 
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+
+
+        autoFactory = new AutoFactory(
+        RobotState.getInstance().getPose(), // A function that returns the current robot pose
+        RobotState.getInstance().odometry, // A function that resets the current robot pose to the provided Pose2d
+        driveSubsystem::followTrajectory, // The drive subsystem trajectory follower 
+        true, // If alliance flipping should be enabled 
+        driveSubsystem // The drive subsystem
+        );
     }
 
     /**

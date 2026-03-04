@@ -39,6 +39,12 @@ import frc.robot.Constants.Mode;
 import frc.robot.RobotState;
 import frc.robot.util.LocalADStarAK;
 
+import static frc.robot.subsystems.drive.DriveConstants.xController;
+import static frc.robot.subsystems.drive.DriveConstants.yController;
+import static frc.robot.subsystems.drive.DriveConstants.headingController;
+import choreo.trajectory.SwerveSample;
+
+
 /** Subsystem for controlling the swerve drive. Contains four modules and a gyro. */
 public class Drive extends SubsystemBase {
     private final RobotState robotState = RobotState.getInstance();
@@ -93,6 +99,10 @@ public class Drive extends SubsystemBase {
         currentStates = this.getModuleStates();
         previousSetpoint = new SwerveSetpoint(
             currentSpeeds, currentStates, DriveFeedforwards.zeros(DriveConstants.pathplannerConfig.numModules));
+
+        
+        // for the Choreo auto follower
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     @Override
@@ -303,4 +313,19 @@ public class Drive extends SubsystemBase {
         return motors.toArray(new TalonFX[motors.size()]);
     }
     
+
+    public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = robotState.getInstance().getPose();
+    
+        // Generate the next speeds for the robot
+        ChassisSpeeds speeds = new ChassisSpeeds(
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+        );
+    
+        // Apply the generated speeds
+        runVelocity(speeds);
+    }
 }
