@@ -1,10 +1,10 @@
 package frc.robot.subsystems.drive;
 
+import java.util.Queue;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.drive.DriveConstants.SwerveModuleConfig;
-
-import java.util.Queue;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and CANcoder.
@@ -42,5 +42,4 @@ public class ModuleIOTalonFXReal extends ModuleIOTalonFX {
         drivePositionQueue.clear();
         turnPositionQueue.clear();
     }
-    
 }

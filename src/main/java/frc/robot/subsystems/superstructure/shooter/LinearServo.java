@@ -1,8 +1,8 @@
 package frc.robot.subsystems.superstructure.shooter;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.math.MathUtil;
 
 /** Linear Servo class for controlling linear actuators. */
 public class LinearServo extends Servo {
@@ -25,6 +25,7 @@ public class LinearServo extends Servo {
         super(channel);
         this.length = length;
         this.speed = speed;
+        super.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
     }
 
     /**

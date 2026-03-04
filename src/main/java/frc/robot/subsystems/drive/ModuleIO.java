@@ -1,11 +1,9 @@
 package frc.robot.subsystems.drive;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Current;
-
 import org.littletonrobotics.junction.AutoLog;
 
-import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Current;
 
 public interface ModuleIO {
     @AutoLog
@@ -19,6 +17,7 @@ public interface ModuleIO {
         public boolean turnConnected = false;
         public boolean turnEncoderConnected = false;
         public Rotation2d turnAbsolutePosition = new Rotation2d();
+        public Rotation2d uncorrectedTurnAbsolute = new Rotation2d();
         public double turnVelocityRadPerSec = 0.0;
         public double turnAppliedVolts = 0.0;
         public double turnCurrentAmps = 0.0;
@@ -51,12 +50,4 @@ public interface ModuleIO {
 
     /** Temporarily override the drive motor current limit for slip current characterization. */
     public default void setSlipMeasurementCurrentLimit(Current current) {}
-
-    public default TalonFX getDriveMotor() {
-        return null;
-    }
-
-    public default TalonFX getTurnMotor() {
-        return null;
-    }
 }

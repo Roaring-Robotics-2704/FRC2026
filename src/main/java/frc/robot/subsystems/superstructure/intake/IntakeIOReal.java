@@ -4,11 +4,25 @@
 
 package frc.robot.subsystems.superstructure.intake;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Voltage;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.ENCODER_GEAR_RATIO;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.ROLLER_CURRENT_LIMIT;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_CURRENT_LIMIT;
@@ -21,20 +35,6 @@ import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_P
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KP;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KS;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KV;
-
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.FeedbackSensor;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
-
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Voltage;
 import frc.robot.util.SparkUtil;
 
 /** Add your docs here. */
@@ -56,10 +56,13 @@ public class IntakeIOReal implements IntakeIO {
         slideConfig.closedLoop.feedForward.kA(SLIDE_POSITION_KA);
         slideConfig.closedLoop.pid(SLIDE_POSITION_KP, SLIDE_POSITION_KI, SLIDE_POSITION_KD);
 
-        slideConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
-        slideConfig.absoluteEncoder.inverted(false);
+        slideConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+        slideConfig.absoluteEncoder.zeroCentered(true);
+        slideConfig.absoluteEncoder.inverted(true);
+        slideConfig.inverted(true);
         slideConfig.absoluteEncoder.positionConversionFactor(ENCODER_GEAR_RATIO);
-
+        slideConfig.absoluteEncoder.averageDepth(2);
+        slideConfig.encoder.positionConversionFactor(IntakeConstants.MOTOR_GEAR_RATIO);
 
         slideConfig.closedLoop.maxMotion.maxAcceleration(SLIDE_MAX_ACCELERATION);
         slideConfig.closedLoop.maxMotion.cruiseVelocity(SLIDE_MAX_VELOCITY);
@@ -75,6 +78,8 @@ public class IntakeIOReal implements IntakeIO {
         SparkUtil.tryUntilOk(rollerMotor, 5,
                 () -> rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters,
                         PersistMode.kPersistParameters));
+
+        slideMotor.getEncoder().setPosition(slideMotor.getAbsoluteEncoder().getPosition());
     }
 
     @Override
@@ -82,6 +87,7 @@ public class IntakeIOReal implements IntakeIO {
         inputs.slideAppliedVoltage.mut_replace(slideMotor.getAppliedOutput(), Volts);
         inputs.slideCurrentDraw.mut_replace(slideMotor.getOutputCurrent(), Amps);
         inputs.slidePosition.mut_replace(slideMotor.getEncoder().getPosition(), Inches);
+        inputs.slideSetpoint.mut_replace(slideMotor.getClosedLoopController().getSetpoint(), Inches);
         inputs.slideAtPosition = slideMotor.getClosedLoopController().isAtSetpoint();
         inputs.slideVelocity.mut_replace(slideMotor.getEncoder().getVelocity(), InchesPerSecond);
 
@@ -114,6 +120,19 @@ public class IntakeIOReal implements IntakeIO {
     @Override
     public void resetSlideEncoder(Distance position) {
         slideMotor.getEncoder().setPosition(position.in(Inches));
+    }
+
+    @Override
+    public void setPID(double kP, double kD, double kS, double kV, double kA) {
+       ClosedLoopConfig config = new ClosedLoopConfig();
+         config.p(kP);
+         config.d(kD);
+        config.feedForward.kS(kS);
+        config.feedForward.kV(kV);
+        config.feedForward.kA(kA);
+        slideConfig.apply(config);
+        SparkUtil.tryUntilOk(slideMotor, 5, () -> slideMotor.configure(slideConfig, ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters));
     }
 
 }
