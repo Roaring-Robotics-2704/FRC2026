@@ -46,12 +46,9 @@ public class IntakeIOSim implements IntakeIO {
 
     ElevatorSim slideSim = new ElevatorSim(slideSystem, SLIDE_MOTOR_TYPE, 0, SLIDE_MAX_DISTANCE.in(Meters), false, 0);
 
-    IntakeSimulation intakeSim;
 
     /** Instantiates the Real Intake hardware. */
-    public IntakeIOSim(AbstractDriveTrainSimulation drive) {
-        intakeSim = IntakeSimulation.OverTheBumperIntake("Fuel", drive, Inches.of(28), Inches.of(11), IntakeSide.FRONT, 40);
-        intakeSim.register(SimulatedArena.getInstance());
+    public IntakeIOSim() {
 
     }
 
