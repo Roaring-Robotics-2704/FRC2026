@@ -1,4 +1,4 @@
-package frc.robot.util.solver;
+package frc.robot.util.solvers;
 
 import java.util.function.BiFunction;
 import org.ejml.simple.SimpleMatrix;

@@ -1,29 +1,16 @@
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.ironmaple.simulation.drivesims.COTS;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
-
 import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.Pigeon2Configuration;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import com.ctre.phoenix6.swerve.SwerveDrivetrain;
-import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
-import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
+import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.hardware.*;
+import com.ctre.phoenix6.signals.*;
+import com.ctre.phoenix6.swerve.*;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -34,27 +21,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Kilogram;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.Volts;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.units.measure.MomentOfInertia;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.measure.*;
+import frc.robot.Constants;
+import frc.robot.subsystems.drive.kinematicConstraints.KinematicConstraints;
 
 /**
- * A cleaned up TunerConstants file; most constants correspond to those in
- * TunerConstants.java.
+ * A cleaned up TunerConstants file; most constants correspond to those in TunerConstants.java.
  * To tune the drivetrain, the following need to be changed:
- * -
+ * - 
  */
 public class DriveConstants {
     public static class SwerveModuleConfig {
@@ -70,25 +44,17 @@ public class DriveConstants {
 
         /**
          * @param driveId
-         *            The CAN ID of the drive motor
          * @param steerId
-         *            The CAN ID of the steer motor
          * @param encoderId
-         *            The CAN ID of the encoder
          * @param encoderOffset
-         *            The offset angle of the encoder
-         * @param yPosition
-         *            The forward-backward coordinate. Positive X is the front of the
-         *            robot.
-         * @param xPosition
-         *            The left-right coordinate. Poitive Y is toward the left of the
-         *            robot.
+         * @param yPosition The forward-backward coordinate. Positive X is the front of the robot.
+         * @param xPosition The left-right coordinate. Poitive Y is toward the left of the robot.
          * @param invertSide
          */
         public SwerveModuleConfig(
-                int driveId, int steerId, int encoderId,
-                Angle encoderOffset, Distance yPosition, Distance xPosition,
-                boolean invertSide) {
+            int driveId, int steerId, int encoderId,
+            Angle encoderOffset, Distance yPosition, Distance xPosition,
+            boolean invertSide) {
             this.steerMotorId = steerId;
             this.driveMotorId = driveId;
             this.encoderId = encoderId;
@@ -99,16 +65,17 @@ public class DriveConstants {
             this.invertMotor = false;
             this.invertEncoder = false;
         }
-
-        private static final SwerveModuleConstantsFactory<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> ConstantCreator = new SwerveModuleConstantsFactory<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>()
+ 
+        private static final SwerveModuleConstantsFactory<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> ConstantCreator =
+            new SwerveModuleConstantsFactory<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>()
                 .withDriveMotorGearRatio(driveGearRatio)
                 .withSteerMotorGearRatio(steerGearRatio)
                 .withCouplingGearRatio(coupleRatio)
                 .withWheelRadius(wheelRadius)
                 .withSteerMotorGains(steerGains)
                 .withDriveMotorGains(driveGains)
-                .withSteerMotorClosedLoopOutput(steerClosedLoopOutput)
-                .withDriveMotorClosedLoopOutput(driveClosedLoopOutput)
+                .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.TorqueCurrentFOC)
+                .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.TorqueCurrentFOC)
                 .withSlipCurrent(slipCurrent)
                 .withSpeedAt12Volts(linearFreeSpeed)
                 .withDriveMotorType(driveMotorType)
@@ -124,10 +91,11 @@ public class DriveConstants {
 
         SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants() {
             return ConstantCreator.createModuleConstants(
-                    steerMotorId, driveMotorId, encoderId,
-                    encoderOffset,
-                    xPosition, yPosition,
-                    invertSide, invertMotor, invertEncoder);
+                steerMotorId, driveMotorId, encoderId,
+                encoderOffset,
+                xPosition, yPosition,
+                invertSide, invertMotor, invertEncoder
+            );
         }
 
         Translation2d getTranslation() {
@@ -137,31 +105,29 @@ public class DriveConstants {
 
     // Both sets of gains need to be tuned to your individual robot.
 
-    public static final Mass robotMass = Kilogram.of(74.088);
-    public static final MomentOfInertia robotMomentOfInertia = KilogramSquareMeters.of(6.883);
+    public static final Mass robotMass = Pound.of(140);
+    public static final MomentOfInertia robotMomentOfInertia = KilogramSquareMeters.of(7.4702);
     public static final double wheelCOF = 1.2;
 
-    // The steer motor uses any SwerveModule.SteerRequestType control request with
-    // the
+    // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     public static final Slot0Configs steerGains = new Slot0Configs()
-            .withKP(325).withKI(0).withKD(0.8).withKS(0.1).withKV(1.59).withKA(0)
-            .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+        .withKP(Constants.isSim ? 100 : 325)
+        .withKI(Constants.isSim ? 0   : 0)
+        .withKD(Constants.isSim ? 10  : 0.8)
+        .withKS(Constants.isSim ? 0.1 : 0.1)
+        .withKV(Constants.isSim ? 0.0 : 1.59)
+        .withKA(Constants.isSim ? 0   : 0)
+
+        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     // When using closed-loop control, the drive motor uses the control
     // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
     public static final Slot0Configs driveGains = new Slot0Configs()
-            .withKP(3).withKI(0).withKD(0).withKS(0).withKV(0.124);
-
-    /**
-     * The closed-loop output type to use for the steer motors; this affects their
-     * PID/FF gains
-     */
-    private static final ClosedLoopOutputType steerClosedLoopOutput = ClosedLoopOutputType.TorqueCurrentFOC;
-    /**
-     * The closed-loop output type to use for the steer motors; this affects their
-     * PID/FF gains
-     */
-    private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.TorqueCurrentFOC;
+        .withKP(Constants.isSim ? 3.0   : 3.0)
+        .withKI(Constants.isSim ? 0     : 0)
+        .withKD(Constants.isSim ? 0     : 0)
+        .withKS(Constants.isSim ? 0     : 0)
+        .withKV(Constants.isSim ? 0.124 : 0.124);
 
     /** The type of motor used for the drive motor */
     private static final DriveMotorArrangement driveMotorType = DriveMotorArrangement.TalonFX_Integrated;
@@ -176,32 +142,32 @@ public class DriveConstants {
     // This needs to be tuned to your individual robot
     public static final Current slipCurrent = Amps.of(120.0);
 
-    // Initial configs for the drive and steer motors and the azimuth encoder; these
-    // cannot be null. Some configs will be overwritten.
+    // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null. Some configs will be overwritten.
     private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration();
     private static final TalonFXConfiguration steerInitialConfigs = new TalonFXConfiguration()
-            .withCurrentLimits(new CurrentLimitsConfigs()
-                    // Swerve azimuth does not require much torque output, so we can set a
-                    // relatively low
-                    // stator current limit to help avoid brownouts without impacting performance.
-                    .withStatorCurrentLimit(Amps.of(60))
-                    .withStatorCurrentLimitEnable(true));
+        .withCurrentLimits(new CurrentLimitsConfigs()
+            // Swerve azimuth does not require much torque output, so we can set a relatively low
+            // stator current limit to help avoid brownouts without impacting performance.
+            .withStatorCurrentLimit(Amps.of(60))
+            .withStatorCurrentLimitEnable(true));
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
-    private static final Pigeon2Configuration pigeonConfigs = null;
+    public static final Pigeon2Configuration pigeonConfigs = null;
 
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus
-    public static final CANBus CANBus = new CANBus("Drivetrain", "./logs/example.hoot");
+    public static final CANBus CANBus = new CANBus("Drivetrain");
 
     // Effective free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot
-    public static final LinearVelocity linearFreeSpeed = MetersPerSecond.of(5.85); // "Magic" number from max speed
-                                                                                   // measurement
+    public static final LinearVelocity linearFreeSpeed = MetersPerSecond.of(4.73); // "Magic" number from max speed measurement
 
-    public static final Distance trackWidth = Inches.of(12.5 * 2);
-    public static final Distance wheelBase = Inches.of(9.75 * 2);
-    public static final double driveBaseRadius = Math.hypot(trackWidth.in(Meters) / 2.0, wheelBase.in(Meters) / 2.0);
+    /** Spacing between wheel centers on the Y axis */
+    public static final Distance trackWidthY = Inches.of(27.5);
+    /** Spacing between wheel centers on the X axis */
+    public static final Distance wheelBaseX = Inches.of(14.5);
+
+    public static final double driveBaseRadius = Math.hypot(trackWidthY.in(Meters) / 2.0, wheelBaseX.in(Meters) / 2.0);
 
     public static final double maxSpeedMetersPerSec = linearFreeSpeed.in(MetersPerSecond);
     public static final double maxAngularSpeedRadPerSec = maxSpeedMetersPerSec / driveBaseRadius;
@@ -214,86 +180,66 @@ public class DriveConstants {
     public static final double steerGearRatio = 26;
     public static final Distance wheelRadius = Inches.of(2);
 
-    private static final int pigeonId = 13;
+    public static final int pigeonId = 13;
 
     // These are only used for simulation
-    public static final MomentOfInertia steerInertia = KilogramSquareMeters.of(0.05);
-    public static final MomentOfInertia driveInertia = KilogramSquareMeters.of(0.05);
+    public static final MomentOfInertia steerInertia = KilogramSquareMeters.of(0.004);
+    public static final MomentOfInertia driveInertia = KilogramSquareMeters.of(0.025);
     // Simulated voltage necessary to overcome friction
     public static final Voltage steerFrictionVoltage = Volts.of(0.2);
     public static final Voltage driveFrictionVoltage = Volts.of(0.2);
-
-    public static final SwerveDrivetrainConstants drivetrainConstants = new SwerveDrivetrainConstants()
-            .withCANBusName(CANBus.getName())
-            .withPigeon2Id(pigeonId)
-            .withPigeon2Configs(pigeonConfigs);
-
-    public static final SwerveModuleConfig frontLeftConfig = new SwerveModuleConfig(1, 5, 9,
-            Rotations.of(-0.290771484375), trackWidth.div(2.0), wheelBase.div(2.0), false);
-    public static final SwerveModuleConfig frontRightConfig = new SwerveModuleConfig(2, 6, 11,
-            Rotations.of(-0.212158203125), trackWidth.div(-2.0), wheelBase.div(2.0), true);
-    public static final SwerveModuleConfig backLeftConfig = new SwerveModuleConfig(3, 7, 10,
-            Rotations.of(0.119873046875), trackWidth.div(2.0), wheelBase.div(-2.0), false);
-    public static final SwerveModuleConfig backRightConfig = new SwerveModuleConfig(4, 8, 12,
-            Rotations.of(0.41943359375), trackWidth.div(-2.0), wheelBase.div(-2.0), true);
     
-    public static final ArrayList<SwerveModuleConfig> moduleConfigs = new ArrayList<>(Arrays.asList(
-            frontLeftConfig,
-            frontRightConfig,
-            backLeftConfig,
-            backRightConfig));
-    public static final Translation2d[] moduleTranslations = moduleConfigs
-            .stream()
-            .map(SwerveModuleConfig::getTranslation)
-            .toArray(Translation2d[]::new);
+    public static final KinematicConstraints kinematicConstraints = new KinematicConstraints(
+        MetersPerSecondPerSecond.of(10) /* measuered "magic value" - max linear acceleration */,
+        RadiansPerSecondPerSecond.of(10 * (maxAngularSpeedRadPerSec / maxSpeedMetersPerSec)),
+        MetersPerSecondPerSecond.of(8), /* Skid acceleration limit */
+        MetersPerSecondPerSecond.of(5), /* Max tilt acceleration X */
+        MetersPerSecondPerSecond.of(10) /* Max tilt acceleration Y */
+    );
+    
+    public static final SwerveModuleConfig frontLeftConfig = new SwerveModuleConfig(1, 5, 9,
+            Rotations.of(-0.290771484375), trackWidthY.div(2.0), wheelBaseX.div(2.0), false);
+    public static final SwerveModuleConfig frontRightConfig = new SwerveModuleConfig(2, 6, 11,
+            Rotations.of(-0.212158203125), trackWidthY.div(-2.0), wheelBaseX.div(2.0), true);
+    public static final SwerveModuleConfig backLeftConfig = new SwerveModuleConfig(3, 7, 10,
+            Rotations.of(0.119873046875), trackWidthY.div(2.0), wheelBaseX.div(-2.0), false);
+    public static final SwerveModuleConfig backRightConfig = new SwerveModuleConfig(4, 8, 12,
+            Rotations.of(0.41943359375), trackWidthY.div(-2.0), wheelBaseX.div(-2.0), true);
 
+    public static final ArrayList<SwerveModuleConfig> moduleConfigs = new ArrayList<>(Arrays.asList(
+        frontLeftConfig,
+        frontRightConfig,
+        backLeftConfig,
+        backRightConfig
+    ));
+    public static final Translation2d[] moduleTranslations = moduleConfigs
+        .stream()
+        .map(SwerveModuleConfig::getTranslation)
+        .toArray(Translation2d[]::new);
+    
+    
     public static final RobotConfig pathplannerConfig = new RobotConfig(robotMass, robotMomentOfInertia,
-            new ModuleConfig(wheelRadius, linearFreeSpeed, wheelCOF,
-                    DCMotor.getKrakenX60Foc(1).withReduction(driveGearRatio), DriveConstants.slipCurrent, 1),
-            moduleTranslations);
+        new ModuleConfig(wheelRadius, linearFreeSpeed, wheelCOF,
+            DCMotor.getKrakenX60Foc(1).withReduction(driveGearRatio), DriveConstants.slipCurrent, 1),
+        moduleTranslations);
 
     public static final PPHolonomicDriveController simHolonomicDriveController = new PPHolonomicDriveController(
-            new PIDConstants(13.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0));
+        new PIDConstants(13.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0));
     public static final PPHolonomicDriveController realHolonomicDriveController = new PPHolonomicDriveController(
-            new PIDConstants(6.5, 0.0, 0.25), new PIDConstants(8.0, 1.0, 0.75));
+        new PIDConstants(6.5, 0.0, 0.25), new PIDConstants(8.0, 1.0, 0.75));
 
-    static final double odometryFrequency = new CANBus(DriveConstants.drivetrainConstants.CANBusName).isNetworkFD()
-            ? 250.0
-            : 100.0;
+    static final double odometryFrequency = CANBus.isNetworkFD() ? 250.0 : 100.0;
 
-    public static final DriveTrainSimulationConfig mapleSimConfig = DriveTrainSimulationConfig.Default()
-            .withRobotMass(DriveConstants.robotMass)
-            .withCustomModuleTranslations(DriveConstants.moduleTranslations)
-            .withGyro(COTS.ofPigeon2())
-            .withSwerveModule(new SwerveModuleSimulationConfig(
-                    DCMotor.getKrakenX60Foc(1),
-                    DCMotor.getKrakenX44Foc(1),
-                    DriveConstants.driveGearRatio,
-                    DriveConstants.steerGearRatio,
-                    DriveConstants.driveFrictionVoltage,
-                    DriveConstants.steerFrictionVoltage,
-                    DriveConstants.wheelRadius,
-                    DriveConstants.steerInertia,
-                    DriveConstants.wheelCOF))
-            .withBumperSize(Inches.of(30), Inches.of(25));
-
-    /**
-     * Swerve Drive class utilizing CTR Electronics' Phoenix 6 API with the selected
-     * device types.
-     */
+    /** Swerve Drive class utilizing CTR Electronics' Phoenix 6 API with the selected device types. */
     public static class TunerSwerveDrivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> {
         /**
          * Constructs a CTRE SwerveDrivetrain using the specified constants.
          *
-         * <p>
-         * This constructs the underlying hardware devices, so users should not
-         * construct the devices themselves. If
+         * <p>This constructs the underlying hardware devices, so users should not construct the devices themselves. If
          * they need the devices, they can access them through getters in the classes.
          *
-         * @param drivetrainConstants
-         *            Drivetrain-wide constants for the swerve drive
-         * @param modules
-         *            Constants for each specific module
+         * @param drivetrainConstants Drivetrain-wide constants for the swerve drive
+         * @param modules Constants for each specific module
          */
         public TunerSwerveDrivetrain(
                 SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
@@ -303,19 +249,13 @@ public class DriveConstants {
         /**
          * Constructs a CTRE SwerveDrivetrain using the specified constants.
          *
-         * <p>
-         * This constructs the underlying hardware devices, so users should not
-         * construct the devices themselves. If
+         * <p>This constructs the underlying hardware devices, so users should not construct the devices themselves. If
          * they need the devices, they can access them through getters in the classes.
          *
-         * @param drivetrainConstants
-         *            Drivetrain-wide constants for the swerve drive
-         * @param odometryUpdateFrequency
-         *            The frequency to run the odometry loop. If unspecified or set to 0
-         *            Hz, this is
-         *            250 Hz on CAN FD, and 100 Hz on CAN 2.0.
-         * @param modules
-         *            Constants for each specific module
+         * @param drivetrainConstants Drivetrain-wide constants for the swerve drive
+         * @param odometryUpdateFrequency The frequency to run the odometry loop. If unspecified or set to 0 Hz, this is
+         *     250 Hz on CAN FD, and 100 Hz on CAN 2.0.
+         * @param modules Constants for each specific module
          */
         public TunerSwerveDrivetrain(
                 SwerveDrivetrainConstants drivetrainConstants,
@@ -327,27 +267,17 @@ public class DriveConstants {
         /**
          * Constructs a CTRE SwerveDrivetrain using the specified constants.
          *
-         * <p>
-         * This constructs the underlying hardware devices, so users should not
-         * construct the devices themselves. If
+         * <p>This constructs the underlying hardware devices, so users should not construct the devices themselves. If
          * they need the devices, they can access them through getters in the classes.
          *
-         * @param drivetrainConstants
-         *            Drivetrain-wide constants for the swerve drive
-         * @param odometryUpdateFrequency
-         *            The frequency to run the odometry loop. If unspecified or set to 0
-         *            Hz, this is
-         *            250 Hz on CAN FD, and 100 Hz on CAN 2.0.
-         * @param odometryStandardDeviation
-         *            The standard deviation for odometry calculation in the form [x, y,
-         *            theta]ᵀ,
-         *            with units in meters and radians
-         * @param visionStandardDeviation
-         *            The standard deviation for vision calculation in the form [x, y,
-         *            theta]ᵀ, with
-         *            units in meters and radians
-         * @param modules
-         *            Constants for each specific module
+         * @param drivetrainConstants Drivetrain-wide constants for the swerve drive
+         * @param odometryUpdateFrequency The frequency to run the odometry loop. If unspecified or set to 0 Hz, this is
+         *     250 Hz on CAN FD, and 100 Hz on CAN 2.0.
+         * @param odometryStandardDeviation The standard deviation for odometry calculation in the form [x, y, theta]ᵀ,
+         *     with units in meters and radians
+         * @param visionStandardDeviation The standard deviation for vision calculation in the form [x, y, theta]ᵀ, with
+         *     units in meters and radians
+         * @param modules Constants for each specific module
          */
         public TunerSwerveDrivetrain(
                 SwerveDrivetrainConstants drivetrainConstants,
