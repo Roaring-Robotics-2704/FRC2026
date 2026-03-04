@@ -10,6 +10,7 @@ import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.RobotController;
@@ -33,9 +34,13 @@ import frc.robot.util.tunables.TunableSparkPID;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.littletonrobotics.junction.AutoLogOutputManager;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -322,5 +327,15 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationPeriodic() {
         if(Constants.isSim) Simulation.getInstance().updateSimulation();
+    }
+
+    public BooleanSupplier isBlueAlliance() {
+        Optional<Alliance> alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+            return () -> alliance.get() == Alliance.Blue;
+        } else {
+            // Default to blue alliance if we can't get alliance information
+            return () -> true;
+        }
     }
 }

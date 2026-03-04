@@ -7,5 +7,5 @@ package frc.robot.subsystems.superstructure.hook;
 
 /** Constants for Hook Constants. */
 public final class HookConstants {
-    public static final int HOOK_MOTOR_ID = 98;
+    public static final int HOOK_MOTOR_ID = 42;
 }
