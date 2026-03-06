@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package org.littletonrobotics.frc2026.commands.auto;
+package frc.robot.commands.auto;
 
 import static org.littletonrobotics.frc2026.commands.auto.AutoCommands.*;
 
@@ -28,6 +28,7 @@ import frc.robot.RobotState;
 import frc.robot.subsystems.drive.Drive;
 //import org.littletonrobotics.frc2026.subsystems.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
+import frc.robot.subsystems.superstructure.intake.Intake;
 //import org.littletonrobotics.frc2026.subsystems.kicker.Kicker;
 import frc.robot.subsystems.superstructure.Kicker;
 //import org.littletonrobotics.frc2026.subsystems.launcher.LaunchCalculator;
@@ -35,7 +36,7 @@ import frc.robot.subsystems.superstructure.Kicker;
 //import org.littletonrobotics.frc2026.subsystems.launcher.hood.Hood;
 //import org.littletonrobotics.frc2026.subsystems.slamtake.Slamtake;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
-import org.littletonrobotics.frc2026.util.geometry.AllianceFlipUtil;
+import frc.robot.util.geometry.AllianceFlipUtil;
 
 //@RequiredArgsConstructor
 @SuppressWarnings("unused")
