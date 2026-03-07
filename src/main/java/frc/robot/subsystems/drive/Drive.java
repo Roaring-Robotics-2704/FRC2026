@@ -17,8 +17,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -31,8 +29,6 @@ import frc.robot.util.Elastic;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Elastic.Notification;
 import frc.robot.util.Elastic.Notification.NotificationLevel;
-import com.ctre.phoenix6.hardware.TalonFX;
-import java.awt.List;
 
 import java.io.FileWriter;
 import java.util.Optional;
