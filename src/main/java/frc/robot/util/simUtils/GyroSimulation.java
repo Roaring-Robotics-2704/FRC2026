@@ -95,13 +95,13 @@ public class GyroSimulation {
     public static double generateRandomNormal(double mean, double stdDev) {
         double u1 = random.nextDouble();
         double u2 = random.nextDouble();
-        // Box–Muller transform https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
+        // Box-Muller transform https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
         double z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
         return z0 * stdDev + mean;
     }
 
     /**
-     * <h2>Gets the Measured ΔTheta of the Gyro.</h2>
+     * <h2>Gets the Measured (Delta)Theta of the Gyro.</h2>
      *
      * <p>This method simulates the change in the robot's angle (ΔTheta) since the last sub-tick, as measured by the
      * gyro.
@@ -109,8 +109,8 @@ public class GyroSimulation {
      * <p>The measurement includes random errors based on the configuration of the gyro.
      *
      * @param actualAngularVelocityRadPerSec the actual angular velocity in radians per second, used to calculate the
-     *     ΔTheta
-     * @return the measured ΔTheta, including any measurement errors
+     *     (Delta)Theta
+     * @return the measured (Delta)Theta, including any measurement errors
      */
     private Rotation2d getGyroDTheta(double actualAngularVelocityRadPerSec) {
         this.measuredAngularVelocityRadPerSec = generateRandomNormal(

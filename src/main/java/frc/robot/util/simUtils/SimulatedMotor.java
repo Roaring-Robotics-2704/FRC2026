@@ -28,7 +28,7 @@ public class SimulatedMotor {
         }
 
         public void step(Torque finalElectricTorque, Torque finalFrictionTorque, MomentOfInertia loadMOI, Time dt) {
-            // Step 0: Convert all units to SI units (radians, radians per second, Newton-meters, seconds, kg*m²)
+            // Step 0: Convert all units to SI units (radians, radians per second, Newton-meters, seconds, kg*m^2)
             double currentAngularPositionRadians = mechanismAngularPosition.in(Radians);
             double currentAngularVelocityRadiansPerSecond = mechanismAngularVelocity.in(RadiansPerSecond);
             final double electricTorqueNewtonsMeters = finalElectricTorque.in(NewtonMeters);
