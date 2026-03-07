@@ -159,8 +159,8 @@ public class AutoBuilder {
 
         routine.active().onTrue(
             Commands.sequence(
-                runAutoTrajectory(shootAndClimbTrajectory$0),
-                runAutoTrajectory(shootAndClimbTrajectory$1)
+                runAutoTrajectory(shootAndClimb$0),
+                runAutoTrajectory(shootAndClimb$1)
             ));
 
         shootAndClimb$0.atTime("Shoot").onTrue( shootPreloadCommandSequence() );

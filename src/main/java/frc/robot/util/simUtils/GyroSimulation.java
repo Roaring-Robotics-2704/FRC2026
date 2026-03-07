@@ -103,7 +103,7 @@ public class GyroSimulation {
     /**
      * <h2>Gets the Measured (Delta)Theta of the Gyro.</h2>
      *
-     * <p>This method simulates the change in the robot's angle (ΔTheta) since the last sub-tick, as measured by the
+     * <p>This method simulates the change in the robot's angle ((Delta)Theta) since the last sub-tick, as measured by the
      * gyro.
      *
      * <p>The measurement includes random errors based on the configuration of the gyro.
