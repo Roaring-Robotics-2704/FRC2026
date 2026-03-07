@@ -7,7 +7,7 @@
 
 package frc.robot.commands.auto;
 
-import static org.littletonrobotics.frc2026.commands.auto.AutoCommands.*;
+import frc.robot.commands.auto.AutoCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,25 +18,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
-//import lombok.RequiredArgsConstructor;
-//import org.littletonrobotics.frc2026.AutoFieldConstants.*;
+
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
+import frc.robot.ChoreoTraj;
 import frc.robot.FieldConstants;
-//import org.littletonrobotics.frc2026.AutoSelector.AutoQuestionResponse;
-//import org.littletonrobotics.frc2026.RobotState;
 import frc.robot.RobotState;
-//import org.littletonrobotics.frc2026.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive;
-//import org.littletonrobotics.frc2026.subsystems.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.intake.Intake;
-//import org.littletonrobotics.frc2026.subsystems.kicker.Kicker;
-import frc.robot.subsystems.superstructure.Kicker;
-//import org.littletonrobotics.frc2026.subsystems.launcher.LaunchCalculator;
-//import org.littletonrobotics.frc2026.subsystems.launcher.flywheel.Flywheel;
-//import org.littletonrobotics.frc2026.subsystems.launcher.hood.Hood;
-//import org.littletonrobotics.frc2026.subsystems.slamtake.Slamtake;
+import frc.robot.subsystems.superstructure.intake.Intake.IntakeState;
+import frc.robot.subsystems.superstructure.Kicker.Kicker;
+import frc.robot.subsystems.superstructure.climber.Climber;
+import frc.robot.subsystems.superstructure.climber.Climber.ClimberState;
+import frc.robot.subsystems.superstructure.hook.Hook;
+import frc.robot.subsystems.superstructure.hook.Hook.HookState;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
+import frc.robot.subsystems.superstructure.shooter.Shooter.ShooterState;
 import frc.robot.util.geometry.AllianceFlipUtil;
+import frc.robot.commands.auto.AutoChooser;
+import choreo.auto.AutoFactory;
 
 //@RequiredArgsConstructor
 @SuppressWarnings("unused")
@@ -46,170 +47,166 @@ public class AutoBuilder {
     private final Hopper hopper;
     private final Kicker kicker;
     private final Shooter shooter;
+    private final Climber climber;
+    private final Hook hook;
 
-    //private final Supplier<List<AutoQuestionResponse>> responses;
+    private final AutoFactory autoFactory;
+
+    // private final Supplier<List<AutoQuestionResponse>> responses;
 
     public static final double outpostIntakeTime = 3.0;
     public static final double neutralZoneIntakeTimeFirst = 3.0;
     public static final double neutralZoneIntakeTimeOther = 4.0;
     public static final double launchTime = 4.0;
 
-    public Command homeDepotSalesman() {
-        return Commands.sequence(
-                Commands.select(
-                        Map.of(
-                                AutoQuestionResponse.LEFT_TRENCH,
-                                Commands.either(
-                                        followTrajectory("trenchLeftStartToOutpostLeftIntakeAround", drive, true),
-                                        followTrajectory("trenchLeftStartToOutpostLeftIntake", drive, true),
-                                        () -> responses.get().get(1).equals(AutoQuestionResponse.NO)),
-                                AutoQuestionResponse.LEFT_BUMP,
-                                Commands.either(
-                                        followTrajectory("bumpLeftInnerToOutpostLeftIntakeAround", drive, true),
-                                        followTrajectory("bumpLeftInnerToOutpostLeftIntake", drive, true),
-                                        () -> responses.get().get(1).equals(AutoQuestionResponse.NO))),
-                        () -> responses.get().get(0))
-                        .andThen(Commands.waitSeconds(outpostIntakeTime)),
-                AutoCommands.driveToPose(drive, () -> Launch.rightTower)
-                        .raceWith(
-                                Commands.sequence(
-                                        AutoCommands.waitUntilWithinTolerance(
-                                                Launch.rightTower, 0.1, Rotation2d.fromDegrees(5)),
-                                        index(hopper, kicker, flywheel, intake).withTimeout(6))),
-                Commands.select(
-                        Map.of(
-                                AutoQuestionResponse.NOTHING,
-                                Commands.none(),
-                                AutoQuestionResponse.CLIMB,
-                                followTrajectory("launchRightTowerToClimbRight", drive, false)),
-                        () -> responses.get().get(2)));
+    public AutoBuilder(Drive drive, Intake intake, Hopper hopper, Kicker kicker, Shooter shooter, Climber climber, Hook hook)
+    {
+        this.drive = drive;
+        this.intake = intake;
+        this.hopper = hopper;
+        this.kicker = kicker;
+        this.shooter = shooter;
+        this.climber = climber;
+        this.hook = hook;
+        
+        autoFactory = new AutoFactory(
+            ()->RobotState.getInstance().getPose(), // A function that returns the current robot pose
+            drive::setPose, // A function that resets the current robot pose to the provided Pose2d
+            drive::followTrajectory, // The drive subsystem trajectory follower 
+            true, // If alliance flipping should be enabled 
+            drive // The drive subsystem
+        );
     }
 
-    public Command lowesHardwareSalesman() {
-        return Commands.sequence(
-                // Intake from outpost
-                Commands.select(
-                        Map.of(
-                                AutoQuestionResponse.RIGHT_TRENCH,
-                                followTrajectory("trenchRightStartToOutpostFrontIntake", drive, true),
-                                AutoQuestionResponse.RIGHT_BUMP,
-                                followTrajectory("bumpRightInnerToOutpostFrontIntake", drive, true)),
-                        () -> responses.get().get(0)),
-                Commands.waitSeconds(outpostIntakeTime),
 
-                // Intake from depot
-                Commands.either(
-                        followTrajectory("outpostFrontIntakeToDepotAround", drive, false),
-                        followTrajectory("outpostFrontIntakeToDepot", drive, false),
-                        () -> responses.get().get(1).equals(AutoQuestionResponse.NO)),
-
-                // Launch intaken fuel
-                AutoCommands.driveToPose(drive, () -> Launch.leftTower)
-                        .raceWith(
-                                Commands.sequence(
-                                        AutoCommands.waitUntilWithinTolerance(
-                                                Launch.leftTower, 0.1, Rotation2d.fromDegrees(5)),
-                                        index(hopper, kicker, flywheel, intake).withTimeout(6))),
-                Commands.select(
-                        Map.of(
-                                AutoQuestionResponse.CLIMB,
-                                followTrajectory("launchLeftTowerToClimbLeft", drive, false),
-                                AutoQuestionResponse.NOTHING,
-                                Commands.none()),
-                        () -> responses.get().get(1)));
+    public Command shootPreloadCommandSequence() {
+        return  Commands.sequence(
+                    Commands.runOnce( () -> { shooter.setDesiredState(ShooterState.SHOOTING); } ),
+                    Commands.waitSeconds(3),
+                    Commands.runOnce( () -> { shooter.setDesiredState(ShooterState.IDLE); } )
+                );
+    }
+    public Command shootCollectedFuelCommandSequence() {
+        return  Commands.sequence(
+                Commands.runOnce(() -> {shooter.setDesiredState(ShooterState.SHOOTING);}),
+                Commands.waitSeconds(6),
+                Commands.runOnce(() -> { shooter.setDesiredState(ShooterState.IDLE);})  
+        );
     }
 
-    public Command monopolySalesman() {
-        final BooleanSupplier isLeft = () -> RobotState.getInstance()
-                .getEstimatedPose()
-                .getTranslation()
-                .getDistance(AllianceFlipUtil.apply(Launch.leftTower.getTranslation())) < RobotState.getInstance()
-                        .getEstimatedPose()
-                        .getTranslation()
-                        .getDistance(AllianceFlipUtil.apply(Launch.rightTower.getTranslation()));
+    public Command climbCommandSequence() {
+        return  Commands.sequence(
+                    Commands.runOnce( () -> { hook.setDesiredState(HookState.UNPOWERED); } ),
+                    Commands.waitUntil( hook::isAtDesiredState ),
 
-        return Commands.sequence(
-                // Drive to closest intaking position
-                Commands.select(
-                        Map.of(
-                                AutoQuestionResponse.LEFT_TRENCH,
-                                followTrajectory("trenchLeftStartToTower", drive, true),
-                                AutoQuestionResponse.LEFT_BUMP,
-                                followTrajectory("bumpLeftInnerToTower", drive, true),
-                                AutoQuestionResponse.RIGHT_BUMP,
-                                followTrajectory("bumpRightInnerToOutpostFrontIntake", drive, true)
-                                        .andThen(Commands.waitSeconds(outpostIntakeTime)),
-                                AutoQuestionResponse.RIGHT_TRENCH,
-                                followTrajectory("trenchRightStartToOutpostFrontIntake", drive, true)
-                                        .andThen(Commands.waitSeconds(outpostIntakeTime))),
-                        () -> responses.get().get(0)),
+                    Commands.runOnce( () -> { climber.setDesiredState(ClimberState.TOP); } ),
+                    Commands.waitUntil(climber::isAtDesiredState),
 
-                // Drive to and launch from launch pose
-                Commands.either(
-                        AutoCommands.driveToPose(drive, () -> Launch.leftTower),
-                        AutoCommands.driveToPose(drive, () -> Launch.rightTower),
-                        isLeft)
-                        .raceWith(
-                                Commands.sequence(
-                                        AutoCommands.waitUntilWithinTolerance(
-                                                () -> isLeft.getAsBoolean() ? Launch.leftTower : Launch.rightTower,
-                                                0.1,
-                                                Rotation2d.fromDegrees(5)),
-                                        index(hopper, kicker, flywheel, intake))),
+                    Commands.runOnce( () -> { hook.setDesiredState(HookState.POWERED); } ),
+                    Commands.waitUntil( hook::isAtDesiredState),
 
-                // Initiate chosen end behavior
-                Commands.select(
-                        Map.of(
-                                AutoQuestionResponse.NOTHING,
-                                Commands.none(),
-                                AutoQuestionResponse.CLIMB,
-                                isLeft.getAsBoolean()
-                                        ? followTrajectory("launchLeftTowerToClimbLeft", drive, false)
-                                        : followTrajectory("launchRightTowerToClimbRight", drive, false)),
-                        () -> responses.get().get(1)));
+                    Commands.runOnce( () -> { climber.setDesiredState(ClimberState.BOTTOM); } ),
+                    Commands.waitUntil(climber::isAtDesiredState)
+                );
+    }
+    
+    public Command retractIntakeCommandSequence() {
+        return  Commands.sequence(
+                    Commands.runOnce( () -> { intake.setDesiredState(IntakeState.DEPLOYED_OFF); } ),
+                    Commands.runOnce( () -> { intake.setDesiredState(IntakeState.INSIDE); } )
+            );
     }
 
-    public Command timidSalesman() {
-        Supplier<Pose2d> target = () -> {
-            Translation2d offset = new Translation2d();
-            switch (responses.get().get(0)) {
-                case CENTER:
-                case LEFT_BUMP:
-                case RIGHT_BUMP:
-                    offset = new Translation2d(-1, 0);
-                    break;
-                case LEFT_TRENCH:
-                    offset = new Translation2d(-1, -0.5);
-                    break;
-                case RIGHT_TRENCH:
-                    offset = new Translation2d(-1, 0.5);
-                    break;
-                default:
-                    break;
-            }
-
-            return LaunchCalculator.getStationaryAimedPose(
-                    responses.get().get(0).getWaypoint().translation().plus(offset), true);
-        };
-
-        return Commands.sequence(
-                AutoCommands.resetStartingPose(() -> responses.get().get(0)),
-                Commands.parallel(
-                        AutoCommands.driveToPose(drive, target),
-                        Commands.sequence(
-                                waitUntilWithinTolerance(target, 0.1, Rotation2d.fromDegrees(5)),
-                                index(hopper, kicker, flywheel, intake))));
+    public Command extendIntakeCommandSequence() {
+        return  Commands.runOnce( () -> { intake.setDesiredState(IntakeState.DEPLOYED_ON); } );
     }
 
-    public Command driveForward1m() {
-        return followTrajectory("DriveForward1m", drive, true);
+    public Command runAutoTrajectory(AutoTrajectory trajectory) {
+        return  Commands.sequence(
+                    trajectory.resetOdometry(),
+                    trajectory.cmd(),
+                    Commands.waitUntil(trajectory.done())
+        );
     }
 
-    public Command driveForward1mWhileTurn90() {
-        return followTrajectory("DriveForward1mWhileTurn90", drive, true);
+
+
+
+
+    public AutoRoutine minMovementShoot() {
+        AutoRoutine routine = autoFactory.newRoutine("MinMovementShoot");
+
+        // Load the routine's trajectories
+        AutoTrajectory minMovementShootTrajectory = ChoreoTraj.MinMovementShoot.asAutoTraj(routine);
+
+        // When the routine begins, reset odometry and start the first trajectory
+        routine.active().onTrue(
+                Commands.sequence(
+                        minMovementShootTrajectory.resetOdometry(),
+                        minMovementShootTrajectory.cmd()));
+
+        // Starting at the event marker named "intake", run the intake
+        minMovementShootTrajectory.atTime("Shoot").onTrue( shootPreloadCommandSequence() );
+
+        return routine;
     }
 
-    public Command driveForward1mWhileTurn90VelLim() {
-        return followTrajectory("DriveForward1mWhileTurn90VelLim", drive, true);
+    public AutoRoutine shootAndClimb() {
+        AutoRoutine routine = autoFactory.newRoutine("ShootAndClimb");
+
+        AutoTrajectory shootAndClimbTrajectory$0 = ChoreoTraj.ShootAndClimb$0.asAutoTraj(routine);
+        AutoTrajectory shootAndClimbTrajectory$1 = ChoreoTraj.ShootAndClimb$1.asAutoTraj(routine);
+
+        routine.active().onTrue(
+            Commands.sequence(
+                runAutoTrajectory(shootAndClimbTrajectory$0),
+                runAutoTrajectory(shootAndClimbTrajectory$1)
+            ));
+
+        shootAndClimbTrajectory$0.atTime("Shoot").onTrue( shootPreloadCommandSequence() );
+        
+        shootAndClimbTrajectory$1.atTime("Climb").onTrue( climbCommandSequence() );
+
+        return routine;
     }
+
+    public AutoRoutine shootCollectClimb() {
+        AutoRoutine routine = autoFactory.newRoutine("ShootCollectClimb");
+
+        AutoTrajectory shootCollectClimb$0 = ChoreoTraj.ShootCollectClimb$0.asAutoTraj(routine);
+        AutoTrajectory shootCollectClimb$1 = ChoreoTraj.ShootCollectClimb$1.asAutoTraj(routine);
+
+        routine.active().onTrue(
+            Commands.sequence(
+                runAutoTrajectory(shootCollectClimb$0),
+                runAutoTrajectory(shootCollectClimb$1)
+            ));
+        
+        shootCollectClimb$0.atTime("Shoot").onTrue( shootPreloadCommandSequence() );
+        shootCollectClimb$1.atTime("ExtendIntake").onTrue( extendIntakeCommandSequence() );
+        shootCollectClimb$1.atTime("RetractIntake").onTrue( retractIntakeCommandSequence() );
+        shootCollectClimb$1.atTime("Climb").onTrue( climbCommandSequence() );
+
+        return routine;
+    }
+
+    public AutoRoutine shootCollectPass() {
+        AutoRoutine routine = autoFactory.newRoutine("ShootCollectPass");
+
+        AutoTrajectory shootCollectPass$0 = ChoreoTraj.ShootCollectPass$0.asAutoTraj(routine);
+        AutoTrajectory shootCollectPass$1 = ChoreoTraj.ShootCollectPass$1.asAutoTraj(routine);
+        AutoTrajectory shootCollectPass$2 = ChoreoTraj.ShootCollectPass$2.asAutoTraj(routine);
+
+        routine.active().onTrue(
+            Commands.sequence(
+                runAutoTrajectory(shootCollectPass$0),
+                runAutoTrajectory(shootCollectPass$1),
+                runAutoTrajectory(shootCollectPass$2)
+        ));
+
+        
+
+        return routine;
+    }
+
 }
