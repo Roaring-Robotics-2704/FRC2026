@@ -67,7 +67,7 @@
     "editor.defaultFormatter": "redhat.java"
   },
   "[java]": {
-    "editor.defaultFormatter": "ms-vsliveshare.vsliveshare"
+    "editor.defaultFormatter": "redhat.java"
   },
   "java.checkstyle.configuration": "${workspaceFolder}\\checkstyle.xml",
   "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable",
@@ -79,7 +79,7 @@
   },
   "java.project.sourcePaths": [
     "src/main/java"
-  ],
+],
   "checkstyle-converter.indentPreference": 4,
   "editor.tabSize": 4,
   "checkstyle-converter.changeIncrements": true
