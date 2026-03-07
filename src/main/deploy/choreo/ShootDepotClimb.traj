@@ -133,5 +133,6 @@
  "events":[
    {"name":"Shoot", "from":{"target":1, "targetTimestamp":0.46657, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Shoot"}}},
    {"name":"Extend Intake", "from":{"target":2, "targetTimestamp":0.86256, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"ExtendIntake"}}},
-   {"name":"Climb", "from":{"target":6, "targetTimestamp":2.46106, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Climb"}}}]
+   {"name":"Climb", "from":{"target":6, "targetTimestamp":2.46106, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Climb"}}},
+   {"name":"Retract Intake", "from":{"target":5, "targetTimestamp":2.10031, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"RetractIntake"}}}]
 }

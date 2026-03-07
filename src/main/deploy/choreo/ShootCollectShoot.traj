@@ -196,5 +196,7 @@
  },
  "events":[
    {"name":"Shoot Preloads", "from":{"target":1, "targetTimestamp":0.65901, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Shoot"}}},
-   {"name":"Open Intake", "from":{"target":3, "targetTimestamp":2.09001, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"ExtendIntake"}}}]
+   {"name":"Open Intake", "from":{"target":3, "targetTimestamp":2.09001, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"ExtendIntake"}}},
+   {"name":"Shoot Collected Fuel", "from":{"target":9, "targetTimestamp":5.05192, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Shoot"}}},
+   {"name":"Retract Intake", "from":{"target":6, "targetTimestamp":3.32236, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"RetractIntake"}}}]
 }
