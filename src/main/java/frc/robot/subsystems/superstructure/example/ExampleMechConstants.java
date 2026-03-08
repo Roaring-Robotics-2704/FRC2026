@@ -8,5 +8,5 @@ package frc.robot.subsystems.superstructure.example;
 
 /** Constants for ExampleMech. */
 public final class ExampleMechConstants {
-    public static final int MOTOR_ID = 99; // Replace 99 with the actual CAN ID of the motor
+    public static final int MOTOR_ID = -1; // Replace 99 with the actual CAN ID of the motor
 }

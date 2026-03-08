@@ -1,9 +1,9 @@
 package frc.robot.util;
 
-import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.Seconds;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.ParentConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -12,15 +12,17 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-
-import java.util.function.Supplier;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.motorsims.SimulatedMotorController;
+import frc.robot.util.simUtils.SimulatedBattery;
+import frc.robot.util.simUtils.SimulatedMotorController;
+import frc.robot.util.simUtils.Simulation;
 
 /** Utility class for Phoenix-related functions and simulations. */
 public final class PhoenixUtil {
@@ -54,7 +56,7 @@ public final class PhoenixUtil {
                 AngularVelocity encoderVelocity) {
             talonFXSimState.setRawRotorPosition(encoderAngle);
             talonFXSimState.setRotorVelocity(encoderVelocity);
-            talonFXSimState.setSupplyVoltage(12);
+            talonFXSimState.setSupplyVoltage(SimulatedBattery.getBatteryVoltage());
             return talonFXSimState.getMotorVoltageMeasure();
         }
     }
@@ -81,18 +83,15 @@ public final class PhoenixUtil {
     }
 
     public static double[] getSimulationOdometryTimeStamps() {
-        final double[] odometryTimeStamps = new double[SimulatedArena.getSimulationSubTicksIn1Period()];
+        final double[] odometryTimeStamps = new double[Simulation.subTicks];
         for (int i = 0; i < odometryTimeStamps.length; i++) {
-            odometryTimeStamps[i] = Timer.getFPGATimestamp()
-                    - 0.02
-                    + i * SimulatedArena.getSimulationDt().in(Seconds);
+            odometryTimeStamps[i] = Timer.getFPGATimestamp() - 0.02 + i * Simulation.simulationDtSeconds;
         }
+
         return odometryTimeStamps;
     }
 
     /**
-     *
-     *
      * <h2>Regulates the {@link SwerveModuleConstants} for a single module.</h2>
      *
      * <p>
@@ -115,8 +114,9 @@ public final class PhoenixUtil {
      * impact on constants used on real
      * robot hardware.</h4>
      */
-    public static SwerveModuleConstants regulateModuleConstantForSimulation(
-            SwerveModuleConstants<?, ?, ?> moduleConstants) {
+    public static
+        <A extends ParentConfiguration, B extends ParentConfiguration, C extends ParentConfiguration>
+        SwerveModuleConstants<A, B, C> regulateModuleConstantForSimulation(SwerveModuleConstants<A, B, C> moduleConstants) {
         // Skip regulation if running on a real robot
         if (RobotBase.isReal()) {
             return moduleConstants;

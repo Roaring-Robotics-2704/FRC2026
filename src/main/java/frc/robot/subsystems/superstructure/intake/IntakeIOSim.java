@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure.intake;
 
+
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
@@ -16,13 +17,6 @@ import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_P
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KS;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KV;
 
-import org.ironmaple.simulation.IntakeSimulation;
-import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
-import org.ironmaple.simulation.motorsims.MapleMotorSim;
-import org.ironmaple.simulation.motorsims.SimMotorConfigs;
-
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.numbers.N1;
@@ -34,13 +28,15 @@ import edu.wpi.first.math.trajectory.ExponentialProfile.State;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import frc.robot.util.simUtils.SimMotorConfigs;
+import frc.robot.util.simUtils.SimulatedMotor;
 
 public class IntakeIOSim implements IntakeIO {
 
     LinearSystem<N2, N1, N2> slideSystem = LinearSystemId.createElevatorSystem(SLIDE_MOTOR_TYPE, 0, 0, 0);
-    MapleMotorSim slideMotorSim = new MapleMotorSim(
+    SimulatedMotor slideMotorSim = new SimulatedMotor(
         new SimMotorConfigs(SLIDE_MOTOR_TYPE, MOTOR_GEAR_RATIO, KilogramSquareMeters.of(0.002), Volts.of(0.2)));
-    MapleMotorSim rollerMotorSim = new MapleMotorSim(
+    SimulatedMotor rollerMotorSim = new SimulatedMotor(
         new SimMotorConfigs(ROLLER_MOTOR_TYPE, 2, KilogramSquareMeters.of(0.002), Volts.of(0.2)));
     private PIDController slidePID = new PIDController(SLIDE_POSITION_KP, SLIDE_POSITION_KI, SLIDE_POSITION_KD);
     private ElevatorFeedforward slideFeedforward = new ElevatorFeedforward(
@@ -50,12 +46,9 @@ public class IntakeIOSim implements IntakeIO {
 
     ElevatorSim slideSim = new ElevatorSim(slideSystem, SLIDE_MOTOR_TYPE, 0, SLIDE_MAX_DISTANCE.in(Meters), false, 0);
 
-    IntakeSimulation intakeSim;
 
     /** Instantiates the Real Intake hardware. */
-    public IntakeIOSim(AbstractDriveTrainSimulation drive) {
-        intakeSim = IntakeSimulation.OverTheBumperIntake("Fuel", drive, Inches.of(28), Inches.of(11), IntakeSide.FRONT, 40);
-        intakeSim.register(SimulatedArena.getInstance());
+    public IntakeIOSim() {
 
     }
 

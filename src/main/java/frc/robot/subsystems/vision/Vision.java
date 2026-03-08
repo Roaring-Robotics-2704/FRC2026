@@ -167,21 +167,20 @@ public class Vision extends SubsystemBase {
 
             // Log camera datadata
             Logger.recordOutput("Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
-                tagPoses.toArray(new Pose3d[tagPoses.size()]));
+                tagPoses.toArray(Pose3d[]::new));
             Logger.recordOutput("Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPoses",
-                robotPoses.toArray(new Pose3d[robotPoses.size()]));
+                robotPoses.toArray(Pose3d[]::new));
             Logger.recordOutput("Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesAccepted",
-                robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
+                robotPosesAccepted.toArray(Pose3d[]::new));
             Logger.recordOutput("Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
-                robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
+                robotPosesRejected.toArray(Pose3d[]::new));
 
             Logger.recordOutput("Vision/Camera" + Integer.toString(cameraIndex) + "/IndividualTagRobotPoses",
-                individualTagRobotPoses.toArray(new Pose3d[individualTagRobotPoses.size()]));
+                individualTagRobotPoses.toArray(Pose3d[]::new));
             Logger.recordOutput("Vision/Camera" + Integer.toString(cameraIndex) + "/IndividualTagRobotPosesAccepted",
-                individualTagRobotPosesAccepted.toArray(new Pose3d[individualTagRobotPosesAccepted.size()]));
+                individualTagRobotPosesAccepted.toArray(Pose3d[]::new));
             Logger.recordOutput("Vision/Camera" + Integer.toString(cameraIndex) + "/IndividualTagRobotPosesRejected",
-                individualTagRobotPosesRejected.toArray(new Pose3d[individualTagRobotPosesRejected.size()]));
-
+                individualTagRobotPosesRejected.toArray(Pose3d[]::new));
             allTagPoses.addAll(tagPoses);
             allRobotPoses.addAll(robotPoses);
             allRobotPosesAccepted.addAll(robotPosesAccepted);
@@ -193,19 +192,19 @@ public class Vision extends SubsystemBase {
         }
 
         // Log summary data
-        Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[allTagPoses.size()]));
-        Logger.recordOutput("Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[allRobotPoses.size()]));
+        Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(Pose3d[]::new));
+        Logger.recordOutput("Vision/Summary/RobotPoses", allRobotPoses.toArray(Pose3d[]::new));
         Logger.recordOutput("Vision/Summary/RobotPosesAccepted",
-            allRobotPosesAccepted.toArray(new Pose3d[allRobotPosesAccepted.size()]));
+            allRobotPosesAccepted.toArray(Pose3d[]::new));
         Logger.recordOutput("Vision/Summary/RobotPosesRejected",
-            allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
+            allRobotPosesRejected.toArray(Pose3d[]::new));
 
         Logger.recordOutput("Vision/Summary/IndividualTagRobotPoses",
-            allIndividualTagRobotPoses.toArray(new Pose3d[allIndividualTagRobotPoses.size()]));
+            allIndividualTagRobotPoses.toArray(Pose3d[]::new));
         Logger.recordOutput("Vision/Summary/IndividualTagRobotPosesRejected",
-            allIndividualTagRobotPosesRejected.toArray(new Pose3d[allIndividualTagRobotPosesRejected.size()]));
+            allIndividualTagRobotPosesRejected.toArray(Pose3d[]::new));
         Logger.recordOutput("Vision/Summary/IndividualTagRobotPosesAccepted",
-            allIndividualTagRobotPosesAccepted.toArray(new Pose3d[allIndividualTagRobotPosesAccepted.size()]));
+            allIndividualTagRobotPosesAccepted.toArray(Pose3d[]::new));
     }
 
     public Transform3d[] getBestTagTransforms() {

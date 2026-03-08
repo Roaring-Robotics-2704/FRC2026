@@ -3,26 +3,44 @@ package frc.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
- * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running on a roboRIO. Change
- * the value of "simMode" to switch between "sim" (physics sim) and "replay" (log replay from a file).
+ * This class defines the runtime mode used by AdvantageKit. The mode is always
+ * "real" when running on a roboRIO. Change
+ * the value of "simMode" to switch between "sim" (physics sim) and "replay"
+ * (log replay from a file).
  */
 public final class Constants {
+
+    public static final double loopPeriodSecs = 0.02;
+    public static final double loopPeriodWatchdogSecs = 0.2;
     /**
-     * Defines the runtime mode used by AdvantageKit. The mode is always "real" when running on a roboRIO. Change the
-     * value of "simMode" to switch between "sim" (physics sim) and "replay" (log replay from a file).  
+     * Defines the runtime mode used by AdvantageKit. The mode is always "real" when
+     * running on a roboRIO. Change the
+     * value of "simMode" to switch between "sim" (physics sim) and "replay" (log
+     * replay from a file).
      * This is automatically updated by Justfile commands if they are used.
      */
+
     public static final Mode simMode = Mode.SIM;
     /** If the robot should log data to files in simulation. */
     public static final boolean logInSimulation = true;
 
+    public static boolean disableHAL = false;
+
+    public static void disableHAL() {
+        disableHAL = true;
+    }
+
     /**
-     * Whether to use NetworkTables instead of RLog for AdvantageScope logging. RLog _significantly_ reduces lag in
+     * Whether to use NetworkTables instead of RLog for AdvantageScope logging. RLog
+     * _significantly_ reduces lag in
      * AdvantageScope.
      */
     public static final boolean useNTLogs = true;
 
-    /** If the robot is in "tuning mode". When in tuning mode, tunable constants are added to NetworkTables. */
+    /**
+     * If the robot is in "tuning mode". When in tuning mode, tunable constants are
+     * added to NetworkTables.
+     */
     public static boolean tuningMode = true;
 
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
@@ -39,16 +57,24 @@ public final class Constants {
     public static boolean isSim = currentMode == Mode.SIM;
 
     /**
-     * Maintains a real-time thread priority for the main robot thread throughout the entire program execution. This is
-     * INCREDIBLY dangerous! Do NOT use this without understanding the consequences and EXTENSIVELY testing code with it
-     * enabled. If loop times are longer than 20ms, this WILL cause all other threads (including important vendor ones,
-     * AdvantageKit ones, and more) to be starved and not execute. This can cause issues with odometry, instability with
-     * sending commands, and other issues. However, this has quite visible advantages with reducing loop time
-     * inconsistency. Again, if you want to use this functionality, test with it on and understand its consequences! If
-     * there are spooky issues going on with the robot, disabling this (if enabled) is a good first step. Only use this
-     * as a last resort. Here be dragons.
+     * Maintains a real-time thread priority for the main robot thread throughout
+     * the entire program execution. This is
+     * INCREDIBLY dangerous! Do NOT use this without understanding the consequences
+     * and EXTENSIVELY testing code with it
+     * enabled. If loop times are longer than 20ms, this WILL cause all other
+     * threads (including important vendor ones,
+     * AdvantageKit ones, and more) to be starved and not execute. This can cause
+     * issues with odometry, instability with
+     * sending commands, and other issues. However, this has quite visible
+     * advantages with reducing loop time
+     * inconsistency. Again, if you want to use this functionality, test with it on
+     * and understand its consequences! If
+     * there are spooky issues going on with the robot, disabling this (if enabled)
+     * is a good first step. Only use this
+     * as a last resort. Here be dragons
+     * .
      */
-    public static boolean useSuperDangerousRTThreadPriority = false;
+    public static boolean useSuperDangerousRTThreadPriority = true;
 
     public static final double voltageCompensation = 12.0;
 }

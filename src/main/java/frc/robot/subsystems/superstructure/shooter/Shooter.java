@@ -4,23 +4,18 @@
 
 package frc.robot.subsystems.superstructure.shooter;
 
-import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_IDLE;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TARGET;
-
-import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import static edu.wpi.first.units.Units.RPM;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotState;
-import frc.robot.util.solvers.BasicTunedCalc;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_IDLE;
 import frc.robot.util.solvers.SolverIO;
+import frc.robot.util.solvers.SolverIO.ShootingSolution;
+import frc.robot.util.tunables.LoggedTunableNumber;
 
 /** The shooter subsystem. */
 public class Shooter extends SubsystemBase {
@@ -31,27 +26,55 @@ public class Shooter extends SubsystemBase {
     private Angle hoodAngle;
     private AngularVelocity flywheelVelocity;
 
-
     private final ShooterIO io;
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
     private final SolverIO solver;
 
+    private static final LoggedTunableNumber shootP = new LoggedTunableNumber("Shooter/ShootP");
+    private static final LoggedTunableNumber shootD = new LoggedTunableNumber("Shooter/ShootD");
+
+    private static final LoggedTunableNumber shootS = new LoggedTunableNumber("Shooter/ShootS");
+    private static final LoggedTunableNumber shootV = new LoggedTunableNumber("Shooter/ShootV");
+    private static final LoggedTunableNumber shootA = new LoggedTunableNumber("Shooter/ShootA");
+
+
+
+    static {
+        shootP.initDefault(ShooterConstants.SHOOTER_KP);
+        shootD.initDefault(ShooterConstants.SHOOTER_KD);
+
+        shootS.initDefault(ShooterConstants.SHOOTER_KS);
+        shootV.initDefault(ShooterConstants.SHOOTER_KV);
+        shootA.initDefault(ShooterConstants.SHOOTER_KA);
+    }
+
+    private Rotation2d robotAngle = Rotation2d.fromDegrees(0    );
+
     public Shooter(ShooterIO io, SolverIO solver) {
         this.io = io;
         this.solver = solver;
+
     }
 
     @Override
     public void periodic() {
+
+        if(shootP.hasChanged(hashCode()) || shootD.hasChanged(hashCode()) ||
+            shootS.hasChanged(hashCode()) || shootV.hasChanged(hashCode()) || shootA.hasChanged(hashCode())) {
+            io.setPID(shootP.get(), 0, shootD.get(), shootS.get(), shootV.get(), shootA.get());
+        }
+
         io.updateInputs(inputs);
         Logger.processInputs("Shooter", inputs);
-        hoodAngle = solver.getShootingSolution(
-            RobotState.getInstance().getOdometryPose(), RobotState.getInstance().getRobotVelocity()).hoodAngle();
-        flywheelVelocity = solver.getShootingSolution(
-            RobotState.getInstance().getOdometryPose(), RobotState.getInstance().getRobotVelocity()).flywheelVelocity();
+        ShootingSolution solution = solver.getShootingSolution();
+        hoodAngle = solution.hoodAngle();
+        flywheelVelocity = solution.flywheelVelocity();
+        robotAngle = solution.robotAngle();
+
         Logger.recordOutput("Shooter/CalculatedHoodAngle", hoodAngle);
         Logger.recordOutput("Shooter/CalculatedFlywheelVelocity", flywheelVelocity);
+        Logger.recordOutput("Shooter/CalculatedRobotAngle", robotAngle);
 
         Logger.recordOutput("Shooter/DesiredState", desiredState.toString());
         Logger.recordOutput("Shooter/CurrentState", currentState.toString());
@@ -59,7 +82,7 @@ public class Shooter extends SubsystemBase {
         if (currentState != desiredState) {
             switch (desiredState) {
                 case STATIONARY:
-                    io.setFlywheelVoltage(Volts.of(0));
+                    io.setFlywheelVelocity(RPM.of(0));
                     io.setHoodAngle(MIN_ANGLE);
                     ;
                     break;
@@ -69,7 +92,7 @@ public class Shooter extends SubsystemBase {
                     break;
                 case SHOOTING:
                     io.setHoodAngle(hoodAngle);
-                    io.setFlywheelVelocity(SHOOTER_TARGET);
+                    io.setFlywheelVelocity(ShooterConstants.SHOOTER_TARGET);
                     break;
                 default:
                     break;
@@ -79,6 +102,7 @@ public class Shooter extends SubsystemBase {
             }
 
         }
+
         // This method will be called once per scheduler run
     }
 
@@ -113,6 +137,10 @@ public class Shooter extends SubsystemBase {
     /** Possible states for the shooter subsystem. */
     public enum ShooterState {
         STATIONARY, IDLE, SHOOTING
+    }
+
+    public Rotation2d getWantedRobotAngle() {
+        return robotAngle;
     }
 
 }

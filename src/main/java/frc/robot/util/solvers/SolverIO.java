@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.RPM;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -16,7 +17,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 /** Add your docs here. */
 public interface SolverIO {
 
-    default ShootingSolution getShootingSolution(Pose2d robotPose, ChassisSpeeds robotVelocity) {
+    default ShootingSolution getShootingSolution() {
         return new ShootingSolution(RPM.of(0), Degrees.of(0), Rotation2d.kZero);
     }
 

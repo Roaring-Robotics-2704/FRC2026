@@ -14,14 +14,12 @@ import java.util.Queue;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
-    private final Pigeon2 pigeon =
-            new Pigeon2(DriveConstants.drivetrainConstants.Pigeon2Id, DriveConstants.CANBus);
+    private final Pigeon2 pigeon = new Pigeon2(DriveConstants.pigeonId, DriveConstants.CANBus);
     private final StatusSignal<Angle> yaw = pigeon.getYaw();
     private final Queue<Double> yawPositionQueue;
     private final Queue<Double> yawTimestampQueue;
     private final StatusSignal<AngularVelocity> yawVelocity = pigeon.getAngularVelocityZWorld();
 
-    
     public GyroIOPigeon2() {
         pigeon.getConfigurator().apply(new Pigeon2Configuration());
         pigeon.getConfigurator().setYaw(0.0);

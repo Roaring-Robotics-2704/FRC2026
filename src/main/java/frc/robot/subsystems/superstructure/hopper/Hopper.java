@@ -11,6 +11,7 @@ import org.littletonrobotics.junction.Logger;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -82,7 +83,7 @@ public class Hopper extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (currentState == HopperState.TRANSITIONING) {
+        if (currentState != desiredState) {
             // Determine numeric target volts based on desired state
             switch (desiredState) {
                 case IDLE:
@@ -100,10 +101,8 @@ public class Hopper extends SubsystemBase {
             }
 
             hopperIO.setMotorVoltage(Volts.of(targetVolts));
-            if (inputs.appliedVoltage.in(Volts) == targetVolts) {
-                currentState = desiredState;
+            currentState = desiredState;
 
-            }
         }
         // This method will be called once per scheduler run
 
@@ -121,9 +120,7 @@ public class Hopper extends SubsystemBase {
     public enum HopperState {
         IDLE,
         FEEDING,
-        REVERSING,
-        TRANSITIONING
-    }
+        REVERSING    }
 
     /**
      * Gets the current state of the hopper.
@@ -143,10 +140,7 @@ public class Hopper extends SubsystemBase {
      * @param state The desired HopperState
      */
     public void setDesiredState(HopperState state) {
-        if (state != currentState) {
             this.desiredState = state;
-            currentState = HopperState.TRANSITIONING;
-        }
     }
 
 

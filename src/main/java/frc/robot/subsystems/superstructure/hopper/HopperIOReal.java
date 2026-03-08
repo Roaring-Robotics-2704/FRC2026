@@ -29,6 +29,7 @@ public class HopperIOReal implements HopperIO {
         SparkMaxConfig hopperConfig = new SparkMaxConfig();
         hopperConfig.idleMode(IdleMode.kCoast);
         hopperConfig.smartCurrentLimit(HOPPER_CURRENT_LIMIT);
+        hopperConfig.inverted(true);
         SparkUtil.tryUntilOk(hopperMotor, 5,
             () -> hopperMotor.configure(hopperConfig,
                 ResetMode.kResetSafeParameters,
