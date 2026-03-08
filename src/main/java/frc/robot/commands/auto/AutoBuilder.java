@@ -38,6 +38,7 @@ import frc.robot.subsystems.superstructure.shooter.Shooter.ShooterState;
 import frc.robot.util.geometry.AllianceFlipUtil;
 import frc.robot.commands.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 //@RequiredArgsConstructor
 @SuppressWarnings("unused")
@@ -59,8 +60,7 @@ public class AutoBuilder {
     public static final double neutralZoneIntakeTimeOther = 4.0;
     public static final double launchTime = 4.0;
 
-    public AutoBuilder(Drive drive, Intake intake, Hopper hopper, Kicker kicker, Shooter shooter, Climber climber, Hook hook)
-    {
+    public AutoBuilder(Drive drive, Intake intake, Hopper hopper, Kicker kicker, Shooter shooter, Climber climber, Hook hook) {
         this.drive = drive;
         this.intake = intake;
         this.hopper = hopper;
@@ -78,6 +78,20 @@ public class AutoBuilder {
         );
     }
 
+    public SendableChooser<Command> buildAutoChooser() {
+        SendableChooser<Command> sendableChooser = new SendableChooser<Command>();
+
+        sendableChooser.addOption("Shoot only", minMovementShoot().cmd());
+        sendableChooser.addOption("Shoot, climb", shootAndClimb().cmd());
+        sendableChooser.addOption("Shoot, collect, climb", shootCollectClimb().cmd());
+        sendableChooser.addOption("Shoot, collect, pass, collect, pass", shootCollectPass().cmd());
+        sendableChooser.addOption("Shoot, collect, shoot", shootCollectShoot().cmd());
+        sendableChooser.addOption("Shoot, depot, climb", shootDepotClimb().cmd());
+        sendableChooser.addOption("Shoot, depot, shoot", shootDepotShoot().cmd());
+
+        return sendableChooser;
+    }
+
 
     public Command shootPreloadCommandSequence() {
         return  Commands.sequence(
@@ -86,6 +100,7 @@ public class AutoBuilder {
                     Commands.runOnce( () -> { shooter.setDesiredState(ShooterState.IDLE); } )
                 );
     }
+
     public Command shootCollectedFuelCommandSequence() {
         return  Commands.sequence(
                     Commands.runOnce(() -> {shooter.setDesiredState(ShooterState.SHOOTING);}),

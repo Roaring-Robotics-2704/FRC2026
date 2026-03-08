@@ -9,7 +9,9 @@ package frc.robot;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-import com.pathplanner.lib.auto.AutoBuilder;
+//import com.pathplanner.lib.auto.AutoBuilder;
+import frc.robot.commands.auto.AutoBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -40,6 +42,10 @@ import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.superstructure.shooter.ShooterIO;
 import frc.robot.subsystems.superstructure.shooter.ShooterIOGreyT;
 import frc.robot.subsystems.superstructure.shooter.ShooterIOSim;
+import frc.robot.subsystems.superstructure.hook.Hook;
+import frc.robot.subsystems.superstructure.hook.HookIO;
+import frc.robot.subsystems.superstructure.hook.HookIOReal;
+import frc.robot.subsystems.superstructure.hook.HookIOSim;
 import frc.robot.subsystems.vision.Vision;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
@@ -67,6 +73,7 @@ public class RobotContainer {
     public final Intake intake;
     public final Shooter shooter;
     public final Climber climber;
+    public final Hook hook;
 
     public final Vision vision;
     // private final FuelPoseEstimator objectDetection;
@@ -85,6 +92,7 @@ public class RobotContainer {
 
     // Choreo auto factory library
     private final AutoFactory autoFactory;
+    private final AutoBuilder autoBuilder;
 
     private final LoggedDashboardChooser<Command> testChooser;
     /**
@@ -107,6 +115,7 @@ public class RobotContainer {
                 intake = new Intake(new IntakeIOReal());
                 hopper = new Hopper(new HopperIOReal());
                 climber = new Climber(new ClimberIO() {});
+                hook = new Hook(new HookIO() {});
                 vision = new Vision(
                         new VisionIOPhotonVision(camera0Name, robotToCamera0));
                 // objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
@@ -129,6 +138,7 @@ public class RobotContainer {
                 });
                 hopper = new Hopper(new HopperIOSim());
                 climber = new Climber(new ClimberIO() {});
+                hook = new Hook(new HookIO() {});
 
                 vision = new Vision(
                         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0,
@@ -162,6 +172,7 @@ public class RobotContainer {
                 // });
 
                 climber = new Climber(new ClimberIO() {});
+                hook = new Hook(new HookIO() {});
 
                 shooter = new Shooter(new ShooterIO() {}, new BasicTunedCalc());
                 break;
@@ -171,7 +182,8 @@ public class RobotContainer {
         // superStructure = new SuperStructure(intake, hopper, kicker, shooter, climber);
 
         // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        autoBuilder = new AutoBuilder(drive, intake, hopper, kicker, shooter, climber, hook);
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", autoBuilder.buildAutoChooser());
 
         Controls.getInstance().configureControls(this);
 
