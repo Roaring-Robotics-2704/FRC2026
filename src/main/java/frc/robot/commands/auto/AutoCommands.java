@@ -27,12 +27,11 @@ import frc.robot.commands.DriveToPose;
 import frc.robot.commands.DriveTrajectory;
 import frc.robot.subsystems.drive.Drive;
 //import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.subsystems.superstructure.Kicker.Kicker;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.Hopper.HopperState;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.superstructure.intake.Intake;
-
+import frc.robot.subsystems.superstructure.kicker.Kicker;
 import frc.robot.util.tunables.LoggedTunableNumber;
 import frc.robot.util.geometry.AllianceFlipUtil;
 

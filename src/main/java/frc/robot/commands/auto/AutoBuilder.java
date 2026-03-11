@@ -28,7 +28,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.intake.Intake.IntakeState;
-import frc.robot.subsystems.superstructure.Kicker.Kicker;
+import frc.robot.subsystems.superstructure.kicker.Kicker;
 import frc.robot.subsystems.superstructure.climber.Climber;
 import frc.robot.subsystems.superstructure.climber.Climber.ClimberState;
 import frc.robot.subsystems.superstructure.hook.Hook;
@@ -131,8 +131,8 @@ public class AutoBuilder {
     
     public Command retractIntakeCommandSequence() {
         return  Commands.sequence(
-                    Commands.runOnce( () -> { intake.setDesiredState(IntakeState.DEPLOYED_OFF); } ),
-                    Commands.runOnce( () -> { intake.setDesiredState(IntakeState.INSIDE); } )
+                    Commands.runOnce(() -> intake.setDesiredState(IntakeState.DEPLOYED_OFF)),
+                    Commands.runOnce(() -> intake.setDesiredState(IntakeState.INSIDE))
             );
     }
 

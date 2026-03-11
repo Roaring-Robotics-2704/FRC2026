@@ -28,7 +28,7 @@ import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
 import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
-import frc.robot.subsystems.superstructure.Kicker.Kicker;
+import frc.robot.subsystems.superstructure.kicker.Kicker;
 import frc.robot.subsystems.superstructure.climber.Climber;
 import frc.robot.subsystems.superstructure.climber.ClimberIO;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
@@ -38,6 +38,7 @@ import frc.robot.subsystems.superstructure.hopper.HopperIOSim;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
 import frc.robot.subsystems.superstructure.intake.IntakeIOReal;
+import frc.robot.subsystems.superstructure.shooter.BasicTunedCalc;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.superstructure.shooter.ShooterIO;
 import frc.robot.subsystems.superstructure.shooter.ShooterIOGreyT;
@@ -53,8 +54,6 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.simUtils.Simulation;
-import frc.robot.util.solvers.BasicTunedCalc;
-import frc.robot.util.solvers.SleipnirCalc;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -120,7 +119,7 @@ public class RobotContainer {
                         new VisionIOPhotonVision(camera0Name, robotToCamera0));
                 // objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
                 //         ObjectDetectionConstants.cameraToRobotTransform));
-                shooter = new Shooter(new ShooterIOGreyT(), new BasicTunedCalc());
+                shooter = new Shooter(new ShooterIOGreyT());
                 break;
 
             case SIM:
@@ -145,7 +144,7 @@ public class RobotContainer {
                                 driveSimulation::getSimulatedDriveTrainPose));
                 // objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                 //     });
-                shooter = new Shooter(new ShooterIOSim(), new BasicTunedCalc());
+                shooter = new Shooter(new ShooterIOSim());
                 break;
 
             default:
@@ -174,7 +173,7 @@ public class RobotContainer {
                 climber = new Climber(new ClimberIO() {});
                 hook = new Hook(new HookIO() {});
 
-                shooter = new Shooter(new ShooterIO() {}, new BasicTunedCalc());
+                shooter = new Shooter(new ShooterIO() {});
                 break;
         }
 
