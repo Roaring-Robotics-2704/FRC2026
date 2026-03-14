@@ -28,13 +28,13 @@ import static frc.robot.subsystems.superstructure.intake.IntakeConstants.ROLLER_
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_CURRENT_LIMIT;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_MAX_ACCELERATION;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_MAX_VELOCITY;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KA;
+/*import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KA;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KD;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KG;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KI;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KP;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KS;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KV;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KV;*/
 import frc.robot.util.SparkUtil;
 
 /** Add your docs here. */
@@ -50,11 +50,11 @@ public class IntakeIOReal implements IntakeIO {
         slideConfig = new SparkMaxConfig();
 
         slideConfig.smartCurrentLimit(SLIDE_CURRENT_LIMIT);
-        slideConfig.closedLoop.feedForward.kG(SLIDE_POSITION_KG);
-        slideConfig.closedLoop.feedForward.kS(SLIDE_POSITION_KS);
-        slideConfig.closedLoop.feedForward.kV(SLIDE_POSITION_KV);
-        slideConfig.closedLoop.feedForward.kA(SLIDE_POSITION_KA);
-        slideConfig.closedLoop.pid(SLIDE_POSITION_KP, SLIDE_POSITION_KI, SLIDE_POSITION_KD);
+        //slideConfig.closedLoop.feedForward.kG(SLIDE_POSITION_KG);
+        //slideConfig.closedLoop.feedForward.kS(SLIDE_POSITION_KS);
+        //slideConfig.closedLoop.feedForward.kV(SLIDE_POSITION_KV);
+        //slideConfig.closedLoop.feedForward.kA(SLIDE_POSITION_KA);
+        //slideConfig.closedLoop.pid(SLIDE_POSITION_KP, SLIDE_POSITION_KI, SLIDE_POSITION_KD);
 
         slideConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
         slideConfig.absoluteEncoder.zeroCentered(true);
@@ -122,17 +122,17 @@ public class IntakeIOReal implements IntakeIO {
         slideMotor.getEncoder().setPosition(position.in(Inches));
     }
 
-    @Override
+    /*@Override
     public void setPID(double kP, double kD, double kS, double kV, double kA) {
-       ClosedLoopConfig config = new ClosedLoopConfig();
-         config.p(kP);
-         config.d(kD);
+        ClosedLoopConfig config = new ClosedLoopConfig();
+        config.p(kP);
+        config.d(kD);
         config.feedForward.kS(kS);
         config.feedForward.kV(kV);
         config.feedForward.kA(kA);
         slideConfig.apply(config);
         SparkUtil.tryUntilOk(slideMotor, 5, () -> slideMotor.configure(slideConfig, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters));
-    }
+    }*/
 
 }

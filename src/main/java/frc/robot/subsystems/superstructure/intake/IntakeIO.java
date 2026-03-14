@@ -18,6 +18,7 @@ import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
+import static frc.robot.subsystems.superstructure.intake.Intake.IntakePosition;
 
 /**
  * IO implementation for the intake.
@@ -56,7 +57,10 @@ public interface IntakeIO {
         // Default to nothing for replay
     }
 
-    default void setPosition(Distance position) {
+    //default void setPosition(Distance position) {
+    //    // Default to nothing for replay
+    //}
+    default void goToPosition(IntakePosition intakePosition) {
         // Default to nothing for replay
     }
 
