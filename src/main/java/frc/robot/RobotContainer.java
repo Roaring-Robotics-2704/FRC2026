@@ -81,6 +81,7 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
+    private final CommandXboxController controller2 = new CommandXboxController(1);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -109,7 +110,7 @@ public class RobotContainer {
                         new VisionIOPhotonVision(camera0Name, robotToCamera0));
                 // objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
                 //         ObjectDetectionConstants.cameraToRobotTransform));
-                shooter = new Shooter(new ShooterIOGreyT(), new BasicTunedCalc());
+                shooter = new Shooter(new ShooterIOGreyT());
                 break;
 
             case SIM:
@@ -134,7 +135,7 @@ public class RobotContainer {
                                 driveSimulation::getSimulatedDriveTrainPose));
                 // objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                 //     });
-                shooter = new Shooter(new ShooterIOSim(), new BasicTunedCalc());
+                shooter = new Shooter(new ShooterIOSim());
                 break;
 
             default:
@@ -162,7 +163,7 @@ public class RobotContainer {
 
                 climber = new Climber(new ClimberIO() {});
 
-                shooter = new Shooter(new ShooterIO() {}, new BasicTunedCalc());
+                shooter = new Shooter(new ShooterIO() {});
                 break;
         }
 
@@ -231,6 +232,15 @@ public class RobotContainer {
             Commands.startEnd(()->hopper.setDesiredState(Hopper.HopperState.FEEDING), ()->hopper.setDesiredState(Hopper.HopperState.IDLE), hopper)
         ));
         // controller.rightTrigger().whileTrue(Commands.run(()->superStructure.setDesiredState(SuperStructureStates.SHOOT)).finallyDo(()->superStructure.setDesiredState(SuperStructureStates.IDLE)));
+        
+        controller2.leftBumper().onTrue(Commands.run(()->shooter.incrementHoodAngle(-5)));
+        controller2.rightBumper().onTrue(Commands.run(()->shooter.incrementHoodAngle(5)));
+        controller2.leftTrigger().onTrue(Commands.run(()->shooter.incrementFlywheelSpeed(-100)));
+        controller2.rightTrigger().onTrue(Commands.run(()->shooter.incrementFlywheelSpeed(100)));
+
+
+
+
 
         controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
 

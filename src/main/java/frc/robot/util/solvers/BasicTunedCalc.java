@@ -8,8 +8,12 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
 
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.FlippingUtil;
+
+import edu.wpi.first.math.filter.LinearFilter;
 
 // x = v0 * cos(theta) * ( (v0 * sin(theta) + sqrt((v0 * sin(theta))^2 - 2 * g * (hf - hi))) / g )
 
@@ -19,40 +23,71 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotState;
+import frc.robot.subsystems.superstructure.shooter.ShooterConstants;
 import frc.robot.util.PoseUtil;
 
 /** Add your docs here. */
-public class BasicTunedCalc implements SolverIO {
+public class BasicTunedCalc {
     private InterpolatingDoubleTreeMap hoodAngleMap = new InterpolatingDoubleTreeMap();
+    private InterpolatingDoubleTreeMap flywheelSpeedMap = new InterpolatingDoubleTreeMap();
+    private InterpolatingDoubleTreeMap timeOfFlightMap = new InterpolatingDoubleTreeMap();
 
+    private final LinearFilter hoodAngleFilter = LinearFilter.movingAverage((int) (0.1 / 0.02));
+    private final LinearFilter driveAngleFilter = LinearFilter.movingAverage((int) (0.1 / 0.02));
     private Pose2d blueHubPose = new Pose2d(4.625, 4.03, Rotation2d.fromDegrees(0));
-    
+
+    double lastHoodAngle = 0;
+    double lastDriveAngle = 0;
+
     private int rotationsPerMinute = 2800;
 
+    private double MIN_ANGLE = ShooterConstants.MIN_ANGLE.in(Degrees);
     /** Basic interpolated map for shooter calculations. */
     public BasicTunedCalc() {
         // Example data points (distance in meters, angle in degrees)
-        hoodAngleMap.put(1.0, 10.0);
-        hoodAngleMap.put(2.0, 20.0);
-        hoodAngleMap.put(3.0, 30.0);
-        hoodAngleMap.put(4.0, 40.0);
-        hoodAngleMap.put(5.0, 45.0);
+        hoodAngleMap.put(1.0, MIN_ANGLE);
+        flywheelSpeedMap.put(1.0, 1000.0);
+        timeOfFlightMap.put(1.0, 1.1);
+
+        hoodAngleMap.put(2.0, MIN_ANGLE+3);
+        flywheelSpeedMap.put(2.0, 1750.0);
+        timeOfFlightMap.put(2.0, 0.62);
+
+        hoodAngleMap.put(3.0, MIN_ANGLE+10);
+        flywheelSpeedMap.put(3.0, 3000.0);
+        timeOfFlightMap.put(3.0, 4.0);
+
+        hoodAngleMap.put(4.0, MIN_ANGLE+15);
+        flywheelSpeedMap.put(4.0, 4000.0);
+        timeOfFlightMap.put(4.0, 5.0);
+
+        hoodAngleMap.put(5.0, MIN_ANGLE+20);
+        flywheelSpeedMap.put(5.0, 5000.0);
+        timeOfFlightMap.put(5.0, 6.0);
+
     }
 
-
-    @Override
     public ShootingSolution getShootingSolution() {
         Pose2d robotPose = RobotState.getInstance().getOdometryPose();
         Distance distance = Meters.of(PoseUtil.distance(robotPose, blueHubPose));
         Angle hoodAngle = Degrees.of(hoodAngleMap.get(distance.in(Meters)));
+        hoodAngle = Degrees.of(hoodAngleFilter.calculate(hoodAngle.in(Degrees)));
 
-        Pose2d robotPoseLookAhead = RobotState.getInstance().getLookaheadPose(distance.in(Feet) * 0.1);
+        Pose2d robotPoseLookAhead = RobotState.getInstance().getLookaheadPose(timeOfFlightMap.get(distance.in(Meters)));
         double dx = blueHubPose.getX() - robotPose.getX();
         double dy = blueHubPose.getY() - robotPose.getY();
-        Rotation2d targetAngle = new Rotation2d(Math.atan2(dy, dx));
-        return new ShootingSolution(DegreesPerSecond.of(rotationsPerMinute * 360.0 / 60.0), hoodAngle, targetAngle);
+        double targetAngle = Math.atan2(dy, dx);
+        targetAngle = driveAngleFilter.calculate(targetAngle);
+
+        return new ShootingSolution(DegreesPerSecond.of(rotationsPerMinute * 360.0 / 60.0), hoodAngle, Rotation2d.fromRadians(targetAngle), distance);
+    }
+
+    /** A record to hold the shooting solution. */
+    public record ShootingSolution(AngularVelocity flywheelVelocity, Angle hoodAngle, Rotation2d robotAngle, Distance distance) {
     }
 }

@@ -6,15 +6,21 @@ package frc.robot.subsystems.superstructure.shooter;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MAX_ANGLE;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_IDLE;
-import frc.robot.util.solvers.SolverIO;
-import frc.robot.util.solvers.SolverIO.ShootingSolution;
+
+import frc.robot.util.solvers.BasicTunedCalc;
+import frc.robot.util.solvers.BasicTunedCalc.ShootingSolution;
 import frc.robot.util.tunables.LoggedTunableNumber;
 
 /** The shooter subsystem. */
@@ -25,11 +31,11 @@ public class Shooter extends SubsystemBase {
 
     private Angle hoodAngle;
     private AngularVelocity flywheelVelocity;
+    private final BasicTunedCalc solver = new BasicTunedCalc();
 
     private final ShooterIO io;
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
-    private final SolverIO solver;
 
     private static final LoggedTunableNumber shootP = new LoggedTunableNumber("Shooter/ShootP");
     private static final LoggedTunableNumber shootD = new LoggedTunableNumber("Shooter/ShootD");
@@ -37,7 +43,8 @@ public class Shooter extends SubsystemBase {
     private static final LoggedTunableNumber shootS = new LoggedTunableNumber("Shooter/ShootS");
     private static final LoggedTunableNumber shootV = new LoggedTunableNumber("Shooter/ShootV");
     private static final LoggedTunableNumber shootA = new LoggedTunableNumber("Shooter/ShootA");
-
+    private AngularVelocity target = ShooterConstants.SHOOTER_TARGET;
+    private boolean hoodOverride = false;
 
 
     static {
@@ -51,10 +58,8 @@ public class Shooter extends SubsystemBase {
 
     private Rotation2d robotAngle = Rotation2d.fromDegrees(0    );
 
-    public Shooter(ShooterIO io, SolverIO solver) {
+    public Shooter(ShooterIO io) {
         this.io = io;
-        this.solver = solver;
-
     }
 
     @Override
@@ -75,10 +80,10 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/CalculatedHoodAngle", hoodAngle);
         Logger.recordOutput("Shooter/CalculatedFlywheelVelocity", flywheelVelocity);
         Logger.recordOutput("Shooter/CalculatedRobotAngle", robotAngle);
-
+        Logger.recordOutput("Shooter/Distance", solution.distance());
         Logger.recordOutput("Shooter/DesiredState", desiredState.toString());
         Logger.recordOutput("Shooter/CurrentState", currentState.toString());
-
+        hoodAngle = Degrees.of(MathUtil.clamp(hoodAngle.in(Degrees), MIN_ANGLE.in(Degrees), MAX_ANGLE.in(Degrees)));
         if (currentState != desiredState) {
             switch (desiredState) {
                 case STATIONARY:
@@ -92,7 +97,7 @@ public class Shooter extends SubsystemBase {
                     break;
                 case SHOOTING:
                     io.setHoodAngle(hoodAngle);
-                    io.setFlywheelVelocity(ShooterConstants.SHOOTER_TARGET);
+                    io.setFlywheelVelocity(target);
                     break;
                 default:
                     break;
@@ -141,6 +146,15 @@ public class Shooter extends SubsystemBase {
 
     public Rotation2d getWantedRobotAngle() {
         return robotAngle;
+    }
+
+    public void incrementFlywheelSpeed(double rpm) {
+        target.plus(RPM.of(rpm));
+    };
+
+    public void incrementHoodAngle(double increment) {
+        hoodOverride = true;
+        hoodAngle.plus(Degrees.of(increment));
     }
 
 }
