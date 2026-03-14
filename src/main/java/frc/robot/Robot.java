@@ -28,7 +28,6 @@ import frc.robot.util.NTClientLogger;
 import frc.robot.util.RioAlerts;
 import frc.robot.util.SparkUtil;
 import frc.robot.util.ThreadPriorityDummyLogReceiver;
-import frc.robot.util.simUtils.Simulation;
 import frc.robot.util.tunables.TunableSparkPID;
 
 import java.lang.reflect.Field;
@@ -264,7 +263,6 @@ public class Robot extends LoggedRobot {
     /** This function is called once when the robot is disabled. */
     @Override
     public void disabledInit() {
-        if(Constants.isSim) Simulation.getInstance().resetSimulationField();
     }
 
     /** This function is called periodically when disabled. */
@@ -277,8 +275,8 @@ public class Robot extends LoggedRobot {
         autonomousCommand = robotContainer.getAutonomousCommand();
 
         // schedule the autonomous command
-        if(autonomousCommand != null) {
-            autonomousCommand.schedule();
+        if (autonomousCommand != null) {
+            CommandScheduler.getInstance().schedule(autonomousCommand);
         }
     }
 
@@ -326,7 +324,7 @@ public class Robot extends LoggedRobot {
     /** This function is called periodically whilst in simulation. */
     @Override
     public void simulationPeriodic() {
-        if(Constants.isSim) Simulation.getInstance().updateSimulation();
+
     }
 
     public BooleanSupplier isBlueAlliance() {

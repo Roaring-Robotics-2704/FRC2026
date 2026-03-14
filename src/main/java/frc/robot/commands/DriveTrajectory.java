@@ -94,7 +94,7 @@ public class DriveTrajectory extends Command {
 
         drive.runVelocity(
                 ChassisSpeeds.fromFieldRelativeSpeeds(
-                        new ChassisSpeeds(xOutput, yOutput, thetaOutput), currentPose.getRotation()), true);
+                        new ChassisSpeeds(xOutput, yOutput, thetaOutput), currentPose.getRotation()));
 
         Logger.recordOutput("DriveTrajectory/Setpoint/Pose", desiredState.getPose());
         Logger.recordOutput(

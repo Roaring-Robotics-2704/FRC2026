@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotState;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.DriveConstants;
 
 public class DriveCommands {
     private static final double DEADBAND = 0.1;
@@ -37,7 +37,8 @@ public class DriveCommands {
     }
 
     /** Field relative drive command using two joysticks (controlling linear and angular velocities). */
-    public static Command joystickDrive(Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
+    public static Command joystickDrive(Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, 
+    DoubleSupplier omegaSupplier) {
         RobotState robotState = RobotState.getInstance();
         return Commands.run(() -> {
             // Get linear velocity
@@ -52,15 +53,14 @@ public class DriveCommands {
 
             // Convert to field relative speeds & send command
             ChassisSpeeds speeds = new ChassisSpeeds(
-                linearVelocity.getX() * DriveConstants.linearFreeSpeed.in(MetersPerSecond),
-                linearVelocity.getY() * DriveConstants.linearFreeSpeed.in(MetersPerSecond),
-                omega * DriveConstants.maxAngularSpeedRadPerSec);
+                linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                omega * drive.getMaxAngularSpeedRadPerSec());
             boolean isFlipped = DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == Alliance.Red;
             drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
                 speeds,
-                isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()),
-                true);
+                isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()));
         }, drive);
     }
 }

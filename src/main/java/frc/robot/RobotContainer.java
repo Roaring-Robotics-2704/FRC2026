@@ -11,6 +11,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 //import com.pathplanner.lib.auto.AutoBuilder;
 import frc.robot.commands.auto.AutoBuilder;
+import frc.robot.generated.TunerConstants;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import choreo.auto.AutoFactory;
@@ -19,18 +20,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.DriveTuningCommands;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
-import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
-import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
+import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.superstructure.kicker.Kicker;
 import frc.robot.subsystems.superstructure.climber.Climber;
 import frc.robot.subsystems.superstructure.climber.ClimberIO;
+import frc.robot.subsystems.superstructure.climber.ClimberIOReal;
+import frc.robot.subsystems.superstructure.climber.ClimberIOSim;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.HopperIO;
 import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
@@ -42,7 +42,6 @@ import frc.robot.subsystems.superstructure.shooter.BasicTunedCalc;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.superstructure.shooter.ShooterIO;
 import frc.robot.subsystems.superstructure.shooter.ShooterIOGreyT;
-import frc.robot.subsystems.superstructure.shooter.ShooterIOSim;
 import frc.robot.subsystems.superstructure.hook.Hook;
 import frc.robot.subsystems.superstructure.hook.HookIO;
 import frc.robot.subsystems.superstructure.hook.HookIOReal;
@@ -53,7 +52,6 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.util.simUtils.Simulation;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -72,7 +70,7 @@ public class RobotContainer {
     public final Intake intake;
     public final Shooter shooter;
     public final Climber climber;
-    public final Hook hook;
+    //public final Hook hook;
 
     public final Vision vision;
     // private final FuelPoseEstimator objectDetection;
@@ -84,16 +82,19 @@ public class RobotContainer {
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
+    //
+
     public boolean noAutoSelected() {
         var selected = autoChooser.getSendableChooser().getSelected();
         return selected == null || selected == "None";
     }
 
     // Choreo auto factory library
-    private final AutoFactory autoFactory;
+    // private final AutoFactory autoFactory;
     private final AutoBuilder autoBuilder;
 
     private final LoggedDashboardChooser<Command> testChooser;
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -107,44 +108,49 @@ public class RobotContainer {
                 // a CANcoder
                 drive = new Drive(
                         new GyroIOPigeon2(),
-                        new ModuleIOTalonFXReal(DriveConstants.frontLeftConfig),
-                        new ModuleIOTalonFXReal(DriveConstants.frontRightConfig),
-                        new ModuleIOTalonFXReal(DriveConstants.backLeftConfig),
-                        new ModuleIOTalonFXReal(DriveConstants.backRightConfig));
+                        new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                        new ModuleIOTalonFX(TunerConstants.FrontRight),
+                        new ModuleIOTalonFX(TunerConstants.BackLeft),
+                        new ModuleIOTalonFX(TunerConstants.BackRight));
                 intake = new Intake(new IntakeIOReal());
                 hopper = new Hopper(new HopperIOReal());
-                climber = new Climber(new ClimberIO() {});
-                hook = new Hook(new HookIO() {});
+                climber = new Climber(new ClimberIOReal() {
+                });
+                //hook = new Hook(new HookIO() {
+                //});
                 vision = new Vision(
                         new VisionIOPhotonVision(camera0Name, robotToCamera0));
-                // objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
-                //         ObjectDetectionConstants.cameraToRobotTransform));
+
+                        
+                // objectDetection = new FuelPoseEstimator(new
+                // ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
+                // ObjectDetectionConstants.cameraToRobotTransform));
                 shooter = new Shooter(new ShooterIOGreyT());
                 break;
 
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
-                var driveSimulation = Simulation.getInstance().configureSimulation();
-
                 drive = new Drive(
-                        new GyroIOSim(driveSimulation.getGyroSimulation()),
-                        new ModuleIOTalonFXSim(DriveConstants.frontLeftConfig, driveSimulation.getModules()[0]),
-                        new ModuleIOTalonFXSim(DriveConstants.frontRightConfig, driveSimulation.getModules()[1]),
-                        new ModuleIOTalonFXSim(DriveConstants.backLeftConfig, driveSimulation.getModules()[2]),
-                        new ModuleIOTalonFXSim(DriveConstants.backRightConfig, driveSimulation.getModules()[3]));
-                
+                        new GyroIO() {
+                        },
+                        new ModuleIOSim(TunerConstants.FrontLeft),
+                        new ModuleIOSim(TunerConstants.FrontRight),
+                        new ModuleIOSim(TunerConstants.BackLeft),
+                        new ModuleIOSim(TunerConstants.BackRight));
+
                 intake = new Intake(new IntakeIO() {
                 });
                 hopper = new Hopper(new HopperIOSim());
-                climber = new Climber(new ClimberIO() {});
-                hook = new Hook(new HookIO() {});
+                climber = new Climber(new ClimberIO() {
+                });
+                //hook = new Hook(new HookIOSim() {
+                //});
 
                 vision = new Vision(
-                        new VisionIOPhotonVisionSim(camera0Name, robotToCamera0,
-                                driveSimulation::getSimulatedDriveTrainPose));
+                        new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose));
                 // objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
-                //     });
-                shooter = new Shooter(new ShooterIOSim());
+                // });
+                shooter = new Shooter(new ShooterIO() {});
                 break;
 
             default:
@@ -170,37 +176,39 @@ public class RobotContainer {
                 // objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                 // });
 
-                climber = new Climber(new ClimberIO() {});
-                hook = new Hook(new HookIO() {});
+                climber = new Climber(new ClimberIO() {
+                });
+                //hook = new Hook(new HookIO() {
+                //});
 
-                shooter = new Shooter(new ShooterIO() {});
+                shooter = new Shooter(new ShooterIO() {
+                });
                 break;
         }
 
         // Set up superstructure
-        // superStructure = new SuperStructure(intake, hopper, kicker, shooter, climber);
+        // superStructure = new SuperStructure(intake, hopper, kicker, shooter,
+        // climber);
 
         // Set up auto routines
-        autoBuilder = new AutoBuilder(drive, intake, hopper, kicker, shooter, climber, hook);
+        autoBuilder = new AutoBuilder(drive, intake, hopper, kicker, shooter, climber);
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", autoBuilder.buildAutoChooser());
 
         Controls.getInstance().configureControls(this);
 
         testChooser = new LoggedDashboardChooser<>("Test Command");
-        testChooser.addDefaultOption("Zero module rotations", drive.rezeroModules());
-        DriveTuningCommands.addTuningCommandsToAutoChooser(drive, testChooser);
 
-
-
-        autoFactory = new AutoFactory(
-        ()->RobotState.getInstance().getPose(), // A function that returns the current robot pose
-        (Pose2d pose)->RobotState.getInstance().resetPose(pose), // A function that resets the current robot pose to the provided Pose2d
-        drive::followTrajectory, // The drive subsystem trajectory follower 
-        true, // If alliance flipping should be enabled 
-        drive // The drive subsystem
-        );
-
-        if(Constants.isSim) Simulation.getInstance().resetSimulationField();
+        // TODO: Fix
+        
+        // autoFactory = new AutoFactory(
+        // ()->RobotState.getInstance().getPose(), // A function that returns the
+        // current robot pose
+        // (Pose2d pose)->RobotState.getInstance().resetPose(pose), // A function that
+        // resets the current robot pose to the provided Pose2d
+        // drive::followTrajectory, // The drive subsystem trajectory follower
+        // true, // If alliance flipping should be enabled
+        // drive // The drive subsystem
+        // );
 
     }
 

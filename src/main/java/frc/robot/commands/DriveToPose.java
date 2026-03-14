@@ -221,7 +221,7 @@ public class DriveToPose extends Command {
                             driveVelocity.getX(),
                             driveVelocity.getY(),
                             omegaOverride.get().isPresent() ? omegaOverride.get().get() : thetaVelocity,
-                            currentPose.getRotation()), true);
+                            currentPose.getRotation()));
         }
 
         // Log data

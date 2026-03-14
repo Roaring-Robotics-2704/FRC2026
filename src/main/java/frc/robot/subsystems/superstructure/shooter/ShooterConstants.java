@@ -41,5 +41,11 @@ public class ShooterConstants {
     // GET REAL VALUES FOR FOLLOWING:
     public static final Angle MIN_ANGLE = Degrees.of(28.048335); // lowest angle shooter can reach
     public static final Angle MAX_ANGLE = Degrees.of(59.874070); // largest angle shooter can reach
+
+    public enum CONTROL_MODE {
+        PID, LQR
+    }
+
+    public static final CONTROL_MODE SHOOTER_CONTROL_MODE = CONTROL_MODE.PID; // change this to switch between PID and LQR control
 }
 

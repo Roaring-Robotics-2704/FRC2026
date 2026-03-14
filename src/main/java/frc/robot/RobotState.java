@@ -12,9 +12,11 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -23,13 +25,13 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.objectDetection.FuelPoseEstimator.FuelPoseEstimate;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.Vision.IndividualTagEstimate;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.FuelFinder;
-import frc.robot.util.poseEst.OdometrySwerveDrivePoseEstimator;
 
 /**
  * A singleton class that holds the global state of the robot. This holds state that doesn't directly control mechanisms and
@@ -54,7 +56,8 @@ public class RobotState {
         }
     }
 
-    public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(DriveConstants.moduleTranslations);
+
+    public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(Drive.getModuleTranslations());
     private Rotation2d rawGyroRotation = Rotation2d.kZero;
 
     // For delta tracking
@@ -62,7 +65,7 @@ public class RobotState {
         new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()
     };
 
-    private OdometrySwerveDrivePoseEstimator poseEstimator = new OdometrySwerveDrivePoseEstimator(kinematics,
+    private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics,
         rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
     @AutoLogOutput(key = "Odometry/RobotVelocity")
@@ -83,7 +86,7 @@ public class RobotState {
      * @return An optional containing the odometry pose at the specified timestamp, or empty if no data is available.
      */
     public Optional<Pose2d> getOdometryPoseAtTimestamp(double timestamp) {
-        return poseEstimator.m_odometryPoseBuffer.getSample(timestamp);
+        return poseEstimator.sampleAt(timestamp);
     }
 
     /**
@@ -93,7 +96,7 @@ public class RobotState {
      * @return The current odometry pose.
      */
     public Pose2d getOdometryPose() {
-        return poseEstimator.m_odometry.getPoseMeters();
+        return poseEstimator.getEstimatedPosition();
     }
 
     /**
