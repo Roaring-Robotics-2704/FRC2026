@@ -16,6 +16,8 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -105,11 +107,13 @@ public class RobotContainer {
                         new ModuleIOTalonFXReal(DriveConstants.backRightConfig));
                 intake = new Intake(new IntakeIOReal());
                 hopper = new Hopper(new HopperIOReal());
-                climber = new Climber(new ClimberIO() {});
+                climber = new Climber(new ClimberIO() {
+                });
                 vision = new Vision(
                         new VisionIOPhotonVision(camera0Name, robotToCamera0));
-                // objectDetection = new FuelPoseEstimator(new ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
-                //         ObjectDetectionConstants.cameraToRobotTransform));
+                // objectDetection = new FuelPoseEstimator(new
+                // ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
+                // ObjectDetectionConstants.cameraToRobotTransform));
                 shooter = new Shooter(new ShooterIOGreyT());
                 break;
 
@@ -124,17 +128,18 @@ public class RobotContainer {
                         new ModuleIOTalonFXSim(DriveConstants.frontRightConfig, driveSimulation.getModules()[1]),
                         new ModuleIOTalonFXSim(DriveConstants.backLeftConfig, driveSimulation.getModules()[2]),
                         new ModuleIOTalonFXSim(DriveConstants.backRightConfig, driveSimulation.getModules()[3]));
-                
+
                 intake = new Intake(new IntakeIO() {
                 });
                 hopper = new Hopper(new HopperIOSim());
-                climber = new Climber(new ClimberIO() {});
+                climber = new Climber(new ClimberIO() {
+                });
 
                 vision = new Vision(
                         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0,
                                 driveSimulation::getSimulatedDriveTrainPose));
                 // objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
-                //     });
+                // });
                 shooter = new Shooter(new ShooterIOSim());
                 break;
 
@@ -161,20 +166,22 @@ public class RobotContainer {
                 // objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
                 // });
 
-                climber = new Climber(new ClimberIO() {});
+                climber = new Climber(new ClimberIO() {
+                });
 
-                shooter = new Shooter(new ShooterIO() {});
+                shooter = new Shooter(new ShooterIO() {
+                });
                 break;
         }
 
         // Set up superstructure
-        // superStructure = new SuperStructure(intake, hopper, kicker, shooter, climber);
+        // superStructure = new SuperStructure(intake, hopper, kicker, shooter,
+        // climber);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
-
 
         // Configure the button bindings
         configureButtonBindings();
@@ -194,9 +201,9 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> controller.getLeftY()*0.7,
-                        () -> controller.getLeftX()*0.7,
-                        () -> -controller.getRightX()*0.7));
+                        () -> controller.getLeftY() * 0.7,
+                        () -> controller.getLeftX() * 0.7,
+                        () -> -controller.getRightX() * 0.7));
         vision.setDefaultCommand(vision.idle());
         // objectDetection.setDefaultCommand(objectDetection.idle());
 
@@ -206,51 +213,53 @@ public class RobotContainer {
                 .whileTrue(
                         DriveCommands.joystickDriveAtAngle(
                                 drive,
-                                () -> controller.getLeftY()*0.7,
-                                () -> controller.getLeftX()*0.7,
+                                () -> controller.getLeftY() * 0.7,
+                                () -> controller.getLeftX() * 0.7,
                                 () -> shooter.getWantedRobotAngle().plus(Rotation2d.kCW_90deg)));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-        controller.start().onTrue(Commands.runOnce(()->RobotState.getInstance().resetPose(Pose2d.kZero)));
+        controller.start().onTrue(Commands.runOnce(() -> RobotState.getInstance().resetPose(Pose2d.kZero)));
 
         // Reset gyro to 0 deg when B button is pressed
-        // controller.leftTrigger().whileTrue(Commands.run(()->superStructure.setDesiredState(SuperStructureStates.INTAKE)).finallyDo(()->superStructure.setDesiredState(SuperStructureStates.IDLE)));
         controller.leftTrigger().whileTrue(Commands.parallel(
-            Commands.startEnd(
-                () -> intake.setDesiredState(Intake.IntakeState.DEPLOYED_ON),
-                () -> intake.setDesiredState(Intake.IntakeState.STOWED), intake
-                )
-        ));
+                Commands.startEnd(
+                        () -> intake.setDesiredState(Intake.IntakeState.DEPLOYED_ON),
+                        () -> intake.setDesiredState(Intake.IntakeState.STOWED), intake)));
         controller.rightTrigger().whileTrue(Commands.parallel(
-            Commands.startEnd(()->{
-            if (shooter.isAtDesiredState())
-            {kicker.setKickerVoltage(12);}}
-            ,()->kicker.setKickerVoltage(-1), kicker),
-            Commands.startEnd(()->shooter.setDesiredState(Shooter.ShooterState.SHOOTING), ()->shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
-            Commands.startEnd(()->hopper.setDesiredState(Hopper.HopperState.FEEDING), ()->hopper.setDesiredState(Hopper.HopperState.IDLE), hopper)
-        ));
-        // controller.rightTrigger().whileTrue(Commands.run(()->superStructure.setDesiredState(SuperStructureStates.SHOOT)).finallyDo(()->superStructure.setDesiredState(SuperStructureStates.IDLE)));
-        
-        controller2.leftBumper().onTrue(Commands.run(()->shooter.incrementHoodAngle(-5)));
-        controller2.rightBumper().onTrue(Commands.run(()->shooter.incrementHoodAngle(5)));
-        controller2.leftTrigger().onTrue(Commands.run(()->shooter.incrementFlywheelSpeed(-100)));
-        controller2.rightTrigger().onTrue(Commands.run(()->shooter.incrementFlywheelSpeed(100)));
+                Commands.startEnd(() -> {
+                    if (shooter.isAtDesiredState()) {
+                        kicker.setKickerVoltage(12);
+                    }
+                }, () -> kicker.setKickerVoltage(-1), kicker),
+                Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.SHOOTING),
+                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
+                Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
+                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper)));
 
+        controller2.leftBumper().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)));
+        controller2.rightBumper().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)));
+        controller2.leftTrigger().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(-100)));
+        controller2.rightTrigger().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(100)));
 
+        // Reset gyro or odometry if in simulation
+        final Runnable resetGyro = () -> drive.setPose(new Pose2d(RobotState.getInstance().getPose().getTranslation(),
+                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero
+                        : Rotation2d.k180deg)); // Zero gyro
+        final Runnable resetOdometry = () -> drive.setPose(
+                new Pose2d(0, 0, DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero
+                        : Rotation2d.k180deg)); // Zero gyro
 
-
+        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        controller.start().and(controller.leftStick()).debounce(0.5)
+                .onTrue(Commands.runOnce(resetOdometry, drive).ignoringDisable(true));
 
         controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
 
-        
         // Reset gyro to 0 deg when B button is pressed
 
-
     }
-    
-
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -268,8 +277,9 @@ public class RobotContainer {
      * @return the command to run in calibration
      */
     // public Command getCalibrationCommand() {
-    //     return Commands.sequence(superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_IN),
-    //             superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_OUT));
+    // return
+    // Commands.sequence(superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_IN),
+    // superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_OUT));
     // }
 
     /** Reset the simulation field. */
