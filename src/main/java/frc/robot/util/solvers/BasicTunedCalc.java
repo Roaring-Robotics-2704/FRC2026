@@ -18,7 +18,10 @@ import edu.wpi.first.math.filter.LinearFilter;
 // x = v0 * cos(theta) * ( (v0 * sin(theta) + sqrt((v0 * sin(theta))^2 - 2 * g * (hf - hi))) / g )
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -29,6 +32,8 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotState;
 import frc.robot.subsystems.superstructure.shooter.ShooterConstants;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.PoseUtil;
 
 /** Add your docs here. */
@@ -74,13 +79,14 @@ public class BasicTunedCalc {
 
     public ShootingSolution getShootingSolution() {
         Pose2d robotPose = RobotState.getInstance().getOdometryPose();
-        Distance distance = Meters.of(PoseUtil.distance(robotPose, blueHubPose));
+        Pose2d shooterPose = robotPose.transformBy(new Transform2d(VisionConstants.robotToCamera0.getMeasureX(),VisionConstants.robotToCamera0.getMeasureY(), VisionConstants.robotToCamera0.getRotation().toRotation2d()));
+        Distance distance = Meters.of(PoseUtil.distance(shooterPose, blueHubPose));
         Angle hoodAngle = Degrees.of(hoodAngleMap.get(distance.in(Meters)));
         hoodAngle = Degrees.of(hoodAngleFilter.calculate(hoodAngle.in(Degrees)));
 
         Pose2d robotPoseLookAhead = RobotState.getInstance().getLookaheadPose(timeOfFlightMap.get(distance.in(Meters)));
-        double dx = blueHubPose.getX() - robotPose.getX();
-        double dy = blueHubPose.getY() - robotPose.getY();
+        double dx = blueHubPose.getX() - shooterPose.getX();
+        double dy = blueHubPose.getY() - shooterPose.getY();
         double targetAngle = Math.atan2(dy, dx);
         targetAngle = driveAngleFilter.calculate(targetAngle);
 
