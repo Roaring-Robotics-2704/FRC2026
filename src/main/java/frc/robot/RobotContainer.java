@@ -226,11 +226,12 @@ public class RobotContainer {
         controller.leftTrigger().whileTrue(Commands.parallel(
                 Commands.startEnd(
                         () -> intake.setDesiredState(Intake.IntakeState.DEPLOYED_ON),
-                        () -> intake.setDesiredState(Intake.IntakeState.STOWED), intake)));
+                        () -> intake.setDesiredState(Intake.IntakeState.DEPLOYED_OFF), intake)));
         controller.rightTrigger().whileTrue(Commands.parallel(
                 Commands.startEnd(() -> {
                     if (shooter.isAtDesiredState()) {
                         kicker.setKickerVoltage(12);
+                        intake.setDesiredState(Intake.IntakeState.INSIDE);
                     }
                 }, () -> kicker.setKickerVoltage(-1), kicker),
                 Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.SHOOTING),
