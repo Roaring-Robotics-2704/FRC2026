@@ -36,7 +36,6 @@ public interface IntakeIO {
         public MutDistance slidePosition = Inches.mutable(0);
         public MutDistance slideSetpoint = Inches.mutable(0);
         public MutLinearVelocity slideVelocity = InchesPerSecond.mutable(0);
-        public boolean slideAtPosition = false;
 
         // Roller values
         public MutVoltage rollerAppliedVoltage = Volts.mutable(0);

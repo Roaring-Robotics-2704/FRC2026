@@ -28,6 +28,8 @@ import static frc.robot.subsystems.superstructure.intake.IntakeConstants.ROLLER_
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_CURRENT_LIMIT;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_MAX_ACCELERATION;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_MAX_VELOCITY;
+
+import frc.robot.subsystems.superstructure.intake.Intake.IntakePosition;
 /*import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KA;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KD;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KG;
@@ -88,12 +90,14 @@ public class IntakeIOReal implements IntakeIO {
         inputs.slideCurrentDraw.mut_replace(slideMotor.getOutputCurrent(), Amps);
         inputs.slidePosition.mut_replace(slideMotor.getEncoder().getPosition(), Inches);
         inputs.slideSetpoint.mut_replace(slideMotor.getClosedLoopController().getSetpoint(), Inches);
-        inputs.slideAtPosition = slideMotor.getClosedLoopController().isAtSetpoint();
+        //inputs.slideAtPosition = slideMotor.getClosedLoopController().isAtSetpoint();
         inputs.slideVelocity.mut_replace(slideMotor.getEncoder().getVelocity(), InchesPerSecond);
 
         inputs.rollerAppliedVoltage.mut_replace(rollerMotor.getAppliedOutput(), Volts);
         inputs.rollerCurrentDraw.mut_replace(rollerMotor.getOutputCurrent(), Amps);
         inputs.rollerVelocity.mut_replace(rollerMotor.getEncoder().getVelocity(), RadiansPerSecond);
+
+        //slideMotor.
     }
 
     @Override
@@ -106,9 +110,20 @@ public class IntakeIOReal implements IntakeIO {
         rollerMotor.setVoltage(voltage);
     }
 
-    @Override
+    /*@Override
     public void setPosition(Distance position) {
         slideMotor.getClosedLoopController().setSetpoint(position.in(Inches), ControlType.kMAXMotionPositionControl);
+    }*/
+    @Override
+    public void goToPosition(IntakePosition intakePosition) {
+        switch (intakePosition) {
+            case EXTENDED:
+                setSlideVoltage(-2);
+                break;
+            case RETRACTED:
+                setSlideVoltage(2);
+                break;
+        }
     }
     
     @Override

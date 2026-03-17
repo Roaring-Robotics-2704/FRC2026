@@ -24,7 +24,7 @@ public class Intake extends SubsystemBase {
     private Timer calibrationTimer = new Timer();
     private Distance foundMaxDistance = Inches.zero();
 
-    private boolean IsAtDesiredState = true;
+    private boolean isAtDesiredState = true;
 
     /*private static final LoggedTunableNumber slideP = new LoggedTunableNumber("Intake/SlideP");
     private static final LoggedTunableNumber slideD = new LoggedTunableNumber("Intake/SlideD");
@@ -59,43 +59,30 @@ public class Intake extends SubsystemBase {
         // This method will be called once per scheduler run
             switch (desiredState) {
                 case INSIDE:
-                    intakeIO.setPosition(Inches.zero());
+                    intakeIO.goToPosition(IntakePosition.RETRACTED);
                     intakeIO.setRollerVoltage(Volts.of(0));
                     break;
                 case DEPLOYED_OFF:
-                    intakeIO.setPosition(SLIDE_MAX_DISTANCE); // Example deployed position
+                    intakeIO.goToPosition(IntakePosition.EXTENDED); // Example deployed position
                     intakeIO.setRollerVoltage(Volts.of(0));
                     break;
                 case DEPLOYED_ON:
-                    intakeIO.setPosition(SLIDE_MAX_DISTANCE); // Example deployed position
+                    intakeIO.goToPosition(IntakePosition.EXTENDED); // Example deployed position
                     intakeIO.setRollerVoltage(Volts.of(6)); // Example roller voltage to
                     break;
                 default:
                     break;
             }
             intakeIO.updateInputs(inputs);
-            if (desiredState.isCalibrating()) {
-                if (Math.abs(inputs.slideVelocity.in(InchesPerSecond)) > 0.001) {
-                    calibrationTimer.reset();
-                    calibrationTimer.start();
-                } else if (calibrationTimer.hasElapsed(3)) {
-                    if (desiredState == IntakeState.CALIBRATE_IN) {
-                        intakeIO.resetSlideEncoder(Inches.zero());
-                    } else if (desiredState == IntakeState.CALIBRATE_OUT) {
-                        foundMaxDistance = Inches.of(inputs.slidePosition.in(Inches));
-                        System.out.println("Found max distance: " + foundMaxDistance);
-                    }
-                    currentState = IntakeState.INSIDE;
-                    calibrationTimer.stop();
-                    calibrationTimer.reset();
-                }
-            } else if (inputs.slideAtPosition) {
+            if (intakeIO.slideCurrentDraw >= IntakeConstants.SLIDE_STALL_LIMIT) {
                 currentState = desiredState;
+                isAtDesiredState = true;
             }
             
         
         Logger.recordOutput("Intake/CurrentState", currentState);
         Logger.recordOutput("Intake/DesiredState", desiredState);
+        Logger.recordOutput("Intake/IsAtDesiredState", isAtDesiredState);
     }
 
     public void setDesiredState(IntakeState state) {
@@ -115,7 +102,7 @@ public class Intake extends SubsystemBase {
 
     public boolean atDesiredState() {
         //return currentState == desiredState;
-        return IsAtDesiredState;
+        return isAtDesiredState;
     }
 
     
