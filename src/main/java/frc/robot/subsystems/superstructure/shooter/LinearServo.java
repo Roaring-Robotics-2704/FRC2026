@@ -41,6 +41,11 @@ public class LinearServo extends Servo {
         setSpeed((setPos / length * 2) - 1);
     }
 
+    public void setPercent(double percent) {
+        setPos = MathUtil.clamp(percent * length, 0, 1) * length;
+        setSpeed((setPos / length * 2) - 1);
+    }
+
     double lastTime = 0;
 
     /**

@@ -22,6 +22,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -142,13 +144,12 @@ public class ShooterIOGreyT implements ShooterIO {
     public void setHoodAngle(Angle angle) {
         double servoPosition = (angle.in(Degrees) - MIN_ANGLE.in(Degrees))
                 / (MAX_ANGLE.in(Degrees) - MIN_ANGLE.in(Degrees));
+        servoPosition = MathUtil.clamp(servoPosition, MIN_ANGLE.in(Degrees), MAX_ANGLE.in(Degrees));
         hoodServo1.set(servoPosition);
     }
 
     private Angle getHoodServoPosition() {
-        return Degrees.of(
-           hoodServo1.get() * (MAX_ANGLE.in(Degrees) - MIN_ANGLE.in(Degrees)) + MIN_ANGLE.in(Degrees)
-        );
+        return Degrees.of(hoodServo1.get() * (MAX_ANGLE.in(Degrees) - MIN_ANGLE.in(Degrees)) + MIN_ANGLE.in(Degrees));
     }
 
     @Override

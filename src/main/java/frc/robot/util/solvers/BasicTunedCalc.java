@@ -79,7 +79,15 @@ public class BasicTunedCalc {
     public ShootingSolution getShootingSolution() {
         Pose2d robotPose = RobotState.getInstance().getOdometryPose();
         Pose2d shooterPose = robotPose.transformBy(new Transform2d(VisionConstants.robotToCamera0.getMeasureX(),VisionConstants.robotToCamera0.getMeasureY(), VisionConstants.robotToCamera0.getRotation().toRotation2d()));
-        Distance distance = Meters.of(PoseUtil.distance(shooterPose, blueHubPose));
+        
+        
+        Distance distancetoBlue = Meters.of(PoseUtil.distance(shooterPose, blueHubPose));
+        Distance distancetoRed = Meters.of(PoseUtil.distance(shooterPose, FlippingUtil.flipFieldPose(blueHubPose)));
+        Pose2d hubPose = blueHubPose;
+        if (distancetoRed.in(Meters) < distancetoBlue.in(Meters)) {
+            hubPose = FlippingUtil.flipFieldPose(blueHubPose);
+        }
+        Distance distance = Meters.of(PoseUtil.distance(shooterPose, hubPose));
         Angle hoodAngle = Degrees.of(hoodAngleMap.get(distance.in(Feet)));
         AngularVelocity flywheelVelocity = RPM.of(flywheelSpeedMap.get(distance.in(Feet)));
         hoodAngle = Degrees.of(hoodAngleFilter.calculate(hoodAngle.in(Degrees)));

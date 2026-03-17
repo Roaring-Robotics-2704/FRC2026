@@ -45,6 +45,7 @@ public class Shooter extends SubsystemBase {
     private static final LoggedTunableNumber shootA = new LoggedTunableNumber("Shooter/ShootA");
     private AngularVelocity target = ShooterConstants.SHOOTER_TARGET;
     private boolean hoodOverride = false;
+    private boolean flywheelOverride = false;
 
 
     static {
@@ -149,12 +150,18 @@ public class Shooter extends SubsystemBase {
     }
 
     public void incrementFlywheelSpeed(double rpm) {
-        target.plus(RPM.of(rpm));
-    };
+        flywheelOverride = true;
+        target = target.plus(RPM.of(rpm));
+    }
 
     public void incrementHoodAngle(double increment) {
         hoodOverride = true;
-        hoodAngle.plus(Degrees.of(increment));
+        hoodAngle = hoodAngle.plus(Degrees.of(increment));
+    }
+
+    public void resetOverrides() {
+        hoodOverride = false;
+        flywheelOverride = false;
     }
 
 }
