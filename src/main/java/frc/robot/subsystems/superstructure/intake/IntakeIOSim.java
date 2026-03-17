@@ -37,67 +37,67 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
 public class IntakeIOSim implements IntakeIO {
 
-    LinearSystem<N2, N1, N2> slideSystem = LinearSystemId.createElevatorSystem(SLIDE_MOTOR_TYPE, 0, 0, 0);
-    MapleMotorSim slideMotorSim = new MapleMotorSim(
-        new SimMotorConfigs(SLIDE_MOTOR_TYPE, MOTOR_GEAR_RATIO, KilogramSquareMeters.of(0.002), Volts.of(0.2)));
-    MapleMotorSim rollerMotorSim = new MapleMotorSim(
-        new SimMotorConfigs(ROLLER_MOTOR_TYPE, 2, KilogramSquareMeters.of(0.002), Volts.of(0.2)));
-    private PIDController slidePID = new PIDController(SLIDE_POSITION_KP, SLIDE_POSITION_KI, SLIDE_POSITION_KD);
-    private ElevatorFeedforward slideFeedforward = new ElevatorFeedforward(
-        SLIDE_POSITION_KS, SLIDE_POSITION_KG, SLIDE_POSITION_KV, SLIDE_POSITION_KA);
-    private ExponentialProfile slideProfile = new ExponentialProfile(
-        ExponentialProfile.Constraints.fromCharacteristics(12, SLIDE_POSITION_KV, SLIDE_POSITION_KA));
+    // LinearSystem<N2, N1, N2> slideSystem = LinearSystemId.createElevatorSystem(SLIDE_MOTOR_TYPE, 0, 0, 0);
+    // MapleMotorSim slideMotorSim = new MapleMotorSim(
+    //     new SimMotorConfigs(SLIDE_MOTOR_TYPE, MOTOR_GEAR_RATIO, KilogramSquareMeters.of(0.002), Volts.of(0.2)));
+    // MapleMotorSim rollerMotorSim = new MapleMotorSim(
+    //     new SimMotorConfigs(ROLLER_MOTOR_TYPE, 2, KilogramSquareMeters.of(0.002), Volts.of(0.2)));
+    // private PIDController slidePID = new PIDController(SLIDE_POSITION_KP, SLIDE_POSITION_KI, SLIDE_POSITION_KD);
+    // private ElevatorFeedforward slideFeedforward = new ElevatorFeedforward(
+    //     SLIDE_POSITION_KS, SLIDE_POSITION_KG, SLIDE_POSITION_KV, SLIDE_POSITION_KA);
+    // private ExponentialProfile slideProfile = new ExponentialProfile(
+    //     ExponentialProfile.Constraints.fromCharacteristics(12, SLIDE_POSITION_KV, SLIDE_POSITION_KA));
 
-    ElevatorSim slideSim = new ElevatorSim(slideSystem, SLIDE_MOTOR_TYPE, 0, SLIDE_MAX_DISTANCE.in(Meters), false, 0);
+    // ElevatorSim slideSim = new ElevatorSim(slideSystem, SLIDE_MOTOR_TYPE, 0, SLIDE_MAX_DISTANCE.in(Meters), false, 0);
 
-    IntakeSimulation intakeSim;
+    // IntakeSimulation intakeSim;
 
-    /** Instantiates the Real Intake hardware. */
-    public IntakeIOSim(AbstractDriveTrainSimulation drive) {
-        intakeSim = IntakeSimulation.OverTheBumperIntake("Fuel", drive, Inches.of(28), Inches.of(11), IntakeSide.FRONT, 40);
-        intakeSim.register(SimulatedArena.getInstance());
+    // /** Instantiates the Real Intake hardware. */
+    // public IntakeIOSim(AbstractDriveTrainSimulation drive) {
+    //     intakeSim = IntakeSimulation.OverTheBumperIntake("Fuel", drive, Inches.of(28), Inches.of(11), IntakeSide.FRONT, 40);
+    //     intakeSim.register(SimulatedArena.getInstance());
 
-    }
+    // }
 
-    @Override
-    public void updateInputs(IntakeIOInputs inputs) {
-        inputs.slidePosition.mut_replace(Meters.of(slideSim.getPositionMeters()));
-        inputs.rollerVelocity.mut_replace(
-            slideMotorSim.getEncoderVelocity());
-        inputs.slideAppliedVoltage.mut_replace(slideMotorSim.getAppliedVoltage());
+    // @Override
+    // public void updateInputs(IntakeIOInputs inputs) {
+    //     inputs.slidePosition.mut_replace(Meters.of(slideSim.getPositionMeters()));
+    //     inputs.rollerVelocity.mut_replace(
+    //         slideMotorSim.getEncoderVelocity());
+    //     inputs.slideAppliedVoltage.mut_replace(slideMotorSim.getAppliedVoltage());
 
-    }
+    // }
 
-    @Override
-    public void setSlideVoltage(Voltage voltage) {
-        slideMotorSim.useSimpleDCMotorController().requestVoltage(voltage);
-    }
+    // @Override
+    // public void setSlideVoltage(Voltage voltage) {
+    //     slideMotorSim.useSimpleDCMotorController().requestVoltage(voltage);
+    // }
 
-    @Override
-    public void setRollerVoltage(Voltage voltage) {
-        rollerMotorSim.useSimpleDCMotorController().requestVoltage(voltage);
-    }
+    // @Override
+    // public void setRollerVoltage(Voltage voltage) {
+    //     rollerMotorSim.useSimpleDCMotorController().requestVoltage(voltage);
+    // }
 
-    @Override
-    public void setPosition(Distance position) {
-        State slideProfileState = slideProfile.calculate(0.02,
-            new State(slideSim.getPositionMeters(), slideSim.getVelocityMetersPerSecond()),
-            new State(position.in(Meters), 0));
-        double output = slidePID.calculate(slideSim.getPositionMeters(), position.in(Meters));
-        output += slideFeedforward.calculateWithVelocities(
-            slideSim.getVelocityMetersPerSecond(), slideProfileState.velocity);
-        slideMotorSim.useSimpleDCMotorController().requestVoltage(Volts.of(output));
-    }
+    // @Override
+    // public void setPosition(Distance position) {
+    //     State slideProfileState = slideProfile.calculate(0.02,
+    //         new State(slideSim.getPositionMeters(), slideSim.getVelocityMetersPerSecond()),
+    //         new State(position.in(Meters), 0));
+    //     double output = slidePID.calculate(slideSim.getPositionMeters(), position.in(Meters));
+    //     output += slideFeedforward.calculateWithVelocities(
+    //         slideSim.getVelocityMetersPerSecond(), slideProfileState.velocity);
+    //     slideMotorSim.useSimpleDCMotorController().requestVoltage(Volts.of(output));
+    // }
     
-    @Override
-    public void stopMotors() {
-        slideMotorSim.useSimpleDCMotorController().requestVoltage(Volts.of(0));
-        rollerMotorSim.useSimpleDCMotorController().requestVoltage(Volts.of(0));
-    }
+    // @Override
+    // public void stopMotors() {
+    //     slideMotorSim.useSimpleDCMotorController().requestVoltage(Volts.of(0));
+    //     rollerMotorSim.useSimpleDCMotorController().requestVoltage(Volts.of(0));
+    // }
 
-    @Override
-    public void resetSlideEncoder(Distance position) {
+    // @Override
+    // public void resetSlideEncoder(Distance position) {
         
-    }
+    // }
 
 }

@@ -24,22 +24,24 @@ public class Intake extends SubsystemBase {
     private Timer calibrationTimer = new Timer();
     private Distance foundMaxDistance = Inches.zero();
 
-    private static final LoggedTunableNumber slideP = new LoggedTunableNumber("Intake/SlideP");
+    private boolean IsAtDesiredState = true;
+
+    /*private static final LoggedTunableNumber slideP = new LoggedTunableNumber("Intake/SlideP");
     private static final LoggedTunableNumber slideD = new LoggedTunableNumber("Intake/SlideD");
 
     private static final LoggedTunableNumber slideS = new LoggedTunableNumber("Intake/SlideS");
     private static final LoggedTunableNumber slideV = new LoggedTunableNumber("Intake/SlideV");
-    private static final LoggedTunableNumber slideA = new LoggedTunableNumber("Intake/SlideA");
+    private static final LoggedTunableNumber slideA = new LoggedTunableNumber("Intake/SlideA");*/
 
 
-    static {
+    /*static {
         slideP.initDefault(IntakeConstants.SLIDE_POSITION_KP);
         slideD.initDefault(IntakeConstants.SLIDE_POSITION_KD);
 
         slideS.initDefault(IntakeConstants.SLIDE_POSITION_KS);
         slideV.initDefault(IntakeConstants.SLIDE_POSITION_KV);
         slideA.initDefault(IntakeConstants.SLIDE_POSITION_KA);
-    }
+    }*/
     /** Creates a new Intake. */
     public Intake(IntakeIO intakeIO) {
         this.intakeIO = intakeIO;
@@ -48,20 +50,16 @@ public class Intake extends SubsystemBase {
     /** This method will be called once per scheduler run. */
     @Override
     public void periodic() {
-        if(slideP.hasChanged(hashCode()) || slideD.hasChanged(hashCode()) ||
+        /*if(slideP.hasChanged(hashCode()) || slideD.hasChanged(hashCode()) ||
             slideS.hasChanged(hashCode()) || slideV.hasChanged(hashCode()) || slideA.hasChanged(hashCode())) {
             intakeIO.setPID(slideP.get(), slideD.get(), slideS.get(), slideV.get(), slideA.get());
-        }
+        }*/
         intakeIO.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
         // This method will be called once per scheduler run
             switch (desiredState) {
                 case INSIDE:
                     intakeIO.setPosition(Inches.zero());
-                    intakeIO.setRollerVoltage(Volts.of(0));
-                    break;
-                case STOWED:
-                    intakeIO.setPosition(Inches.of(4)); // Example stowed position
                     intakeIO.setRollerVoltage(Volts.of(0));
                     break;
                 case DEPLOYED_OFF:
@@ -71,16 +69,6 @@ public class Intake extends SubsystemBase {
                 case DEPLOYED_ON:
                     intakeIO.setPosition(SLIDE_MAX_DISTANCE); // Example deployed position
                     intakeIO.setRollerVoltage(Volts.of(6)); // Example roller voltage to
-                    break;
-                case CALIBRATE_OUT:
-                    intakeIO.setSlideVoltage(Volts.of(4));
-                    intakeIO.setRollerVoltage(Volts.of(0));
-                    calibrationTimer.start();
-                    break;
-                case CALIBRATE_IN:
-                    intakeIO.setSlideVoltage(Volts.of(-4));
-                    intakeIO.setRollerVoltage(Volts.of(0));
-                    calibrationTimer.start();
                     break;
                 default:
                     break;
@@ -116,27 +104,18 @@ public class Intake extends SubsystemBase {
 
     /** Possible goals for the intake subsystem. */
     public enum IntakeState {
-        INSIDE(false),
-        STOWED(false),
-        DEPLOYED_OFF(false),
-        DEPLOYED_ON(false),
-        CALIBRATE_OUT(true),
-        CALIBRATE_IN(true);
-
-        boolean calibrating;
-        
-        /** Constructor for IntakeState enum. */
-        private IntakeState(boolean calibrating) {
-            this.calibrating = calibrating;
-        }
-
-        public boolean isCalibrating() {
-            return calibrating;
-        }
+        INSIDE,
+        DEPLOYED_OFF,
+        DEPLOYED_ON;
+    }
+    public enum IntakePosition {
+        EXTENDED,
+        RETRACTED;
     }
 
     public boolean atDesiredState() {
-        return currentState == desiredState;
+        //return currentState == desiredState;
+        return IsAtDesiredState;
     }
 
     
