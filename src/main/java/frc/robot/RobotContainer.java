@@ -243,6 +243,7 @@ public class RobotContainer {
         controller2.rightBumper().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)));
         controller2.leftTrigger().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(-100)));
         controller2.rightTrigger().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(100)));
+        controller2.y().onTrue(Commands.run(() -> shooter.resetOverrides()));
 
         // Reset gyro or odometry if in simulation
         final Runnable resetGyro = () -> drive.setPose(new Pose2d(RobotState.getInstance().getPose().getTranslation(),
