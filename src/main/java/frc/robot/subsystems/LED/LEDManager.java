@@ -29,7 +29,7 @@ public class LEDManager extends SubsystemBase {
     LEDPattern idlePattern;
 
     public LEDManager() {
-        ledStrip = new AddressableLED(9); // Change 0 to the actual PWM port
+        ledStrip = new AddressableLED(4); // Change 0 to the actual PWM port
         ledBuffer = new AddressableLEDBuffer(60); // Change 60 to the actual number of LEDs
         ledStrip.setLength(ledBuffer.getLength());
 
