@@ -23,11 +23,8 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.ENCODER_GEAR_RATIO;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.ROLLER_CURRENT_LIMIT;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_CURRENT_LIMIT;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_MAX_ACCELERATION;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_MAX_VELOCITY;
 
 import frc.robot.subsystems.superstructure.intake.Intake.IntakePosition;
 /*import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KA;
@@ -62,12 +59,8 @@ public class IntakeIOReal implements IntakeIO {
         slideConfig.absoluteEncoder.zeroCentered(true);
         slideConfig.absoluteEncoder.inverted(true);
         slideConfig.inverted(true);
-        slideConfig.absoluteEncoder.positionConversionFactor(ENCODER_GEAR_RATIO);
         slideConfig.absoluteEncoder.averageDepth(2);
-        slideConfig.encoder.positionConversionFactor(IntakeConstants.MOTOR_GEAR_RATIO);
 
-        slideConfig.closedLoop.maxMotion.maxAcceleration(SLIDE_MAX_ACCELERATION);
-        slideConfig.closedLoop.maxMotion.cruiseVelocity(SLIDE_MAX_VELOCITY);
 
         SparkUtil.tryUntilOk(slideMotor, 5,
                 () -> slideMotor.configure(slideConfig, ResetMode.kResetSafeParameters,
@@ -118,10 +111,10 @@ public class IntakeIOReal implements IntakeIO {
     public void goToPosition(IntakePosition intakePosition) {
         switch (intakePosition) {
             case EXTENDED:
-                setSlideVoltage(-2);
+                setSlideVoltage(Volts.of(-2));
                 break;
             case RETRACTED:
-                setSlideVoltage(2);
+                setSlideVoltage(Volts.of(2));
                 break;
         }
     }

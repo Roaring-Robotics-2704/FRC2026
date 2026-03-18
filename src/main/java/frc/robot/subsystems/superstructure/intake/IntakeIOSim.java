@@ -4,17 +4,9 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.MOTOR_GEAR_RATIO;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.ROLLER_MOTOR_TYPE;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_MAX_DISTANCE;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_MOTOR_TYPE;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KA;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KD;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KG;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KI;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KP;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KS;
-import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KV;
+
 
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
