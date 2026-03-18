@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.revrobotics.ColorSensorV3.LEDCurrent;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,6 +26,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveTuningCommands;
+import frc.robot.subsystems.LED.LEDManager;
+import frc.robot.subsystems.LED.LEDManager.LEDState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -75,6 +78,8 @@ public class RobotContainer {
     private final Shooter shooter;
     private final Climber climber;
 
+
+    LEDManager LEDmanager;
     private final Vision vision;
     // private final FuelPoseEstimator objectDetection;
 
@@ -94,6 +99,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         RobotState.getInstance(); // Ensure RobotState is initialized
+        LEDmanager = new LEDManager(); // Initialize LED Manager
         switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
@@ -226,7 +232,10 @@ public class RobotContainer {
         controller.leftTrigger().whileTrue(Commands.parallel(
                 Commands.startEnd(
                         () -> intake.setDesiredState(Intake.IntakeState.DEPLOYED_ON),
-                        () -> intake.setDesiredState(Intake.IntakeState.DEPLOYED_OFF), intake)));
+                        () -> intake.setDesiredState(Intake.IntakeState.DEPLOYED_OFF), intake),
+                Commands.startEnd(
+                    () -> LEDmanager.setPattern(LEDState.INTAKE),
+                    () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
         controller.rightTrigger().whileTrue(Commands.parallel(
                 Commands.startEnd(() -> {
                     if (shooter.isAtDesiredState()) {
@@ -237,7 +246,10 @@ public class RobotContainer {
                 Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.SHOOTING),
                         () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
                 Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
-                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper)));
+                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
+                Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
+                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager
+                        )));
 
         controller2.leftBumper().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)));
         controller2.rightBumper().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)));
