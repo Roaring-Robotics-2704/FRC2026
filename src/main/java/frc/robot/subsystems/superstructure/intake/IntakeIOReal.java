@@ -25,6 +25,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.ROLLER_CURRENT_LIMIT;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_CURRENT_LIMIT;
+import edu.wpi.first.math.filter.LinearFilter;
 
 import frc.robot.subsystems.superstructure.intake.Intake.IntakePosition;
 /*import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KA;
@@ -41,6 +42,7 @@ public class IntakeIOReal implements IntakeIO {
     private SparkFlex rollerMotor;
     private SparkMax slideMotor;
     private SparkMaxConfig slideConfig;
+    private LinearFilter filter = LinearFilter.movingAverage(5);
 
     /** Instantiates the Real Intake hardware. */
     public IntakeIOReal() {
@@ -58,8 +60,10 @@ public class IntakeIOReal implements IntakeIO {
         slideConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
         slideConfig.absoluteEncoder.zeroCentered(true);
         slideConfig.absoluteEncoder.inverted(true);
-        slideConfig.inverted(true);
+        slideConfig.inverted(false);
         slideConfig.absoluteEncoder.averageDepth(2);
+        slideConfig.idleMode(IdleMode.kBrake);
+        
 
 
         SparkUtil.tryUntilOk(slideMotor, 5,
@@ -84,12 +88,12 @@ public class IntakeIOReal implements IntakeIO {
         inputs.slidePosition.mut_replace(slideMotor.getEncoder().getPosition(), Inches);
         inputs.slideSetpoint.mut_replace(slideMotor.getClosedLoopController().getSetpoint(), Inches);
         //inputs.slideAtPosition = slideMotor.getClosedLoopController().isAtSetpoint();
-        inputs.slideVelocity.mut_replace(slideMotor.getEncoder().getVelocity(), InchesPerSecond);
+        inputs.slideVelocity.mut_replace(filter.calculate(slideMotor.getEncoder().getVelocity()), InchesPerSecond);
 
         inputs.rollerAppliedVoltage.mut_replace(rollerMotor.getAppliedOutput(), Volts);
         inputs.rollerCurrentDraw.mut_replace(rollerMotor.getOutputCurrent(), Amps);
         inputs.rollerVelocity.mut_replace(rollerMotor.getEncoder().getVelocity(), RadiansPerSecond);
-
+        
         //slideMotor.
     }
 
@@ -111,10 +115,13 @@ public class IntakeIOReal implements IntakeIO {
     public void goToPosition(IntakePosition intakePosition) {
         switch (intakePosition) {
             case EXTENDED:
-                setSlideVoltage(Volts.of(-2));
+                setSlideVoltage(Volts.of(-4));
                 break;
             case RETRACTED:
-                setSlideVoltage(Volts.of(2));
+                setSlideVoltage(Volts.of(4));
+                break;
+            case OFF: 
+                setSlideVoltage(Volts.of(0));
                 break;
         }
     }

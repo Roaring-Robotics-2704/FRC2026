@@ -144,8 +144,8 @@ public class ShooterIOGreyT implements ShooterIO {
     public void setHoodAngle(Angle angle) {
         double servoPosition = (angle.in(Degrees) - MIN_ANGLE.in(Degrees))
                 / (MAX_ANGLE.in(Degrees) - MIN_ANGLE.in(Degrees));
-        servoPosition = MathUtil.clamp(servoPosition, MIN_ANGLE.in(Degrees), MAX_ANGLE.in(Degrees));
-        hoodServo1.set(servoPosition);
+        servoPosition = MathUtil.clamp(servoPosition, 0, 1);
+        hoodServo1.setPercent(servoPosition);
     }
 
     private Angle getHoodServoPosition() {

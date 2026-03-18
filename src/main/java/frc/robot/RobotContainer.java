@@ -46,6 +46,7 @@ import frc.robot.subsystems.superstructure.hopper.HopperIOSim;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
 import frc.robot.subsystems.superstructure.intake.IntakeIOReal;
+import frc.robot.subsystems.superstructure.intake.Intake.IntakeState;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.superstructure.shooter.ShooterIO;
 import frc.robot.subsystems.superstructure.shooter.ShooterIOGreyT;
@@ -214,14 +215,14 @@ public class RobotContainer {
         // objectDetection.setDefaultCommand(objectDetection.idle());
 
         // Lock to 0 deg when A button is held
-        controller
-                .rightTrigger()
-                .whileTrue(
-                        DriveCommands.joystickDriveAtAngle(
-                                drive,
-                                () -> controller.getLeftY() * 0.7,
-                                () -> controller.getLeftX() * 0.7,
-                                () -> shooter.getWantedRobotAngle()));
+        // controller
+        //         .rightTrigger()
+        //         .whileTrue(
+        //                 DriveCommands.joystickDriveAtAngle(
+        //                         drive,
+        //                         () -> controller.getLeftY() * 0.7,
+        //                         () -> controller.getLeftX() * 0.7,
+        //                         () -> shooter.getWantedRobotAngle()));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -240,7 +241,6 @@ public class RobotContainer {
                 Commands.startEnd(() -> {
                     if (shooter.isAtDesiredState()) {
                         kicker.setKickerVoltage(12);
-                        intake.setDesiredState(Intake.IntakeState.INSIDE);
                     }
                 }, () -> kicker.setKickerVoltage(-1), kicker),
                 Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.SHOOTING),
@@ -249,7 +249,9 @@ public class RobotContainer {
                         () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
                 Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
                         () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager
-                        )));
+                        ),
+                Commands.run(()->intake.setDesiredState(IntakeState.INSIDE))
+        ));
 
         controller2.leftBumper().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)));
         controller2.rightBumper().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)));

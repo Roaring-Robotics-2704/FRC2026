@@ -9,11 +9,12 @@ import org.littletonrobotics.junction.Logger;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.tunables.LoggedTunableNumber;
+
 
 /** Intake subsystem for controlling the robot's intake mechanism. */
 public class Intake extends SubsystemBase {
@@ -69,6 +70,7 @@ public class Intake extends SubsystemBase {
         intakeIO.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
         // This method will be called once per scheduler run
+        if(desiredState != currentState) {
         switch (desiredState) {
             case INSIDE:
                 intakeIO.goToPosition(IntakePosition.RETRACTED);
@@ -80,16 +82,18 @@ public class Intake extends SubsystemBase {
                 break;
             case DEPLOYED_ON:
                 intakeIO.goToPosition(IntakePosition.EXTENDED); // Example deployed position
-                intakeIO.setRollerVoltage(Volts.of(6)); // Example roller voltage to
+                intakeIO.setRollerVoltage(Volts.of(12)); // Example roller voltage to
                 break;
             default:
                 break;
         }
-        intakeIO.updateInputs(inputs);
-        if (inputs.slideCurrentDraw.in(Amps) >= IntakeConstants.SLIDE_STALL_LIMIT) {
+        if ((inputs.slideCurrentDraw.in(Amps) >= IntakeConstants.SLIDE_STALL_LIMIT) ) {//|| 
+           // inputs.slideVelocity.in(Inches.per(Second)) <0.01) {
             currentState = desiredState;
+            intakeIO.goToPosition(IntakePosition.OFF);
             isAtDesiredState = true;
         }
+    }
 
         Logger.recordOutput("Intake/CurrentState", currentState);
         Logger.recordOutput("Intake/DesiredState", desiredState);
@@ -106,7 +110,7 @@ public class Intake extends SubsystemBase {
     }
 
     public enum IntakePosition {
-        EXTENDED, RETRACTED;
+        EXTENDED, RETRACTED,OFF;
     }
 
     public boolean atDesiredState() {
