@@ -29,6 +29,8 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Servo;
+
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.CURRENT_LIMIT;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.FLYWHEEL_MOTOR_ONE;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.FLYWHEEL_MOTOR_TWO;
@@ -58,7 +60,7 @@ public class ShooterIOGreyT implements ShooterIO {
     private double targetFlywheelVelocity = 0.0;
 
     /** Instantiates the GreyT Shooter hardware. */
-    private LinearServo hoodServo1 = new LinearServo(HOOD_SERVO1_PORT, 50, 6);
+    private Servo hoodServo1 = new Servo(HOOD_SERVO1_PORT); //50, 6);
 
     /** Constructs the GreyT shooter code. */
     public ShooterIOGreyT() {
@@ -113,9 +115,9 @@ public class ShooterIOGreyT implements ShooterIO {
         inputs.flywheelAppliedVolts.mut_replace(flywheelAppliedVoltsSignal.getValue());
         inputs.flywheelCurrentAmps.mut_replace(flywheelCurrentAmpsSignal.getValue());
 
-        inputs.hoodAngle.mut_replace(getHoodServoPosition());
+        inputs.hoodAngle.mut_replace(MAX_ANGLE.minus(MIN_ANGLE).times(hoodServo1.get()));
         inputs.atTargetVelocity = flywheelMotor1.getClosedLoopError().getValue() < SHOOTER_TOLERANCE.in(RotationsPerSecond);
-        inputs.atTargetAngle = hoodServo1.isFinished();
+        inputs.atTargetAngle = true;
         inputs.targetFlywheelVelocity.mut_replace(targetFlywheelVelocity , RotationsPerSecond);
     }
 
@@ -141,16 +143,12 @@ public class ShooterIOGreyT implements ShooterIO {
      *            The target angle for the hood.
      */
     @Override
-    public void setHoodAngle(Angle angle) {
-        double servoPosition = (angle.in(Degrees) - MIN_ANGLE.in(Degrees))
-                / (MAX_ANGLE.in(Degrees) - MIN_ANGLE.in(Degrees));
+    public void setHoodPercent(double percent) {
+        double servoPosition = percent;
         servoPosition = MathUtil.clamp(servoPosition, 0, 1);
-        hoodServo1.setPercent(servoPosition);
+        hoodServo1.set(servoPosition);
     }
 
-    private Angle getHoodServoPosition() {
-        return Degrees.of(hoodServo1.get() * (MAX_ANGLE.in(Degrees) - MIN_ANGLE.in(Degrees)) + MIN_ANGLE.in(Degrees));
-    }
 
     @Override
     public void setPID(double kP, double kI, double kD, double kS, double kV, double kA) {

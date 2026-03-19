@@ -27,6 +27,7 @@ public final class Constants {
 
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
+    /** Mode that the robot code is running in. */
     public static enum Mode {
         /** Running on a real robot. */
         REAL,
@@ -49,7 +50,7 @@ public final class Constants {
      * as a last resort. Here be dragons
      * .
      */
-    public static boolean useSuperDangerousRTThreadPriority = true;
+    public static boolean useSuperDangerousRTThreadPriority = false;
 
     public static final double voltageCompensation = 12.0;
 }

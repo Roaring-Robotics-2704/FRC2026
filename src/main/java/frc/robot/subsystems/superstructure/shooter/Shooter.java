@@ -29,7 +29,7 @@ public class Shooter extends SubsystemBase {
     private ShooterState currentState = ShooterState.STATIONARY;
     private ShooterState desiredState = ShooterState.IDLE;
 
-    private Angle hoodAngle;
+    private double hoodPercent;
     private AngularVelocity flywheelVelocity;
     private final BasicTunedCalc solver = new BasicTunedCalc();
 
@@ -46,6 +46,8 @@ public class Shooter extends SubsystemBase {
     private AngularVelocity target = ShooterConstants.SHOOTER_TARGET;
     private boolean hoodOverride = false;
     private boolean flywheelOverride = false;
+    private double hoodOffset = 0;
+    private AngularVelocity flywheelOffset = RPM.zero();
 
 
     static {
@@ -74,31 +76,30 @@ public class Shooter extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Shooter", inputs);
         ShootingSolution solution = solver.getShootingSolution();
-        hoodAngle = solution.hoodAngle();
+        hoodPercent = solution.hoodPercent();
         flywheelVelocity = solution.flywheelVelocity();
         robotAngle = solution.robotAngle();
 
-        Logger.recordOutput("Shooter/CalculatedHoodAngle", hoodAngle);
+        Logger.recordOutput("Shooter/CalculatedHoodPercent", hoodPercent);
         Logger.recordOutput("Shooter/CalculatedFlywheelVelocity", flywheelVelocity);
         Logger.recordOutput("Shooter/CalculatedRobotAngle", robotAngle);
         Logger.recordOutput("Shooter/Distance", solution.distance());
         Logger.recordOutput("Shooter/DesiredState", desiredState.toString());
         Logger.recordOutput("Shooter/CurrentState", currentState.toString());
-        hoodAngle = Degrees.of(MathUtil.clamp(hoodAngle.in(Degrees), MIN_ANGLE.in(Degrees), MAX_ANGLE.in(Degrees)));
         if (currentState != desiredState) {
             switch (desiredState) {
                 case STATIONARY:
                     io.setFlywheelVelocity(RPM.of(0));
-                    io.setHoodAngle(MIN_ANGLE);
+                    io.setHoodPercent(0)
                     ;
                     break;
                 case IDLE:
                     io.setFlywheelVelocity(SHOOTER_IDLE);
-                    io.setHoodAngle(MIN_ANGLE);
+                    io.setHoodPercent(0);
                     break;
                 case SHOOTING:
-                    io.setHoodAngle(hoodAngle);
-                    io.setFlywheelVelocity(target);
+                    io.setHoodPercent(hoodOverride ? hoodOffset : hoodPercent);
+                    io.setFlywheelVelocity(flywheelVelocity);
                     break;
                 default:
                     break;
@@ -151,17 +152,19 @@ public class Shooter extends SubsystemBase {
 
     public void incrementFlywheelSpeed(double rpm) {
         flywheelOverride = true;
-        target = target.plus(RPM.of(rpm));
+        flywheelOffset = flywheelOffset.plus(RPM.of(rpm));
     }
 
     public void incrementHoodAngle(double increment) {
         hoodOverride = true;
-        hoodAngle = hoodAngle.plus(Degrees.of(increment));
+        hoodOffset = hoodOffset + increment;
     }
 
     public void resetOverrides() {
         hoodOverride = false;
         flywheelOverride = false;
+        hoodOffset = 0;
+        flywheelOffset = RPM.zero();
     }
 
 }

@@ -114,7 +114,7 @@ public class Robot extends LoggedRobot {
         if(Constants.useSuperDangerousRTThreadPriority) Logger.addDataReceiver(new ThreadPriorityDummyLogReceiver());
 
         // Initialize URCL
-        // Logger.registerURCL(URCL.startExternal());
+         Logger.registerURCL(URCL.startExternal());
 
         // Start AdvantageKit logger
         Logger.start();

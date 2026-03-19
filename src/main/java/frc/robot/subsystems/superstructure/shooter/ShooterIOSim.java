@@ -69,11 +69,6 @@ public class ShooterIOSim implements ShooterIO {
 
     }
 
-    @Override
-    public void setHoodAngle(Angle angle) {
-        // No hood in simulation
-        hoodAngle = angle;
-    }
 
     @Override 
     public void setFlywheelVelocity(AngularVelocity velocity) {

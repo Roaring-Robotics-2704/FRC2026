@@ -208,9 +208,9 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> controller.getLeftY() * 0.7,
-                        () -> controller.getLeftX() * 0.7,
-                        () -> -controller.getRightX() * 0.7));
+                        () -> controller.getLeftY() * 0.5,
+                        () -> controller.getLeftX() * 0.5,
+                        () -> -controller.getRightX() * 0.5));
         vision.setDefaultCommand(vision.idle());
         // objectDetection.setDefaultCommand(objectDetection.idle());
 

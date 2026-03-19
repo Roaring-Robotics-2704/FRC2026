@@ -59,9 +59,6 @@ public interface IntakeIO {
     //default void setPosition(Distance position) {
     //    // Default to nothing for replay
     //}
-    default void goToPosition(IntakePosition intakePosition) {
-        // Default to nothing for replay
-    }
 
     default void stopMotors() {
         // Default to nothing for replay

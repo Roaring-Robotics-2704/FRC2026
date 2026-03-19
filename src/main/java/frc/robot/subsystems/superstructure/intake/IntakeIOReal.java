@@ -25,6 +25,8 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.ROLLER_CURRENT_LIMIT;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_CURRENT_LIMIT;
+import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_STALL_LIMIT;
+
 import edu.wpi.first.math.filter.LinearFilter;
 
 import frc.robot.subsystems.superstructure.intake.Intake.IntakePosition;
@@ -48,27 +50,28 @@ public class IntakeIOReal implements IntakeIO {
     public IntakeIOReal() {
         rollerMotor = new SparkFlex(IntakeConstants.ROLLER_MOTOR_ID, MotorType.kBrushless);
         slideMotor = new SparkMax(IntakeConstants.SLIDE_MOTOR_ID, MotorType.kBrushless);
-        slideConfig = new SparkMaxConfig();
+        // slideConfig = new SparkMaxConfig();
 
-        slideConfig.smartCurrentLimit(SLIDE_CURRENT_LIMIT);
+        // slideConfig.smartCurrentLimit(SLIDE_CURRENT_LIMIT);
         //slideConfig.closedLoop.feedForward.kG(SLIDE_POSITION_KG);
         //slideConfig.closedLoop.feedForward.kS(SLIDE_POSITION_KS);
         //slideConfig.closedLoop.feedForward.kV(SLIDE_POSITION_KV);
         //slideConfig.closedLoop.feedForward.kA(SLIDE_POSITION_KA);
         //slideConfig.closedLoop.pid(SLIDE_POSITION_KP, SLIDE_POSITION_KI, SLIDE_POSITION_KD);
 
-        slideConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
-        slideConfig.absoluteEncoder.zeroCentered(true);
-        slideConfig.absoluteEncoder.inverted(true);
-        slideConfig.inverted(false);
-        slideConfig.absoluteEncoder.averageDepth(2);
-        slideConfig.idleMode(IdleMode.kBrake);
+        // slideConfig.closedLoop.feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder);
+        // slideConfig.absoluteEncoder.zeroCentered(true);
+        // slideConfig.absoluteEncoder.inverted(true);
+        // slideConfig.inverted(false);
+        // slideConfig.absoluteEncoder.averageDepth(2);
+        // slideConfig.idleMode(IdleMode.kBrake);
+        // slideConfig.openLoopRampRate(1);
         
 
 
-        SparkUtil.tryUntilOk(slideMotor, 5,
-                () -> slideMotor.configure(slideConfig, ResetMode.kResetSafeParameters,
-                        PersistMode.kPersistParameters));
+        // SparkUtil.tryUntilOk(slideMotor, 5,
+        //         () -> slideMotor.configure(slideConfig, ResetMode.kResetSafeParameters,
+        //                 PersistMode.kPersistParameters));
 
         SparkFlexConfig rollerConfig = new SparkFlexConfig();
 
@@ -78,7 +81,6 @@ public class IntakeIOReal implements IntakeIO {
                 () -> rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters,
                         PersistMode.kPersistParameters));
 
-        slideMotor.getEncoder().setPosition(slideMotor.getAbsoluteEncoder().getPosition());
     }
 
     @Override
@@ -89,7 +91,6 @@ public class IntakeIOReal implements IntakeIO {
         inputs.slideSetpoint.mut_replace(slideMotor.getClosedLoopController().getSetpoint(), Inches);
         //inputs.slideAtPosition = slideMotor.getClosedLoopController().isAtSetpoint();
         inputs.slideVelocity.mut_replace(filter.calculate(slideMotor.getEncoder().getVelocity()), InchesPerSecond);
-
         inputs.rollerAppliedVoltage.mut_replace(rollerMotor.getAppliedOutput(), Volts);
         inputs.rollerCurrentDraw.mut_replace(rollerMotor.getOutputCurrent(), Amps);
         inputs.rollerVelocity.mut_replace(rollerMotor.getEncoder().getVelocity(), RadiansPerSecond);
@@ -100,6 +101,7 @@ public class IntakeIOReal implements IntakeIO {
     @Override
     public void setSlideVoltage(Voltage voltage) {
         slideMotor.setVoltage(voltage);
+        System.out.println("Set voltage on slide to: " + voltage.in(Volts));
     }
 
     @Override
@@ -111,20 +113,7 @@ public class IntakeIOReal implements IntakeIO {
     public void setPosition(Distance position) {
         slideMotor.getClosedLoopController().setSetpoint(position.in(Inches), ControlType.kMAXMotionPositionControl);
     }*/
-    @Override
-    public void goToPosition(IntakePosition intakePosition) {
-        switch (intakePosition) {
-            case EXTENDED:
-                setSlideVoltage(Volts.of(-4));
-                break;
-            case RETRACTED:
-                setSlideVoltage(Volts.of(4));
-                break;
-            case OFF: 
-                setSlideVoltage(Volts.of(0));
-                break;
-        }
-    }
+
     
     @Override
     public void stopMotors() {

@@ -45,7 +45,7 @@ public interface ShooterIO { // creates and sets baseline values of robot for lo
     }
     
 
-    default void setHoodAngle(Angle angle) {
+    default void setHoodPercent(double percent) {
     }
 
     default void setFlywheelVelocity(AngularVelocity velocity) {

@@ -10,11 +10,12 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.tunables.LoggedTunableNumber;
-
 
 /** Intake subsystem for controlling the robot's intake mechanism. */
 public class Intake extends SubsystemBase {
@@ -24,7 +25,8 @@ public class Intake extends SubsystemBase {
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
     private Timer calibrationTimer = new Timer();
     private Distance foundMaxDistance = Inches.zero();
-
+    LinearFilter currentFilter = LinearFilter.movingAverage( (int)(1/0.02));
+    private double current;
     private boolean isAtDesiredState = true;
 
     /*
@@ -54,6 +56,7 @@ public class Intake extends SubsystemBase {
     /** Creates a new Intake. */
     public Intake(IntakeIO intakeIO) {
         this.intakeIO = intakeIO;
+
     }
 
     /** This method will be called once per scheduler run. */
@@ -70,33 +73,34 @@ public class Intake extends SubsystemBase {
         intakeIO.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
         // This method will be called once per scheduler run
-        if(desiredState != currentState) {
-        switch (desiredState) {
-            case INSIDE:
-                intakeIO.goToPosition(IntakePosition.RETRACTED);
-                intakeIO.setRollerVoltage(Volts.of(0));
-                break;
-            case DEPLOYED_OFF:
-                intakeIO.goToPosition(IntakePosition.EXTENDED); // Example deployed position
-                intakeIO.setRollerVoltage(Volts.of(0));
-                break;
-            case DEPLOYED_ON:
-                intakeIO.goToPosition(IntakePosition.EXTENDED); // Example deployed position
-                intakeIO.setRollerVoltage(Volts.of(12)); // Example roller voltage to
-                break;
-            default:
-                break;
+        current = currentFilter.calculate(Math.abs(inputs.slideCurrentDraw.in(Amp)));
+        if (desiredState != currentState) {
+            switch (desiredState) {
+                case INSIDE:
+                    intakeIO.setSlideVoltage(Volts.of(2));
+                    intakeIO.setRollerVoltage(Volts.of(0));
+                    break;
+                case DEPLOYED_OFF:
+                    intakeIO.setSlideVoltage(Volts.of(-4));
+                    intakeIO.setRollerVoltage(Volts.of(0));
+                    break;
+                case DEPLOYED_ON:
+                    intakeIO.setSlideVoltage(Volts.of(-4));
+                    intakeIO.setRollerVoltage(Volts.of(12)); // Example roller voltage to
+                    break;
+                default:
+                    break;
+            }
+            if ((current) >= IntakeConstants.SLIDE_STALL_LIMIT) {
+                currentState = desiredState;
+                intakeIO.stopMotors();
+                isAtDesiredState = true;
+            }
         }
-        if ((inputs.slideCurrentDraw.in(Amps) >= IntakeConstants.SLIDE_STALL_LIMIT) ) {//|| 
-           // inputs.slideVelocity.in(Inches.per(Second)) <0.01) {
-            currentState = desiredState;
-            intakeIO.goToPosition(IntakePosition.OFF);
-            isAtDesiredState = true;
-        }
-    }
 
         Logger.recordOutput("Intake/CurrentState", currentState);
         Logger.recordOutput("Intake/DesiredState", desiredState);
+        Logger.recordOutput("Intake/Current", current);
         Logger.recordOutput("Intake/IsAtDesiredState", isAtDesiredState);
     }
 
@@ -110,7 +114,7 @@ public class Intake extends SubsystemBase {
     }
 
     public enum IntakePosition {
-        EXTENDED, RETRACTED,OFF;
+        EXTENDED, RETRACTED, OFF;
     }
 
     public boolean atDesiredState() {
