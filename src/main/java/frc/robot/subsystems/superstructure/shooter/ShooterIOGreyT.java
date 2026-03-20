@@ -60,7 +60,7 @@ public class ShooterIOGreyT implements ShooterIO {
     private double targetFlywheelVelocity = 0.0;
 
     /** Instantiates the GreyT Shooter hardware. */
-    private Servo hoodServo1 = new Servo(HOOD_SERVO1_PORT); //50, 6);
+    private LinearServo hoodServo1 = new LinearServo(HOOD_SERVO1_PORT,50, 6);
 
     /** Constructs the GreyT shooter code. */
     public ShooterIOGreyT() {
@@ -117,7 +117,7 @@ public class ShooterIOGreyT implements ShooterIO {
 
         inputs.hoodAngle.mut_replace(MAX_ANGLE.minus(MIN_ANGLE).times(hoodServo1.get()));
         inputs.atTargetVelocity = flywheelMotor1.getClosedLoopError().getValue() < SHOOTER_TOLERANCE.in(RotationsPerSecond);
-        inputs.atTargetAngle = true;
+        inputs.atTargetAngle = hoodServo1.isFinished();
         inputs.targetFlywheelVelocity.mut_replace(targetFlywheelVelocity , RotationsPerSecond);
     }
 
@@ -146,7 +146,7 @@ public class ShooterIOGreyT implements ShooterIO {
     public void setHoodPercent(double percent) {
         double servoPosition = percent;
         servoPosition = MathUtil.clamp(servoPosition, 0, 1);
-        hoodServo1.set(servoPosition);
+        hoodServo1.setPosition(servoPosition*50);
     }
 
 

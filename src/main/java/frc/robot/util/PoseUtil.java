@@ -13,6 +13,6 @@ public final class PoseUtil {
     }
 
     public static double distance(Pose2d pose1, Pose2d pose2) {
-        return pose1.getTranslation().getDistance(pose2.getTranslation());
+        return Math.abs(pose1.getTranslation().getDistance(pose2.getTranslation()));
     }
 }

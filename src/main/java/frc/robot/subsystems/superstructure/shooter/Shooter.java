@@ -76,12 +76,13 @@ public class Shooter extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Shooter", inputs);
         ShootingSolution solution = solver.getShootingSolution();
-        hoodPercent = solution.hoodPercent();
+        hoodPercent = solution.hoodPercent()/100;
         flywheelVelocity = solution.flywheelVelocity();
         robotAngle = solution.robotAngle();
 
         Logger.recordOutput("Shooter/CalculatedHoodPercent", hoodPercent);
         Logger.recordOutput("Shooter/CalculatedFlywheelVelocity", flywheelVelocity);
+        Logger.recordOutput("Shooter/ActualFlywheelSpeed", inputs.flywheelVelocity.in(RPM));
         Logger.recordOutput("Shooter/CalculatedRobotAngle", robotAngle);
         Logger.recordOutput("Shooter/Distance", solution.distance());
         Logger.recordOutput("Shooter/DesiredState", desiredState.toString());

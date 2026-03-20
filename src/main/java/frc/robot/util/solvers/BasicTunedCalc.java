@@ -7,6 +7,7 @@ package frc.robot.util.solvers;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Feet;
+import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
@@ -38,7 +39,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.PoseUtil;
 
 /** Add your docs here. */
-public class BasicTunedCalc {
+public class BasicTunedCalc{
     private InterpolatingDoubleTreeMap hoodPercentMap = new InterpolatingDoubleTreeMap();
     private InterpolatingDoubleTreeMap flywheelSpeedMap = new InterpolatingDoubleTreeMap();
     private InterpolatingDoubleTreeMap timeOfFlightMap = new InterpolatingDoubleTreeMap();
@@ -53,25 +54,25 @@ public class BasicTunedCalc {
     /** Basic interpolated map for shooter calculations. */
     public BasicTunedCalc() {
         // Example data points (distance in feet, angle in degrees)d
-        hoodPercentMap.put(3.0, 0.0);
-        flywheelSpeedMap.put(1.0, 2800.0);
-        timeOfFlightMap.put(1.0, 1.1);
+        hoodPercentMap.put(4.59, 0.0);//6
+        flywheelSpeedMap.put(1.0, 2700.0);
+        timeOfFlightMap.put(1.0, 0.9);
 
-        hoodPercentMap.put(6.0, 2.5);
-        flywheelSpeedMap.put(2.0, 3500.0);
-        timeOfFlightMap.put(2.0, 0.62);
+         hoodPercentMap.put(6.22, 10.0);//9
+         flywheelSpeedMap.put(2.0, 3000.0);
+         timeOfFlightMap.put(2.0, 1.26);
 
-        hoodPercentMap.put(9.0, 5.0);
-        flywheelSpeedMap.put(3.0, 4000.0);
-        timeOfFlightMap.put(3.0, 4.0);
+         hoodPercentMap.put(10.0, 15.0);
+         flywheelSpeedMap.put(3.0, 3200.0);
+         timeOfFlightMap.put(3.0, 1.5);
 
-        hoodPercentMap.put(12.0, 7.5);
-        flywheelSpeedMap.put(4.0, 4500.0);
-        timeOfFlightMap.put(4.0, 5.0);
+        // hoodPercentMap.put(12.0, 7.5);
+        // flywheelSpeedMap.put(4.0, 4500.0);
+        // timeOfFlightMap.put(4.0, 5.0);
 
-        hoodPercentMap.put(15.0, 9.0);
-        flywheelSpeedMap.put(5.0, 5000.0);
-        timeOfFlightMap.put(5.0, 6.0);
+        // hoodPercentMap.put(15.0, 9.0);
+        // flywheelSpeedMap.put(5.0, 5000.0);
+        // timeOfFlightMap.put(5.0, 6.0);
 
     }
 

@@ -12,7 +12,6 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.revrobotics.ColorSensorV3.LEDCurrent;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveTuningCommands;
+import frc.robot.commands.auto.AutoBuilder;
 import frc.robot.subsystems.LED.LEDManager;
 import frc.robot.subsystems.LED.LEDManager.LEDState;
 import frc.robot.subsystems.drive.Drive;

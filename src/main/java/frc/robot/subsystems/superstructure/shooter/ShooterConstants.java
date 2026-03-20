@@ -36,8 +36,8 @@ public class ShooterConstants {
     public static final AngularVelocity SHOOTER_TARGET = 
         RPM.of(2800); // add these if we need them, desired speed
     public static final AngularVelocity SHOOTER_IDLE = 
-        RPM.of(1000); // add these if we need them, idle speed
-    public static final AngularVelocity SHOOTER_TOLERANCE = RotationsPerSecond.of(0.0);    
+        RPM.of(2000); // add these if we need them, idle speed
+    public static final AngularVelocity SHOOTER_TOLERANCE = RotationsPerSecond.of(100);    
     // GET REAL VALUES FOR FOLLOWING:
     public static final Angle MIN_ANGLE = Degrees.of(28.048335); // lowest angle shooter can reach
     public static final Angle MAX_ANGLE = Degrees.of(59.874070); // largest angle shooter can reach

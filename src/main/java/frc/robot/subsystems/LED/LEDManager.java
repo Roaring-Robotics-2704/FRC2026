@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LEDManager extends SubsystemBase {
     private LEDState currentState = LEDState.IDLE;
+    private LEDState previousState = null;
 
     public enum LEDState {
         IDLE, INTAKE, SHOOTING, CLIMBING
@@ -29,37 +30,41 @@ public class LEDManager extends SubsystemBase {
     LEDPattern idlePattern;
 
     public LEDManager() {
-        ledStrip = new AddressableLED(4); // Change 0 to the actual PWM port
-        ledBuffer = new AddressableLEDBuffer(60); // Change 60 to the actual number of LEDs
+        ledStrip = new AddressableLED(8);
+        ledBuffer = new AddressableLEDBuffer(92); // Change 60 to the actual number of LEDs
         ledStrip.setLength(ledBuffer.getLength());
+        setupPatterns();
+        idlePattern.applyTo(ledBuffer);
 
         ledStrip.setData(ledBuffer);
         ledStrip.start();
-        setupPatterns();
     }
 
     @Override
     public void periodic() {
-        switch (currentState) {
-            case SHOOTING:
-                shootPattern.applyTo(ledBuffer);
-                break;
-            case INTAKE:
-                intakePattern.applyTo(ledBuffer);
-                break;
-            case CLIMBING:
-                climbPattern.applyTo(ledBuffer);
-                break;
-            case IDLE:
-                idlePattern.applyTo(ledBuffer);
-                break;
-            default:
-                idlePattern.applyTo(ledBuffer);
-                break;
+        if (currentState != previousState) {
+            switch (currentState) {
+                case SHOOTING:
+                    shootPattern.applyTo(ledBuffer);
+                    break;
+                case INTAKE:
+                    intakePattern.applyTo(ledBuffer);
+                    break;
+                case CLIMBING:
+                    climbPattern.applyTo(ledBuffer);
+                    break;
+                case IDLE:
+                    idlePattern.applyTo(ledBuffer);
+                    break;
+                default:
+                    idlePattern.applyTo(ledBuffer);
+                    break;
+            }
+            ledStrip.setData(ledBuffer);
+            ledStrip.start();
+            previousState = currentState;
         }
 
-        ledStrip.setData(ledBuffer);
-        ledStrip.start();
         // This method will be called once per scheduler run
     }
 
