@@ -18,9 +18,11 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -47,6 +49,11 @@ public class Drive extends SubsystemBase {
     SwerveModuleState[] currentStates;
     SwerveSetpoint previousSetpoint;
     
+    public static final PIDController turnController = new PIDController(7.5, 0.0, 0.0);
+    public static final PIDController driveXController = new PIDController(10, 0.0, 0.0);
+    public static final PIDController driveYController = new PIDController(10, 0.0, 0.0);
+
+
     static final Lock odometryLock = new ReentrantLock();
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -302,5 +309,18 @@ public class Drive extends SubsystemBase {
         }
         return motors.toArray(new TalonFX[motors.size()]);
     }
-    
+    public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = RobotState.getInstance().getPose();
+
+        // Generate the next speeds for the robot
+        ChassisSpeeds speeds = new ChassisSpeeds(
+            sample.vx + driveXController.calculate(pose.getX(), sample.x),
+            sample.vy + driveYController.calculate(pose.getY(), sample.y),
+            sample.omega + turnController.calculate(pose.getRotation().getRadians(), sample.heading)
+        );
+
+        // Apply the generated speeds
+        runVelocity(speeds);
+    }
 }

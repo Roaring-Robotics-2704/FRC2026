@@ -29,9 +29,10 @@ public class Climber extends SubsystemBase {
     private final ClimberIO climberIO;
     private final Timer timeoutTimer = new Timer();
     private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
+    boolean hasCalibrated = false;
 
     private ClimberState currentState = ClimberState.BOTTOM;
-    private ClimberState desiredState = ClimberState.BOTTOM;
+    private ClimberState desiredState = ClimberState.CALIBRATING;
 
     /** Creates a new Climber. */
     public Climber(ClimberIO climberIO) {
@@ -42,6 +43,9 @@ public class Climber extends SubsystemBase {
     public void periodic() {
         climberIO.updateInputs(inputs);
         Logger.processInputs("Climber", inputs);
+        if (!hasCalibrated) {
+            desiredState = ClimberState.CALIBRATING;
+        }
 
         if (currentState != desiredState) {
             switch (desiredState) {
@@ -55,6 +59,7 @@ public class Climber extends SubsystemBase {
                         climberIO.setClimberVoltage(0);
                         climberIO.resetClimberEncoder();
                         stopTimer();
+                        hasCalibrated = true;
                         desiredState = ClimberState.BOTTOM;
                         currentState = ClimberState.BOTTOM;
                     }
@@ -62,7 +67,11 @@ public class Climber extends SubsystemBase {
                     break;
                 case BOTTOM:
                     startTimer();
-                    climberIO.setClimberVoltage(-2);
+                    if (inputs.climberPosition.in(Inches) > MID_CLIMBER_HEIGHT.in(Inches)) {
+                        climberIO.setClimberVoltage(-2);
+                    } else {
+                        climberIO.setClimberVoltage(2);
+                    }
                     climberIO.setHookVoltage(0);
                     if (MathUtil.isNear(
                             inputs.climberPosition.in(Inches),
@@ -95,7 +104,12 @@ public class Climber extends SubsystemBase {
                     break;
                 case TOP:
                     startTimer();
-                    climberIO.setClimberVoltage(2);
+                    if (inputs.climberPosition.in(Inches) > MID_CLIMBER_HEIGHT.in(Inches)) {
+                        climberIO.setClimberVoltage(-2);
+
+                    } else {
+                        climberIO.setClimberVoltage(2);
+                    }
                     climberIO.setHookVoltage(1);
                     if (MathUtil.isNear(
                             inputs.climberPosition.in(Inches),

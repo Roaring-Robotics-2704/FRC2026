@@ -39,6 +39,7 @@ import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
 import frc.robot.subsystems.superstructure.Kicker;
 import frc.robot.subsystems.superstructure.climber.Climber;
 import frc.robot.subsystems.superstructure.climber.ClimberIO;
+import frc.robot.subsystems.superstructure.climber.ClimberIOReal;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.HopperIO;
 import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
@@ -93,6 +94,16 @@ public class RobotContainer {
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
+    //
+
+    public boolean noAutoSelected() {
+        var selected = autoChooser.getSendableChooser().getSelected();
+        return selected == null || selected == "None";
+    }
+
+    // Choreo auto factory library
+    // private final AutoFactory autoFactory;
+    private final AutoBuilder autoBuilder;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -114,8 +125,7 @@ public class RobotContainer {
                         new ModuleIOTalonFXReal(DriveConstants.backRightConfig));
                 intake = new Intake(new IntakeIOReal());
                 hopper = new Hopper(new HopperIOReal());
-                climber = new Climber(new ClimberIO() {
-                });
+                climber = new Climber(new ClimberIOReal());
                 vision = new Vision(
                         new VisionIOPhotonVision(camera0Name, robotToCamera0));
                 // objectDetection = new FuelPoseEstimator(new
@@ -185,8 +195,8 @@ public class RobotContainer {
         // superStructure = new SuperStructure(intake, hopper, kicker, shooter,
         // climber);
 
-        // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+               autoBuilder = new AutoBuilder(drive, intake, hopper, kicker, shooter, climber);
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", autoBuilder.buildAutoChooser());
 
         DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
 
@@ -273,6 +283,8 @@ public class RobotContainer {
 
         controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
 
+        controller2.povUp().onTrue(Commands.startEnd(()->intake.setDesiredState(IntakeState.DEPLOYED_ON), () -> intake.setDesiredState(IntakeState.DEPLOYED_OFF), intake));
+        controller2.povDown().onTrue(Commands.run(()->intake.setDesiredState(IntakeState.INSIDE), intake));
         // Reset gyro to 0 deg when B button is pressed
 
     }
