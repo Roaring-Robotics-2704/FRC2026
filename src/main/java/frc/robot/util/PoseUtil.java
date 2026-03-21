@@ -4,6 +4,7 @@
 
 package frc.robot.util;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 
 /** Add your docs here. */
@@ -13,6 +14,8 @@ public final class PoseUtil {
     }
 
     public static double distance(Pose2d pose1, Pose2d pose2) {
-        return Math.abs(pose1.getTranslation().getDistance(pose2.getTranslation()));
+        double y =  Math.abs((pose2.getY() - pose1.getY()));
+        double x = Math.abs((pose2.getX() - pose1.getX()));
+        return Math.abs(Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2)));
     }
 }
