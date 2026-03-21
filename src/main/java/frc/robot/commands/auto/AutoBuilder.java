@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+//import org.littletonrobotics.junction.Logger;
 
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
@@ -95,6 +96,11 @@ public class AutoBuilder {
 
         return sendableChooser;
     }
+
+    /*@Override
+    public void periodic() {
+        Logger.recordOutput("Auto/", value);
+    }*/
 
     public Command shootPreloadCommandSequence() {
         return Commands.sequence(
