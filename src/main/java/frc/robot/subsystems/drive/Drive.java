@@ -309,7 +309,9 @@ public class Drive extends SubsystemBase {
         }
         return motors.toArray(new TalonFX[motors.size()]);
     }
+
     public void followTrajectory(SwerveSample sample) {
+        Logger.recordOutput("Auto/TrajectoryFollower/Pose", sample.getPose());
         // Get the current pose of the robot
         Pose2d pose = RobotState.getInstance().getPose();
 
