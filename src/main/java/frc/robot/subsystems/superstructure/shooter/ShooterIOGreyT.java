@@ -43,7 +43,6 @@ import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOT
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KS;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KV;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TOLERANCE;
-import frc.robot.util.OrchestraManager;
 import frc.robot.util.PhoenixUtil;
 
 /** Add your docs here. */
@@ -104,7 +103,6 @@ public class ShooterIOGreyT implements ShooterIO {
 
         statusSignals.setUpdateFrequencyForAll(Hertz.of(50));
         ParentDevice.optimizeBusUtilizationForAll(flywheelMotor1, flywheelMotor2);
-        OrchestraManager.getInstance().addToOrchestra(flywheelMotor1,flywheelMotor2);
     }
 
     @Override

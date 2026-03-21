@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
@@ -10,6 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
@@ -33,6 +35,9 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -48,6 +53,7 @@ public class Drive extends SubsystemBase {
     ChassisSpeeds currentSpeeds;
     SwerveModuleState[] currentStates;
     SwerveSetpoint previousSetpoint;
+    Orchestra orchestra;
     
     public static final PIDController turnController = new PIDController(7.5, 0.0, 0.0);
     public static final PIDController driveXController = new PIDController(10, 0.0, 0.0);
@@ -100,6 +106,18 @@ public class Drive extends SubsystemBase {
         currentStates = this.getModuleStates();
         previousSetpoint = new SwerveSetpoint(
             currentSpeeds, currentStates, DriveFeedforwards.zeros(DriveConstants.pathplannerConfig.numModules));
+        orchestra = new Orchestra();
+        for (var module : modules) {
+            for (var motor : module.getMotors()) {
+                if (motor != null) {
+                    orchestra.addInstrument(motor);
+                }
+            }
+        }
+
+        orchestra.loadMusic("music/thx.chrp");
+        
+        // orchestra.play();
     }
 
     @Override

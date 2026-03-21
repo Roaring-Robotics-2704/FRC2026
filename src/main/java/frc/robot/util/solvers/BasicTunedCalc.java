@@ -12,6 +12,8 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.FlippingUtil;
 
@@ -88,12 +90,13 @@ public class BasicTunedCalc {
         if (distancetoRed.in(Meters) < distancetoBlue.in(Meters)) {
             hubPose = FlippingUtil.flipFieldPose(blueHubPose);
         }
-        Distance distance = Meters.of(PoseUtil.distance(shooterPose, hubPose));
-        double hoodPercent = hoodPercentMap.get(distance.in(Feet));
-        AngularVelocity flywheelVelocity = RPM.of(flywheelSpeedMap.get(distance.in(Feet)));
+        Logger.recordOutput("Calc/HubPose", hubPose);
+        double distance = PoseUtil.distance(shooterPose, hubPose);
+        double hoodPercent = hoodPercentMap.get(distance);
+        AngularVelocity flywheelVelocity = RPM.of(flywheelSpeedMap.get(distance));
         hoodPercent = hoodPercentFilter.calculate(hoodPercent);
 
-        Pose2d robotPoseLookAhead = RobotState.getInstance().getLookaheadPose(timeOfFlightMap.get(distance.in(Meters)));
+        Pose2d robotPoseLookAhead = RobotState.getInstance().getLookaheadPose(timeOfFlightMap.get(distance));
         double dx = blueHubPose.getX() - shooterPose.getX();
         double dy = blueHubPose.getY() - shooterPose.getY();
         double targetAngle = Math.atan2(dy, dx);
@@ -107,10 +110,10 @@ public class BasicTunedCalc {
         public final AngularVelocity flywheelVelocity;
         public final double hoodPercent;
         public final Rotation2d driveAngle;
-        public final Distance distance;
+        public final double distance;
 
         public ShootingSolution(AngularVelocity flywheelVelocity, double hoodPercent, Rotation2d driveAngle,
-                Distance distance) {
+                Double distance) {
             this.flywheelVelocity = flywheelVelocity;
             this.hoodPercent = hoodPercent;
             this.driveAngle = driveAngle;
@@ -130,7 +133,7 @@ public class BasicTunedCalc {
         }
 
         public double distance() {
-            return distance.in(Feet);
+            return distance;
         }
     }
 }

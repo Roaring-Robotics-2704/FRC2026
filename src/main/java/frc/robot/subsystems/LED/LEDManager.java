@@ -4,8 +4,12 @@
 
 package frc.robot.subsystems.LED;
 
+import static edu.wpi.first.units.Units.Hertz;
+import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.units.FrequencyUnit;
+import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -60,11 +64,11 @@ public class LEDManager extends SubsystemBase {
                     idlePattern.applyTo(ledBuffer);
                     break;
             }
-            ledStrip.setData(ledBuffer);
-            ledStrip.start();
             previousState = currentState;
+
         }
 
+            ledStrip.setData(ledBuffer);
         // This method will be called once per scheduler run
     }
 
@@ -74,8 +78,7 @@ public class LEDManager extends SubsystemBase {
         intakePattern = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kBlack, Color.kMagenta);
         intakePattern = intakePattern.blink(Seconds.of(0.25));
         climbPattern = LEDPattern.solid(Color.kAquamarine);
-        idlePattern = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kYellow, Color.kBlue);
-
+        idlePattern = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kYellow, Color.kBlue).scrollAtRelativeSpeed(Percent.per(Seconds).of(25));
     }
 
     public void setPattern(LEDState state) {

@@ -87,7 +87,7 @@ public class Hopper extends SubsystemBase {
             // Determine numeric target volts based on desired state
             switch (desiredState) {
                 case IDLE:
-                    targetVolts = 0.0;
+                    targetVolts = -2.0;
                     break;
                 case FEEDING:
                     targetVolts = HOPPER_VOLTAGE.in(Volts);

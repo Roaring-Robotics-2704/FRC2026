@@ -40,6 +40,7 @@ import frc.robot.subsystems.superstructure.Kicker;
 import frc.robot.subsystems.superstructure.climber.Climber;
 import frc.robot.subsystems.superstructure.climber.ClimberIO;
 import frc.robot.subsystems.superstructure.climber.ClimberIOReal;
+import frc.robot.subsystems.superstructure.climber.Climber.ClimberState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.HopperIO;
 import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
@@ -58,7 +59,6 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.util.OrchestraManager;
 import frc.robot.util.solvers.BasicTunedCalc;
 
 /**
@@ -218,8 +218,8 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> controller.getLeftY() * 0.5,
-                        () -> controller.getLeftX() * 0.5,
+                        () -> -controller.getLeftY() * 0.5,
+                        () -> -controller.getLeftX() * 0.5,
                         () -> -controller.getRightX() * 0.5));
         vision.setDefaultCommand(vision.idle());
         // objectDetection.setDefaultCommand(objectDetection.idle());
@@ -259,14 +259,13 @@ public class RobotContainer {
                         () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
                 Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
                         () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager
-                        ),
-                Commands.run(()->intake.setDesiredState(IntakeState.INSIDE))
+                        )
         ));
 
-        controller2.leftBumper().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)));
-        controller2.rightBumper().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)));
-        controller2.leftTrigger().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(-100)));
-        controller2.rightTrigger().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(100)));
+        controller2.povDown().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)));
+        controller2.povUp().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)));
+        controller2.povLeft().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(-100)));
+        controller2.povRight().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(100)));
         controller2.y().onTrue(Commands.run(() -> shooter.resetOverrides()));
 
         // Reset gyro or odometry if in simulation
@@ -281,11 +280,14 @@ public class RobotContainer {
         controller.start().and(controller.leftStick()).debounce(0.5)
                 .onTrue(Commands.runOnce(resetOdometry, drive).ignoringDisable(true));
 
-        controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
+        // controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
 
-        controller2.povUp().onTrue(Commands.startEnd(()->intake.setDesiredState(IntakeState.DEPLOYED_ON), () -> intake.setDesiredState(IntakeState.DEPLOYED_OFF), intake));
-        controller2.povDown().onTrue(Commands.run(()->intake.setDesiredState(IntakeState.INSIDE), intake));
+        controller2.leftTrigger().whileTrue(Commands.startEnd(()->intake.setDesiredState(IntakeState.DEPLOYED_ON), () -> intake.setDesiredState(IntakeState.DEPLOYED_OFF), intake));
+        controller2.leftTrigger().whileTrue(Commands.run(()->intake.setDesiredState(IntakeState.INSIDE), intake));
         // Reset gyro to 0 deg when B button is pressed
+
+        controller.povUp().onTrue(Commands.run(() -> climber.setDesiredState(ClimberState.TOP), climber));
+        controller.povDown().onTrue(Commands.run(() -> climber.setDesiredState(ClimberState.BOTTOM), climber));
 
     }
 

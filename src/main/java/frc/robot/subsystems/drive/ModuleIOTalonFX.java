@@ -28,7 +28,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
-import frc.robot.util.OrchestraManager;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
 public abstract class ModuleIOTalonFX implements ModuleIO {
@@ -149,7 +148,6 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         turnConfig.Audio.BeepOnBoot = false;
         turnConfig.Audio.BeepOnConfig = false;
         tryUntilOk(5, () -> turnTalon.getConfigurator().apply(turnConfig, 0.25));
-        OrchestraManager.getInstance().addToOrchestra(turnTalon, driveTalon);
     }
 
     @Override

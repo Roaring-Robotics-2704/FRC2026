@@ -160,10 +160,7 @@ public class AutoBuilder {
         AutoTrajectory minMovementShootTrajectory = ChoreoTraj.MinMovementShoot.asAutoTraj(routine);
 
         // When the routine begins, reset odometry and start the first trajectory
-        routine.active().onTrue(
-                Commands.sequence(
-                        minMovementShootTrajectory.resetOdometry(),
-                        minMovementShootTrajectory.cmd()));
+        routine.active().onTrue( runAutoTrajectory(minMovementShootTrajectory) );
 
         // Starting at the event marker named "intake", run the intake
         minMovementShootTrajectory.atTime("Shoot").onTrue(shootPreloadCommandSequence());

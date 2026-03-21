@@ -50,9 +50,9 @@ public class IntakeIOReal implements IntakeIO {
     public IntakeIOReal() {
         rollerMotor = new SparkFlex(IntakeConstants.ROLLER_MOTOR_ID, MotorType.kBrushless);
         slideMotor = new SparkMax(IntakeConstants.SLIDE_MOTOR_ID, MotorType.kBrushless);
-        // slideConfig = new SparkMaxConfig();
+        slideConfig = new SparkMaxConfig();
 
-        // slideConfig.smartCurrentLimit(SLIDE_CURRENT_LIMIT);
+        slideConfig.smartCurrentLimit(SLIDE_CURRENT_LIMIT);
         //slideConfig.closedLoop.feedForward.kG(SLIDE_POSITION_KG);
         //slideConfig.closedLoop.feedForward.kS(SLIDE_POSITION_KS);
         //slideConfig.closedLoop.feedForward.kV(SLIDE_POSITION_KV);
@@ -62,16 +62,16 @@ public class IntakeIOReal implements IntakeIO {
         // slideConfig.closedLoop.feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder);
         // slideConfig.absoluteEncoder.zeroCentered(true);
         // slideConfig.absoluteEncoder.inverted(true);
-        // slideConfig.inverted(false);
+        slideConfig.inverted(false);
         // slideConfig.absoluteEncoder.averageDepth(2);
-        // slideConfig.idleMode(IdleMode.kBrake);
-        // slideConfig.openLoopRampRate(1);
+        slideConfig.idleMode(IdleMode.kBrake);
+        slideConfig.openLoopRampRate(1);
         
 
 
-        // SparkUtil.tryUntilOk(slideMotor, 5,
-        //         () -> slideMotor.configure(slideConfig, ResetMode.kResetSafeParameters,
-        //                 PersistMode.kPersistParameters));
+        SparkUtil.tryUntilOk(slideMotor, 5,
+                () -> slideMotor.configure(slideConfig, ResetMode.kResetSafeParameters,
+                        PersistMode.kPersistParameters));
 
         SparkFlexConfig rollerConfig = new SparkFlexConfig();
 

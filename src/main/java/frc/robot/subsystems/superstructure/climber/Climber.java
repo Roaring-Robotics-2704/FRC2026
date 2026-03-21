@@ -18,6 +18,8 @@ import static edu.wpi.first.units.Units.InchesPerSecond;
 import static frc.robot.subsystems.superstructure.climber.ClimberConstants.*;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,7 +34,7 @@ public class Climber extends SubsystemBase {
     boolean hasCalibrated = false;
 
     private ClimberState currentState = ClimberState.BOTTOM;
-    private ClimberState desiredState = ClimberState.CALIBRATING;
+    private ClimberState desiredState = ClimberState.BOTTOM;
 
     /** Creates a new Climber. */
     public Climber(ClimberIO climberIO) {
@@ -43,9 +45,6 @@ public class Climber extends SubsystemBase {
     public void periodic() {
         climberIO.updateInputs(inputs);
         Logger.processInputs("Climber", inputs);
-        if (!hasCalibrated) {
-            desiredState = ClimberState.CALIBRATING;
-        }
 
         if (currentState != desiredState) {
             switch (desiredState) {
@@ -55,7 +54,7 @@ public class Climber extends SubsystemBase {
                     climberIO.setHookVoltage(0);
                     if (((inputs.climberVelocity.in(InchesPerSecond) == 0.0)
                             || inputs.climberCurrent.in(Amps) > 15)
-                            && timeoutTimer.hasElapsed(0.5)) {
+                            && timeoutTimer.hasElapsed(0.5) && DriverStation.isEnabled()) {
                         climberIO.setClimberVoltage(0);
                         climberIO.resetClimberEncoder();
                         stopTimer();
