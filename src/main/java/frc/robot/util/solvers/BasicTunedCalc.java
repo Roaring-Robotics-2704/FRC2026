@@ -39,7 +39,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.PoseUtil;
 
 /** Add your docs here. */
-public class BasicTunedCalc{
+public class BasicTunedCalc {
     private InterpolatingDoubleTreeMap hoodPercentMap = new InterpolatingDoubleTreeMap();
     private InterpolatingDoubleTreeMap flywheelSpeedMap = new InterpolatingDoubleTreeMap();
     private InterpolatingDoubleTreeMap timeOfFlightMap = new InterpolatingDoubleTreeMap();
@@ -54,17 +54,17 @@ public class BasicTunedCalc{
     /** Basic interpolated map for shooter calculations. */
     public BasicTunedCalc() {
         // Example data points (distance in feet, angle in degrees)d
-        hoodPercentMap.put(4.59, 0.0);//6
+        hoodPercentMap.put(4.59, 0.0);// 6
         flywheelSpeedMap.put(1.0, 2700.0);
         timeOfFlightMap.put(1.0, 0.9);
 
-         hoodPercentMap.put(6.22, 10.0);//9
-         flywheelSpeedMap.put(2.0, 3000.0);
-         timeOfFlightMap.put(2.0, 1.26);
+        hoodPercentMap.put(6.22, 10.0);// 9
+        flywheelSpeedMap.put(2.0, 3000.0);
+        timeOfFlightMap.put(2.0, 1.26);
 
-         hoodPercentMap.put(10.0, 15.0);
-         flywheelSpeedMap.put(3.0, 3200.0);
-         timeOfFlightMap.put(3.0, 1.5);
+        hoodPercentMap.put(10.0, 15.0);
+        flywheelSpeedMap.put(3.0, 3200.0);
+        timeOfFlightMap.put(3.0, 1.5);
 
         // hoodPercentMap.put(12.0, 7.5);
         // flywheelSpeedMap.put(4.0, 4500.0);
@@ -78,9 +78,10 @@ public class BasicTunedCalc{
 
     public ShootingSolution getShootingSolution() {
         Pose2d robotPose = RobotState.getInstance().getOdometryPose();
-        Pose2d shooterPose = robotPose.transformBy(new Transform2d(VisionConstants.robotToCamera0.getMeasureX(),VisionConstants.robotToCamera0.getMeasureY(), VisionConstants.robotToCamera0.getRotation().toRotation2d()));
-        
-        
+        Pose2d shooterPose = robotPose.transformBy(new Transform2d(VisionConstants.robotToCamera0.getMeasureX(),
+                VisionConstants.robotToCamera0.getMeasureY(),
+                VisionConstants.robotToCamera0.getRotation().toRotation2d()));
+
         Distance distancetoBlue = Meters.of(PoseUtil.distance(shooterPose, blueHubPose));
         Distance distancetoRed = Meters.of(PoseUtil.distance(shooterPose, FlippingUtil.flipFieldPose(blueHubPose)));
         Pose2d hubPose = blueHubPose;
@@ -102,6 +103,34 @@ public class BasicTunedCalc{
     }
 
     /** A record to hold the shooting solution. */
-    public record ShootingSolution(AngularVelocity flywheelVelocity, double hoodPercent, Rotation2d robotAngle, Distance distance) {
+    public class ShootingSolution {
+        public final AngularVelocity flywheelVelocity;
+        public final double hoodPercent;
+        public final Rotation2d driveAngle;
+        public final Distance distance;
+
+        public ShootingSolution(AngularVelocity flywheelVelocity, double hoodPercent, Rotation2d driveAngle,
+                Distance distance) {
+            this.flywheelVelocity = flywheelVelocity;
+            this.hoodPercent = hoodPercent;
+            this.driveAngle = driveAngle;
+            this.distance = distance;
+        }
+
+        public double flywheelVelocity() {
+            return flywheelVelocity.in(RPM);
+        }
+
+        public double hoodPercent() {
+            return hoodPercent;
+        }
+
+        public Rotation2d driveAngle() {
+            return driveAngle;
+        }
+
+        public double distance() {
+            return distance.in(Feet);
+        }
     }
 }

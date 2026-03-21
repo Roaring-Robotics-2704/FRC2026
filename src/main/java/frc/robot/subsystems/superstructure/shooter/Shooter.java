@@ -76,9 +76,9 @@ public class Shooter extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Shooter", inputs);
         ShootingSolution solution = solver.getShootingSolution();
-        hoodPercent = solution.hoodPercent()/100;
-        flywheelVelocity = solution.flywheelVelocity();
-        robotAngle = solution.robotAngle();
+        hoodPercent = solution.hoodPercent/100;
+        flywheelVelocity = RPM.of(solution.flywheelVelocity());
+        robotAngle = solution.driveAngle();
 
         Logger.recordOutput("Shooter/CalculatedHoodPercent", hoodPercent);
         Logger.recordOutput("Shooter/CalculatedFlywheelVelocity", flywheelVelocity);
