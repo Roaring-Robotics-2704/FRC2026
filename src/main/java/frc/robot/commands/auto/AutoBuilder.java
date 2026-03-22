@@ -110,13 +110,13 @@ public class AutoBuilder {
 
     public Command shootPreloadCommandSequence() {
         return Commands.sequence(
-                AutoCommands.index(hopper, kicker, shooter, intake, manager, Seconds.of(5))
+                AutoCommands.index(hopper, kicker, shooter, intake, manager, Seconds.of(7))
                 );
     }
 
     public Command shootCollectedFuelCommandSequence() {
         return Commands.sequence(
-                AutoCommands.index(hopper, kicker, shooter, intake, manager, Seconds.of(6))
+                AutoCommands.index(hopper, kicker, shooter, intake, manager, Seconds.of(12))
                 );
     }
 
@@ -237,8 +237,8 @@ public class AutoBuilder {
                         runAutoTrajectory(shootCollectShoot$0),
                         runAutoTrajectory(shootCollectShoot$1)));
 
-        shootCollectShoot$0.atTime("Shoot").onTrue(shootPreloadCommandSequence());
-        shootCollectShoot$1.atTime("ExtendIntake").onTrue(extendIntakeCommandSequence());
+        shootCollectShoot$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
+        shootCollectShoot$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
         shootCollectShoot$1.atTime("RetractIntake").onTrue(retractIntakeCommandSequence());
         shootCollectShoot$1.atTime("Shoot").onTrue(shootCollectedFuelCommandSequence());
 

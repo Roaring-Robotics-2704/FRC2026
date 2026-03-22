@@ -19,6 +19,10 @@ import edu.wpi.first.wpilibj.Timer;
 //import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.subsystems.vision.VisionConstants.maxAmbiguity;
+
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -46,6 +50,11 @@ public class AutoCommands {
             8.0);
     private static final LoggedTunableNumber autoDriveLaunchKd = new LoggedTunableNumber("AutoCommands/Launching/kD",
             0.5);
+
+    static Time timeOn = Seconds.of(3);
+    static Time timeOff = Seconds.of(1);
+    Timer timeOnClock = new Timer();
+    Timer timeOffClock = new Timer();
 
     public static Command followTrajectory(String name, Drive drive, boolean start) {
         Optional<Trajectory<SwerveSample>> trajectoryOptional = Choreo.loadTrajectory(name);
@@ -82,10 +91,11 @@ public class AutoCommands {
 
     public static Command index(Hopper hopper, Kicker kicker, Shooter shooter, Intake intake, LEDManager leds,
             Time shootTime) {
-        return Commands.sequence(
+        return Commands.repeatingSequence(
                 Commands.runOnce(() -> {
                     clock.reset();
                     clock.start();
+
                 }),
                 Commands.startEnd(
                         () -> {
@@ -101,7 +111,9 @@ public class AutoCommands {
                             leds.setPattern(LEDState.IDLE);
                         },
                         hopper,
-                        kicker).until(() -> clock.hasElapsed(shootTime)));
+                        kicker).until(() -> clock.hasElapsed(timeOn)),
+                Commands.waitTime(timeOff)
+            ).withTimeout(shootTime);
     }
 
     public static boolean xCrossed(double xPosition, boolean towardsCenter) {

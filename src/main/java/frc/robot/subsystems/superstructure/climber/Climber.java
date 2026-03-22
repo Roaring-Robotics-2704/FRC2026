@@ -45,7 +45,9 @@ public class Climber extends SubsystemBase {
     public void periodic() {
         climberIO.updateInputs(inputs);
         Logger.processInputs("Climber", inputs);
-
+        if (!hasCalibrated && DriverStation.isEnabled()) {
+            desiredState = ClimberState.CALIBRATING;
+        }
         if (currentState != desiredState) {
             switch (desiredState) {
                 case CALIBRATING:
@@ -126,6 +128,7 @@ public class Climber extends SubsystemBase {
         }
         Logger.recordOutput("Climber/DesiredState", desiredState);
         Logger.recordOutput("Climber/CurrentState", currentState);
+        Logger.recordOutput("Climber/hasCalibrated", hasCalibrated);
         // This method will be called once per scheduler run
     }
 
@@ -146,7 +149,7 @@ public class Climber extends SubsystemBase {
     }
 
     public void setDesiredState(ClimberState desiredState) {
-        this.desiredState = desiredState;
+            this.desiredState = desiredState;
     }
 
     public boolean isAtDesiredState() {

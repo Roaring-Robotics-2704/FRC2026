@@ -225,14 +225,14 @@ public class RobotContainer {
         // objectDetection.setDefaultCommand(objectDetection.idle());
 
         // Lock to 0 deg when A button is held
-        // controller
-        //         .rightTrigger()
-        //         .whileTrue(
-        //                 DriveCommands.joystickDriveAtAngle(
-        //                         drive,
-        //                         () -> controller.getLeftY() * 0.7,
-        //                         () -> controller.getLeftX() * 0.7,
-        //                         () -> shooter.getWantedRobotAngle()));
+        controller
+                .a()
+                .whileTrue(
+                        DriveCommands.joystickDriveAtAngle(
+                                drive,
+                                () -> -controller.getLeftY(),
+                                () -> -controller.getLeftX(),
+                                () -> shooter.getWantedRobotAngle().plus(Rotation2d.kCW_90deg)));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -286,8 +286,7 @@ public class RobotContainer {
         controller2.rightTrigger().whileTrue(Commands.run(()->intake.setDesiredState(IntakeState.INSIDE), intake));
         // Reset gyro to 0 deg when B button is pressed
 
-        controller.povUp().onTrue(Commands.run(() -> climber.setDesiredState(ClimberState.TOP), climber));
-        controller.povDown().onTrue(Commands.run(() -> climber.setDesiredState(ClimberState.BOTTOM), climber));
+        controller.b().onTrue(Commands.startEnd(()->climber.setDesiredState(ClimberState.TOP), ()->climber.setDesiredState(ClimberState.BOTTOM), climber));
 
     }
 
