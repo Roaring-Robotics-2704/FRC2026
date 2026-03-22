@@ -65,7 +65,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Hopper extends SubsystemBase {
     private final HopperIO hopperIO;
     private final HopperIOInputsAutoLogged inputs = new HopperIOInputsAutoLogged();
-    private HopperState currentState = HopperState.IDLE;
+    private HopperState currentState = HopperState.REVERSING;
     private HopperState desiredState = HopperState.IDLE;
 
     Double targetVolts;
