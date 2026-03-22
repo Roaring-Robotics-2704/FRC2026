@@ -77,7 +77,7 @@ public class Intake extends SubsystemBase {
         if (desiredState != currentState) {
             switch (desiredState) {
                 case INSIDE:
-                    intakeIO.setSlideVoltage(Volts.of(2));
+                    intakeIO.setSlideVoltage(Volts.of(3));
                     intakeIO.setRollerVoltage(Volts.of(0));
                     break;
                 case DEPLOYED_OFF:

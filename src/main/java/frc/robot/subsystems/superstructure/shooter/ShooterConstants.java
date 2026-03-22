@@ -27,17 +27,17 @@ public class ShooterConstants {
     public static final int CURRENT_LIMIT = 40; // shooter speed limit, this is a dummy value, change this later
     public static final DCMotor SHOOTER_MOTOR_TYPE = DCMotor.getKrakenX60(2); // change this later if necessary
 
-    public static final double SHOOTER_KP = 0; // more error = more power
+    public static final double SHOOTER_KP = 2; // more error = more power
     public static final double SHOOTER_KD = 0.0; // predicts ROC of error, change these PID values later as needed
-    public static final double SHOOTER_KV = 0.0105; 
-    public static final double SHOOTER_KA = 10.0;
+    public static final double SHOOTER_KV = 0.1; 
+    public static final double SHOOTER_KA = 30.0;
     public static final double SHOOTER_KS = 0.0;
 
     public static final AngularVelocity SHOOTER_TARGET = 
         RPM.of(2800); // add these if we need them, desired speed
     public static final AngularVelocity SHOOTER_IDLE = 
         RPM.of(2000); // add these if we need them, idle speed
-    public static final AngularVelocity SHOOTER_TOLERANCE = RotationsPerSecond.of(100);    
+    public static final AngularVelocity SHOOTER_TOLERANCE = RotationsPerSecond.of(50);    
     // GET REAL VALUES FOR FOLLOWING:
     public static final Angle MIN_ANGLE = Degrees.of(28.048335); // lowest angle shooter can reach
     public static final Angle MAX_ANGLE = Degrees.of(59.874070); // largest angle shooter can reach

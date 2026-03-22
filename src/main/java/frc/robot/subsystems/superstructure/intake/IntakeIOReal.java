@@ -118,7 +118,7 @@ public class IntakeIOReal implements IntakeIO {
     @Override
     public void stopMotors() {
         slideMotor.stopMotor();
-        rollerMotor.stopMotor();
+        //rollerMotor.stopMotor();
     }
 
     @Override

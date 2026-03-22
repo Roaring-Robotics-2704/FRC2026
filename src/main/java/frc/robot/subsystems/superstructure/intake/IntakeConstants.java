@@ -18,7 +18,7 @@ public class IntakeConstants {
     public static final int ROLLER_CURRENT_LIMIT = 40;
     public static final int SLIDE_CURRENT_LIMIT = 40;
 
-    public static final int SLIDE_STALL_LIMIT = 20;
+    public static final int SLIDE_STALL_LIMIT = 30;
 
     //public static final Distance SLIDE_MAX_DISTANCE = Inches.mutable(12);
 

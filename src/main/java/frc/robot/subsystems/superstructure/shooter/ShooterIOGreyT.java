@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -127,7 +128,7 @@ public class ShooterIOGreyT implements ShooterIO {
      */
     @Override
     public void setFlywheelVelocity(AngularVelocity velocity) {
-        flywheelMotor1.setControl(new VelocityDutyCycle(velocity));
+        flywheelMotor1.setControl(new VelocityVoltage(velocity));
         flywheelMotor2.setControl(new Follower(flywheelMotor1.getDeviceID(), MotorAlignmentValue.Opposed));
 
         targetFlywheelVelocity = velocity.in(RotationsPerSecond);

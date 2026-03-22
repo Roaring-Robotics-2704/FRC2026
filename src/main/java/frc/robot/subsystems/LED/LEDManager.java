@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.util.Map;
+
 import edu.wpi.first.units.FrequencyUnit;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -75,7 +77,7 @@ public class LEDManager extends SubsystemBase {
         intakePattern = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kBlack, Color.kMagenta);
         intakePattern = intakePattern.blink(Seconds.of(0.25));
         climbPattern = LEDPattern.solid(Color.kAquamarine);
-        idlePattern = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kYellow, Color.kBlue)
+        idlePattern = LEDPattern.steps(Map.of(0,Color.kYellow,0.5,Color.kBlue))
                 .scrollAtRelativeSpeed(Percent.per(Seconds).of(25));
     }
 

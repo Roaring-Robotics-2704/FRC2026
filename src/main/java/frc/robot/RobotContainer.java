@@ -283,7 +283,7 @@ public class RobotContainer {
         // controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
 
         controller2.leftTrigger().whileTrue(Commands.startEnd(()->intake.setDesiredState(IntakeState.DEPLOYED_ON), () -> intake.setDesiredState(IntakeState.DEPLOYED_OFF), intake));
-        controller2.leftTrigger().whileTrue(Commands.run(()->intake.setDesiredState(IntakeState.INSIDE), intake));
+        controller2.rightTrigger().whileTrue(Commands.run(()->intake.setDesiredState(IntakeState.INSIDE), intake));
         // Reset gyro to 0 deg when B button is pressed
 
         controller.povUp().onTrue(Commands.run(() -> climber.setDesiredState(ClimberState.TOP), climber));
