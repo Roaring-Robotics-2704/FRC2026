@@ -13,6 +13,8 @@ import choreo.trajectory.Trajectory;
 //import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.Timer;
 //import edu.wpi.first.math.geometry.Translation2d;
 //import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,22 +27,25 @@ import frc.robot.FieldConstants;
 import frc.robot.RobotState;
 import frc.robot.commands.DriveToPose;
 import frc.robot.commands.DriveTrajectory;
+import frc.robot.subsystems.LED.LEDManager;
+import frc.robot.subsystems.LED.LEDManager.LEDState;
 import frc.robot.subsystems.drive.Drive;
 //import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.Hopper.HopperState;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
+import frc.robot.subsystems.superstructure.shooter.Shooter.ShooterState;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.Kicker;
 import frc.robot.util.tunables.LoggedTunableNumber;
 import frc.robot.util.geometry.AllianceFlipUtil;
 
 public class AutoCommands {
+    static Timer clock = new Timer();
     private static final LoggedTunableNumber autoDriveLaunchKp = new LoggedTunableNumber("AutoCommands/Launching/kP",
             8.0);
     private static final LoggedTunableNumber autoDriveLaunchKd = new LoggedTunableNumber("AutoCommands/Launching/kD",
             0.5);
-
 
     public static Command followTrajectory(String name, Drive drive, boolean start) {
         Optional<Trajectory<SwerveSample>> trajectoryOptional = Choreo.loadTrajectory(name);
@@ -75,20 +80,28 @@ public class AutoCommands {
         }
     }
 
-    public static Command index(Hopper hopper, Kicker kicker, Shooter shooter, Intake intake) {
-        return Commands.waitUntil(shooter::isAtDesiredState)
-                .andThen(
-                        Commands.startEnd(
-                                () -> {
-                                    hopper.setDesiredState(HopperState.FEEDING);
-                                    kicker.setKickerVoltage(12);
-                                },
-                                () -> {
-                                    hopper.setDesiredState(HopperState.IDLE);
-                                    kicker.setKickerVoltage(-1);
-                                },
-                                hopper,
-                                kicker));
+    public static Command index(Hopper hopper, Kicker kicker, Shooter shooter, Intake intake, LEDManager leds,
+            Time shootTime) {
+        return Commands.sequence(
+                Commands.runOnce(() -> {
+                    clock.reset();
+                    clock.start();
+                }),
+                Commands.startEnd(
+                        () -> {
+                            hopper.setDesiredState(HopperState.FEEDING);
+                            kicker.setKickerVoltage(12);
+                            shooter.setDesiredState(ShooterState.SHOOTING);
+                            leds.setPattern(LEDState.SHOOTING);
+                        },
+                        () -> {
+                            hopper.setDesiredState(HopperState.IDLE);
+                            kicker.setKickerVoltage(-1);
+                            shooter.setDesiredState(ShooterState.IDLE);
+                            leds.setPattern(LEDState.IDLE);
+                        },
+                        hopper,
+                        kicker).until(() -> clock.hasElapsed(shootTime)));
     }
 
     public static boolean xCrossed(double xPosition, boolean towardsCenter) {

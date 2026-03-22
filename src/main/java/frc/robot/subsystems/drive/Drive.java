@@ -325,14 +325,14 @@ public class Drive extends SubsystemBase {
         Logger.recordOutput("Auto/TrajectoryFollower/Pose", sample.getPose());
         // Get the current pose of the robot
         Pose2d pose = RobotState.getInstance().getPose();
-
         // Generate the next speeds for the robot
         ChassisSpeeds speeds = new ChassisSpeeds(
             sample.vx + driveXController.calculate(pose.getX(), sample.x),
             sample.vy + driveYController.calculate(pose.getY(), sample.y),
             sample.omega + turnController.calculate(pose.getRotation().getRadians(), sample.heading)
         );
-
+        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, RobotState.getInstance().getRotation());
+        Logger.recordOutput("Auto/TrajectoryFollower/Speeds", speeds);
         // Apply the generated speeds
         runVelocity(speeds);
     }

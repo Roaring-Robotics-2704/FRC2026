@@ -14,6 +14,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import static edu.wpi.first.units.Units.Seconds;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
@@ -25,6 +28,7 @@ import choreo.auto.AutoTrajectory;
 import frc.robot.ChoreoTraj;
 import frc.robot.FieldConstants;
 import frc.robot.RobotState;
+import frc.robot.subsystems.LED.LEDManager;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.intake.Intake;
@@ -51,6 +55,7 @@ public class AutoBuilder {
     private final Kicker kicker;
     private final Shooter shooter;
     private final Climber climber;
+    private LEDManager manager;
 
     private final AutoFactory autoFactory;
 
@@ -61,13 +66,14 @@ public class AutoBuilder {
     public static final double neutralZoneIntakeTimeOther = 4.0;
     public static final double launchTime = 4.0;
 
-    public AutoBuilder(Drive drive, Intake intake, Hopper hopper, Kicker kicker, Shooter shooter, Climber climber) {
+    public AutoBuilder(Drive drive, Intake intake, Hopper hopper, Kicker kicker, Shooter shooter, Climber climber, LEDManager manager) {
         this.drive = drive;
         this.intake = intake;
         this.hopper = hopper;
         this.kicker = kicker;
         this.shooter = shooter;
         this.climber = climber;
+        this.manager = manager;
 
         autoFactory = new AutoFactory(
                 () -> RobotState.getInstance().getPose(), // A function that returns the current robot pose
@@ -104,27 +110,13 @@ public class AutoBuilder {
 
     public Command shootPreloadCommandSequence() {
         return Commands.sequence(
-                Commands.runOnce(() -> {
-                    shooter.setDesiredState(ShooterState.SHOOTING);
-                }),
-                Commands.waitSeconds(3),
-                Commands.runOnce(() -> {
-                    shooter.setDesiredState(ShooterState.IDLE);
-                }),
-                AutoCommands.index(hopper, kicker, shooter, intake)
+                AutoCommands.index(hopper, kicker, shooter, intake, manager, Seconds.of(5))
                 );
     }
 
     public Command shootCollectedFuelCommandSequence() {
         return Commands.sequence(
-                Commands.runOnce(() -> {
-                    shooter.setDesiredState(ShooterState.SHOOTING);
-                }),
-                Commands.waitSeconds(6),
-                Commands.runOnce(() -> {
-                    shooter.setDesiredState(ShooterState.IDLE);
-                }),
-                AutoCommands.index(hopper, kicker, shooter, intake)
+                AutoCommands.index(hopper, kicker, shooter, intake, manager, Seconds.of(6))
                 );
     }
 
@@ -156,7 +148,8 @@ public class AutoBuilder {
         return Commands.sequence(
                 trajectory.resetOdometry(),
                 trajectory.cmd(),
-                Commands.waitUntil(trajectory.done()));
+                Commands.waitUntil(trajectory.done()),
+                Commands.runOnce(drive::stopWithX));
     }
 
     public AutoRoutine minMovementShoot() {
@@ -166,9 +159,8 @@ public class AutoBuilder {
         AutoTrajectory minMovementShootTrajectory = ChoreoTraj.MinMovementShoot.asAutoTraj(routine);
         // When the routine begins, reset odometry and start the first trajectory
         routine.active().onTrue( runAutoTrajectory(minMovementShootTrajectory) );
-
         // Starting at the event marker named "intake", run the intake
-        minMovementShootTrajectory.atTime("Shoot").onTrue(shootPreloadCommandSequence());
+        minMovementShootTrajectory.atTime("Shoot Preloaded Fuel").onTrue(shootPreloadCommandSequence());
 
         return routine;
     }
@@ -184,7 +176,7 @@ public class AutoBuilder {
                         runAutoTrajectory(shootAndClimb$0),
                         runAutoTrajectory(shootAndClimb$1)));
 
-        shootAndClimb$0.atTime("Shoot").onTrue(shootPreloadCommandSequence());
+        shootAndClimb$0.atTime("Shoot Preloaded Fuel").onTrue(shootPreloadCommandSequence());
 
         shootAndClimb$1.atTime("Climb").onTrue(climbCommandSequence());
 

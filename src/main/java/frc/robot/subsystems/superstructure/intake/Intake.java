@@ -77,15 +77,15 @@ public class Intake extends SubsystemBase {
         if (desiredState != currentState) {
             switch (desiredState) {
                 case INSIDE:
-                    intakeIO.setSlideVoltage(Volts.of(3));
+                    intakeIO.setSlideVoltage(Volts.of(4));
                     intakeIO.setRollerVoltage(Volts.of(0));
                     break;
                 case DEPLOYED_OFF:
-                    intakeIO.setSlideVoltage(Volts.of(-4));
+                    intakeIO.setSlideVoltage(Volts.of(-6));
                     intakeIO.setRollerVoltage(Volts.of(0));
                     break;
                 case DEPLOYED_ON:
-                    intakeIO.setSlideVoltage(Volts.of(-4));
+                    intakeIO.setSlideVoltage(Volts.of(-6));
                     intakeIO.setRollerVoltage(Volts.of(12)); // Example roller voltage to
                     break;
                 default:

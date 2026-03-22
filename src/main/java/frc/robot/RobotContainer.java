@@ -195,7 +195,7 @@ public class RobotContainer {
         // superStructure = new SuperStructure(intake, hopper, kicker, shooter,
         // climber);
 
-               autoBuilder = new AutoBuilder(drive, intake, hopper, kicker, shooter, climber);
+               autoBuilder = new AutoBuilder(drive, intake, hopper, kicker, shooter, climber, LEDmanager);
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", autoBuilder.buildAutoChooser());
 
         DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
@@ -218,9 +218,9 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> -controller.getLeftY() * 0.5,
-                        () -> -controller.getLeftX() * 0.5,
-                        () -> -controller.getRightX() * 0.5));
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> -controller.getRightX()));
         vision.setDefaultCommand(vision.idle());
         // objectDetection.setDefaultCommand(objectDetection.idle());
 
@@ -298,7 +298,7 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // Return the selected autonomous command
-        return autoChooser.get();
+        return Commands.runOnce(drive::stopWithX).andThen(autoChooser.get());
     }
 
     /**
