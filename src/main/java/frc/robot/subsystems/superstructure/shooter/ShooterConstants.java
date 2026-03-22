@@ -30,7 +30,7 @@ public class ShooterConstants {
     public static final double SHOOTER_KP = 0; // more error = more power
     public static final double SHOOTER_KD = 0.0; // predicts ROC of error, change these PID values later as needed
     public static final double SHOOTER_KV = 0.0105; 
-    public static final double SHOOTER_KA = 0.0;
+    public static final double SHOOTER_KA = 10.0;
     public static final double SHOOTER_KS = 0.0;
 
     public static final AngularVelocity SHOOTER_TARGET = 

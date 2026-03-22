@@ -50,7 +50,7 @@ public class DriveTuningCommands {
     private static final double SLIP_RAMP_RATE = 0.075; // Volts/Sec
     private static final double SLIP_TRAVEL_AMOUNT = Units.degreesToRadians(15); // Rad
 
-    private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
+    private static final double WHEEL_RADIUS_MAX_VELOCITY = 1; // Rad/Sec
     private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
     /** The path to the JSON file where we save our tuning results. */

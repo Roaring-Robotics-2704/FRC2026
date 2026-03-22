@@ -211,7 +211,7 @@ public class DriveConstants {
     private static final double coupleRatio = 3.375;
 
     public static final double driveGearRatio = 5.2734375;
-    public static final double steerGearRatio = 26;
+    public static final double steerGearRatio = 26.09;
     public static final Distance wheelRadius = Inches.of(2);
 
     private static final int pigeonId = 13;

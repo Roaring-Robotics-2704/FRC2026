@@ -46,29 +46,26 @@ public class LEDManager extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (currentState != previousState) {
-            switch (currentState) {
-                case SHOOTING:
-                    shootPattern.applyTo(ledBuffer);
-                    break;
-                case INTAKE:
-                    intakePattern.applyTo(ledBuffer);
-                    break;
-                case CLIMBING:
-                    climbPattern.applyTo(ledBuffer);
-                    break;
-                case IDLE:
-                    idlePattern.applyTo(ledBuffer);
-                    break;
-                default:
-                    idlePattern.applyTo(ledBuffer);
-                    break;
-            }
-            previousState = currentState;
-
+        switch (currentState) {
+            case SHOOTING:
+                shootPattern.applyTo(ledBuffer);
+                break;
+            case INTAKE:
+                intakePattern.applyTo(ledBuffer);
+                break;
+            case CLIMBING:
+                climbPattern.applyTo(ledBuffer);
+                break;
+            case IDLE:
+                idlePattern.applyTo(ledBuffer);
+                break;
+            default:
+                idlePattern.applyTo(ledBuffer);
+                break;
         }
+        previousState = currentState;
 
-            ledStrip.setData(ledBuffer);
+        ledStrip.setData(ledBuffer);
         // This method will be called once per scheduler run
     }
 
@@ -78,7 +75,8 @@ public class LEDManager extends SubsystemBase {
         intakePattern = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kBlack, Color.kMagenta);
         intakePattern = intakePattern.blink(Seconds.of(0.25));
         climbPattern = LEDPattern.solid(Color.kAquamarine);
-        idlePattern = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kYellow, Color.kBlue).scrollAtRelativeSpeed(Percent.per(Seconds).of(25));
+        idlePattern = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kYellow, Color.kBlue)
+                .scrollAtRelativeSpeed(Percent.per(Seconds).of(25));
     }
 
     public void setPattern(LEDState state) {

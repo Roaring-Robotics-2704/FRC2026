@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.swerve.jni.SwerveJNI.ModuleState;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
@@ -49,10 +50,8 @@ import frc.robot.util.LocalADStarAK;
 /** Subsystem for controlling the swerve drive. Contains four modules and a gyro. */
 public class Drive extends SubsystemBase {
     private final RobotState robotState = RobotState.getInstance();
-    private SwerveSetpointGenerator setpointGenerator;
     ChassisSpeeds currentSpeeds;
     SwerveModuleState[] currentStates;
-    SwerveSetpoint previousSetpoint;
     Orchestra orchestra;
     
     public static final PIDController turnController = new PIDController(7.5, 0.0, 0.0);
@@ -99,13 +98,8 @@ public class Drive extends SubsystemBase {
         PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
             Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
-        setpointGenerator = new SwerveSetpointGenerator(
-            DriveConstants.pathplannerConfig,
-            RadiansPerSecond.of(DriveConstants.maxAngularSpeedRadPerSec));
         currentSpeeds = RobotState.getInstance().getRobotVelocity();
         currentStates = this.getModuleStates();
-        previousSetpoint = new SwerveSetpoint(
-            currentSpeeds, currentStates, DriveFeedforwards.zeros(DriveConstants.pathplannerConfig.numModules));
         orchestra = new Orchestra();
         for (var module : modules) {
             for (var motor : module.getMotors()) {
@@ -192,22 +186,21 @@ public class Drive extends SubsystemBase {
     public void runVelocity(ChassisSpeeds speeds, double[] accelerationsMps2) {
         // Calculate module setpoints
         speeds = ChassisSpeeds.discretize(speeds, 0.02);
-        previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, speeds, 0.02);
-        SwerveModuleState[] setpointStates = previousSetpoint.moduleStates();
-        SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.linearFreeSpeed);
+        SwerveModuleState[] states = RobotState.getInstance().kinematics.toSwerveModuleStates(speeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.linearFreeSpeed);
 
         
         // Log unoptimized setpoints and setpoint speeds
-        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+        Logger.recordOutput("SwerveStates/Setpoints", states);
         Logger.recordOutput("SwerveChassisSpeeds/Setpoints", speeds);
 
         // Send setpoints to modules
         for (int i = 0; i < 4; i++) {
-            modules[i].runSetpoint(setpointStates[i], accelerationsMps2[i]);
+            modules[i].runSetpoint(states[i], accelerationsMps2[i]);
         }
 
         // Log optimized setpoints (runSetpoint mutates each state)
-        Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+        Logger.recordOutput("SwerveStates/SetpointsOptimized", states);
     }
 
     /** Runs the drive in a straight line with the specified drive output. */
