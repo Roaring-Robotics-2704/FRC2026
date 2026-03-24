@@ -194,9 +194,9 @@ public class AutoBuilder {
                         runAutoTrajectory(shootCollectClimb$0),
                         runAutoTrajectory(shootCollectClimb$1)));
 
-        shootCollectClimb$0.atTime("Shoot").onTrue(shootPreloadCommandSequence());
-        shootCollectClimb$1.atTime("ExtendIntake").onTrue(extendIntakeCommandSequence());
-        shootCollectClimb$1.atTime("RetractIntake").onTrue(retractIntakeCommandSequence());
+        shootCollectClimb$0.atTime("Shoot Preloaded Fuel").onTrue(shootPreloadCommandSequence());
+        shootCollectClimb$1.atTime("Extend Inake").onTrue(extendIntakeCommandSequence());
+        shootCollectClimb$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
         shootCollectClimb$1.atTime("Climb").onTrue(climbCommandSequence());
 
         return routine;
@@ -215,10 +215,10 @@ public class AutoBuilder {
                         runAutoTrajectory(shootCollectPass$1),
                         runAutoTrajectory(shootCollectPass$2)));
 
-        shootCollectPass$0.atTime("Shoot").onTrue(shootPreloadCommandSequence());
-        shootCollectPass$1.atTime("ExtendIntake").onTrue(extendIntakeCommandSequence());
-        shootCollectPass$1.atTime("Pass").onTrue(shootCollectedFuelCommandSequence());
-        shootCollectPass$2.atTime("Pass").onTrue(
+        shootCollectPass$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
+        shootCollectPass$1.atTime("Extend Intake 1").onTrue(extendIntakeCommandSequence());
+        shootCollectPass$1.atTime("Pass 1").onTrue(shootCollectedFuelCommandSequence());
+        shootCollectPass$2.atTime("Pass 2").onTrue(
                 Commands.sequence(
                         shootCollectedFuelCommandSequence(),
                         retractIntakeCommandSequence()));
@@ -239,8 +239,8 @@ public class AutoBuilder {
 
         shootCollectShoot$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
         shootCollectShoot$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
-        shootCollectShoot$1.atTime("RetractIntake").onTrue(retractIntakeCommandSequence());
-        shootCollectShoot$1.atTime("Shoot").onTrue(shootCollectedFuelCommandSequence());
+        shootCollectShoot$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
+        shootCollectShoot$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
 
         return routine;
     }
@@ -257,8 +257,8 @@ public class AutoBuilder {
                         runAutoTrajectory(shootDepotClimb$1)));
 
         shootDepotClimb$0.atTime("Shoot").onTrue(shootPreloadCommandSequence());
-        shootDepotClimb$1.atTime("ExtendIntake").onTrue(extendIntakeCommandSequence());
-        shootDepotClimb$1.atTime("RetractIntake").onTrue(retractIntakeCommandSequence());
+        shootDepotClimb$1.atTime("Extend Intake").onTrue(extendIntakeCommandSequence());
+        shootDepotClimb$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
         shootDepotClimb$1.atTime("Climb").onTrue(climbCommandSequence());
 
         return routine;
@@ -275,10 +275,10 @@ public class AutoBuilder {
                         runAutoTrajectory(shootDepotShoot$0),
                         runAutoTrajectory(shootDepotShoot$1)));
 
-        shootDepotShoot$0.atTime("Shoot").onTrue(shootPreloadCommandSequence());
-        shootDepotShoot$1.atTime("ExtendIntake").onTrue(extendIntakeCommandSequence());
-        shootDepotShoot$1.atTime("RetractIntake").onTrue(retractIntakeCommandSequence());
-        shootDepotShoot$1.atTime("Shoot").onTrue(shootCollectedFuelCommandSequence());
+        shootDepotShoot$0.atTime("Shoot 1").onTrue(shootPreloadCommandSequence());
+        shootDepotShoot$1.atTime("Extend Intake").onTrue(extendIntakeCommandSequence());
+        shootDepotShoot$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
+        shootDepotShoot$1.atTime("Shoot 2").onTrue(shootCollectedFuelCommandSequence());
 
         return routine;
     }
@@ -294,9 +294,9 @@ public class AutoBuilder {
                         runAutoTrajectory(shootCollectClimbMirrored$0),
                         runAutoTrajectory(shootCollectClimbMirrored$1)));
 
-        shootCollectClimbMirrored$0.atTime("Shoot").onTrue(shootPreloadCommandSequence());
-        shootCollectClimbMirrored$1.atTime("ExtendIntake").onTrue(extendIntakeCommandSequence());
-        shootCollectClimbMirrored$1.atTime("RetractIntake").onTrue(retractIntakeCommandSequence());
+        shootCollectClimbMirrored$0.atTime("Shoot Preloaded Fuel").onTrue(shootPreloadCommandSequence());
+        shootCollectClimbMirrored$1.atTime("Extend Intake").onTrue(extendIntakeCommandSequence());
+        shootCollectClimbMirrored$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
         shootCollectClimbMirrored$1.atTime("Climb").onTrue(climbCommandSequence());
 
         return routine;
@@ -313,10 +313,10 @@ public class AutoBuilder {
                         runAutoTrajectory(shootCollectShootMirrored$0),
                         runAutoTrajectory(shootCollectShootMirrored$1)));
 
-        shootCollectShootMirrored$0.atTime("Shoot").onTrue(shootPreloadCommandSequence());
-        shootCollectShootMirrored$1.atTime("ExtendIntake").onTrue(extendIntakeCommandSequence());
-        shootCollectShootMirrored$1.atTime("RetractIntake").onTrue(retractIntakeCommandSequence());
-        shootCollectShootMirrored$1.atTime("Shoot").onTrue(shootCollectedFuelCommandSequence());
+        shootCollectShootMirrored$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
+        shootCollectShootMirrored$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
+        shootCollectShootMirrored$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
+        shootCollectShootMirrored$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
 
         return routine;
     }
@@ -333,10 +333,10 @@ public class AutoBuilder {
                         runAutoTrajectory(shootCollectShootClimb$0),
                         runAutoTrajectory(shootCollectShootClimb$1)));
 
-        shootCollectShootClimb$0.atTime("Shoot").onTrue(shootPreloadCommandSequence());
-        shootCollectShootClimb$1.atTime("ExtendIntake").onTrue(extendIntakeCommandSequence());
-        shootCollectShootClimb$1.atTime("RetractIntake").onTrue(retractIntakeCommandSequence());
-        shootCollectShootClimb$1.atTime("Shoot").onTrue(shootCollectedFuelCommandSequence());
+        shootCollectShootClimb$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
+        shootCollectShootClimb$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
+        shootCollectShootClimb$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
+        shootCollectShootClimb$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
         shootCollectShootClimb$2.atTime("Climb").onTrue(climbCommandSequence());
 
         return routine;
@@ -357,10 +357,10 @@ public class AutoBuilder {
                         runAutoTrajectory(shootCollectShootClimbMirrored$0),
                         runAutoTrajectory(shootCollectShootClimbMirrored$1)));
 
-        shootCollectShootClimbMirrored$0.atTime("Shoot").onTrue(shootPreloadCommandSequence());
-        shootCollectShootClimbMirrored$1.atTime("ExtendIntake").onTrue(extendIntakeCommandSequence());
-        shootCollectShootClimbMirrored$1.atTime("RetractIntake").onTrue(retractIntakeCommandSequence());
-        shootCollectShootClimbMirrored$1.atTime("Shoot").onTrue(shootCollectedFuelCommandSequence());
+        shootCollectShootClimbMirrored$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
+        shootCollectShootClimbMirrored$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
+        shootCollectShootClimbMirrored$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
+        shootCollectShootClimbMirrored$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
         shootCollectShootClimbMirrored$2.atTime("Climb").onTrue(climbCommandSequence());
 
         return routine;
