@@ -91,5 +91,5 @@
  },
  "events":[
    {"name":"Shoot Preloaded Fuel", "from":{"target":1, "targetTimestamp":0.58552, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Shoot"}}},
-   {"name":"Climb To Level 1", "from":{"target":3, "targetTimestamp":1.17681, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Climb"}}}]
+   {"name":"Climb", "from":{"target":3, "targetTimestamp":1.17681, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Climb"}}}]
 }

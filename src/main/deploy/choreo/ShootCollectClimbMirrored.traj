@@ -242,5 +242,5 @@
    {"name":"Shoot Preloaded Fuel", "from":{"target":2, "targetTimestamp":0.65506, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Shoot"}}},
    {"name":"Extend Inake", "from":{"target":6, "targetTimestamp":2.15482, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"ExtendIntake"}}},
    {"name":"Retract Intake", "from":{"target":9, "targetTimestamp":3.90577, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"RetractIntake"}}},
-   {"name":"Climb To Level 1", "from":{"target":13, "targetTimestamp":5.66728, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Climb"}}}]
+   {"name":"Climb", "from":{"target":13, "targetTimestamp":5.66728, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"Climb"}}}]
 }
