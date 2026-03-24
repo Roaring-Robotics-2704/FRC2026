@@ -32,7 +32,6 @@ import frc.robot.subsystems.LED.LEDManager;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.intake.Intake;
-import frc.robot.subsystems.superstructure.intake.Intake.IntakeState;
 import frc.robot.subsystems.superstructure.Kicker;
 import frc.robot.subsystems.superstructure.climber.Climber;
 import frc.robot.subsystems.superstructure.climber.Climber.ClimberState;
@@ -133,15 +132,11 @@ public class AutoBuilder {
     }
 
     public Command retractIntakeCommandSequence() {
-        return Commands.sequence(
-                Commands.runOnce(() -> intake.setDesiredState(IntakeState.DEPLOYED_OFF)),
-                Commands.runOnce(() -> intake.setDesiredState(IntakeState.INSIDE)));
+        return intake.retract().withTimeout(2);
     }
 
     public Command extendIntakeCommandSequence() {
-        return Commands.runOnce(() -> {
-            intake.setDesiredState(IntakeState.DEPLOYED_ON);
-        });
+        return intake.intake();
     }
 
     public Command runAutoTrajectory(AutoTrajectory trajectory) {

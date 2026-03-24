@@ -84,14 +84,14 @@ public class Intake extends SubsystemBase {
         return Commands.parallel(
             extendSlide().withTimeout(2),
             Commands.startEnd(() -> setRollersEnabled(true), () -> setRollersEnabled(false))
-        );
+        ).finallyDo(this::stopIntake);
     }
 
     public Command retract() {
         return Commands.parallel(
             retractSlide(),
             Commands.startEnd(() -> setRollersEnabled(true), () -> setRollersEnabled(false))
-        );
+        ).finallyDo(this::stopIntake);
     }
 
 
