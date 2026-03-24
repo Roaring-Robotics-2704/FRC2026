@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-/**
- * Climbing States Calibrating -> full power to bring the climber down - once velocity is zero we
- * know its at the bottom (alt: once current spikes) - units (distance mutable inches) Stopped -> No
- * power in Motor Transition to Top -> 6 Volts going CCW until height reached or timeout of 5
- * seconds Transition to Middle -> Find the current height. If less than middle. 6V CCW until height
- * in tolerance range. Else opp. Transition to Botton -> 6 Volts going CW until height reached or
- * timeout of 5 seconds
+/*
+  Climbing States Calibrating -> full power to bring the climber down - once velocity is zero we
+  know it's at the bottom (alt: once current spikes) - units (distance mutable inches) Stopped -> No
+  power in Motor Transition to Top -> 6 Volts going CCW until height reached or timeout of 5
+  seconds Transition to Middle -> Find the current height. If less than middle. 6V CCW until height
+  in tolerance range. Else opp. Transition to Botton -> 6 Volts going CW until height reached or
+  timeout of 5 seconds
  */
 package frc.robot.subsystems.superstructure.climber;
 
@@ -19,11 +19,10 @@ import static frc.robot.subsystems.superstructure.climber.ClimberConstants.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -47,6 +46,9 @@ public class Climber extends SubsystemBase {
         Logger.processInputs("Climber", inputs);
         if (!hasCalibrated && DriverStation.isEnabled()) {
             desiredState = ClimberState.CALIBRATING;
+        }
+        if (DriverStation.isDisabled()) {
+            timeoutTimer.reset();
         }
         if (currentState != desiredState) {
             switch (desiredState) {
@@ -149,7 +151,7 @@ public class Climber extends SubsystemBase {
     }
 
     public void setDesiredState(ClimberState desiredState) {
-            this.desiredState = desiredState;
+        this.desiredState = desiredState;
     }
 
     public boolean isAtDesiredState() {
@@ -157,7 +159,6 @@ public class Climber extends SubsystemBase {
     }
 
     public Command goToStateCommand(ClimberState state) {
-        return this.runOnce(() -> setDesiredState(state))
-                .andThen(new WaitUntilCommand(this::isAtDesiredState));
+        return Commands.run(() -> setDesiredState(state), this).until(this::isAtDesiredState);
     }
 }

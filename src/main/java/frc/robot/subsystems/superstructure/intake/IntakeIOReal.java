@@ -29,7 +29,6 @@ import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_S
 
 import edu.wpi.first.math.filter.LinearFilter;
 
-import frc.robot.subsystems.superstructure.intake.Intake.IntakePosition;
 /*import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KA;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KD;
 import static frc.robot.subsystems.superstructure.intake.IntakeConstants.SLIDE_POSITION_KG;

@@ -12,7 +12,6 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-import com.revrobotics.ColorSensorV3.LEDCurrent;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -48,7 +47,6 @@ import frc.robot.subsystems.superstructure.hopper.HopperIOSim;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
 import frc.robot.subsystems.superstructure.intake.IntakeIOReal;
-import frc.robot.subsystems.superstructure.intake.Intake.IntakeState;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
 import frc.robot.subsystems.superstructure.shooter.ShooterIO;
 import frc.robot.subsystems.superstructure.shooter.ShooterIOGreyT;
@@ -79,7 +77,6 @@ public class RobotContainer {
     private final Intake intake;
     private final Shooter shooter;
     private final Climber climber;
-
 
     LEDManager LEDmanager;
     private final Vision vision;
@@ -195,7 +192,7 @@ public class RobotContainer {
         // superStructure = new SuperStructure(intake, hopper, kicker, shooter,
         // climber);
 
-               autoBuilder = new AutoBuilder(drive, intake, hopper, kicker, shooter, climber, LEDmanager);
+        autoBuilder = new AutoBuilder(drive, intake, hopper, kicker, shooter, climber, LEDmanager);
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", autoBuilder.buildAutoChooser());
 
         DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
@@ -214,6 +211,15 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+
+        // Reset gyro or odometry if in simulation
+        final Runnable resetGyro = () -> drive.setPose(new Pose2d(RobotState.getInstance().getPose().getTranslation(),
+                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero
+                        : Rotation2d.k180deg)); // Zero gyro
+        final Runnable resetOdometry = () -> drive.setPose(
+                new Pose2d(0, 0, DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero
+                        : Rotation2d.k180deg)); // Zero gyro
+
         // Default command, normal field-relative drive
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
@@ -237,16 +243,14 @@ public class RobotContainer {
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-        controller.start().onTrue(Commands.runOnce(() -> RobotState.getInstance().resetPose(Pose2d.kZero)));
+        // controller.start().onTrue(Commands.runOnce(() -> RobotState.getInstance().resetPose(Pose2d.kZero)).ignoringDisable(true));
+
+        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        controller.start().and(controller.leftStick()).debounce(0.5)
+                .onTrue(Commands.runOnce(resetOdometry, drive).ignoringDisable(true));
 
         // Reset gyro to 0 deg when B button is pressed
-        controller.leftTrigger().whileTrue(Commands.parallel(
-                Commands.startEnd(
-                        () -> intake.setDesiredState(Intake.IntakeState.DEPLOYED_ON),
-                        () -> intake.setDesiredState(Intake.IntakeState.DEPLOYED_OFF), intake),
-                Commands.startEnd(
-                    () -> LEDmanager.setPattern(LEDState.INTAKE),
-                    () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
+
         controller.rightTrigger().whileTrue(Commands.parallel(
                 Commands.startEnd(() -> {
                     if (shooter.isAtDesiredState()) {
@@ -258,9 +262,7 @@ public class RobotContainer {
                 Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
                         () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
                 Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
-                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager
-                        )
-        ));
+                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
 
         controller2.povDown().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)));
         controller2.povUp().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)));
@@ -268,25 +270,33 @@ public class RobotContainer {
         controller2.povRight().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(100)));
         controller2.y().onTrue(Commands.run(() -> shooter.resetOverrides()));
 
-        // Reset gyro or odometry if in simulation
-        final Runnable resetGyro = () -> drive.setPose(new Pose2d(RobotState.getInstance().getPose().getTranslation(),
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero
-                        : Rotation2d.k180deg)); // Zero gyro
-        final Runnable resetOdometry = () -> drive.setPose(
-                new Pose2d(0, 0, DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero
-                        : Rotation2d.k180deg)); // Zero gyro
-
-        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-        controller.start().and(controller.leftStick()).debounce(0.5)
-                .onTrue(Commands.runOnce(resetOdometry, drive).ignoringDisable(true));
-
         // controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
 
-        controller2.leftTrigger().whileTrue(Commands.startEnd(()->intake.setDesiredState(IntakeState.DEPLOYED_ON), () -> intake.setDesiredState(IntakeState.DEPLOYED_OFF), intake));
-        controller2.rightTrigger().whileTrue(Commands.run(()->intake.setDesiredState(IntakeState.INSIDE), intake));
+        controller.leftTrigger().or(controller2.leftTrigger()).whileTrue(Commands.parallel(
+            intake.intake(),
+            Commands.startEnd(
+                () -> LEDmanager.setPattern(LEDState.INTAKE),
+                () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)
+        ));
+        controller2.rightTrigger().whileTrue(intake.retract());
         // Reset gyro to 0 deg when B button is pressed
 
-        controller.b().onTrue(Commands.startEnd(()->climber.setDesiredState(ClimberState.TOP), ()->climber.setDesiredState(ClimberState.BOTTOM), climber));
+        controller2.b().onTrue(Commands.parallel(
+            Commands.sequence(
+                intake.retract().withTimeout(2),
+                climber.goToStateCommand(ClimberState.TOP)
+                ),
+            Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
+                    () -> LEDmanager.setPattern(LEDState.IDLE))
+        ));
+        controller2.a().onTrue(Commands.parallel(
+            Commands.sequence(
+                intake.retract().withTimeout(0.5),
+                climber.goToStateCommand(ClimberState.BOTTOM)
+            ),
+            Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
+                () -> LEDmanager.setPattern(LEDState.IDLE))
+        ));
 
     }
 
@@ -300,16 +310,6 @@ public class RobotContainer {
         return Commands.runOnce(drive::stopWithX).andThen(autoChooser.get());
     }
 
-    /**
-     * Use this to pass the calibration command to the main {@link Robot} class.
-     *
-     * @return the command to run in calibration
-     */
-    // public Command getCalibrationCommand() {
-    // return
-    // Commands.sequence(superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_IN),
-    // superStructure.goToState(SuperStructureStates.INTAKE_CALIBRATE_OUT));
-    // }
 
     /** Reset the simulation field. */
     public void resetSimulationField() {
