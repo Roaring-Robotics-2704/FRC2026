@@ -61,11 +61,10 @@ public class IntakeIOReal implements IntakeIO {
         // slideConfig.closedLoop.feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder);
         // slideConfig.absoluteEncoder.zeroCentered(true);
         // slideConfig.absoluteEncoder.inverted(true);
-        slideConfig.inverted(false);
+        slideConfig.inverted(true);
         // slideConfig.absoluteEncoder.averageDepth(2);
         slideConfig.idleMode(IdleMode.kBrake);
-        slideConfig.openLoopRampRate(1);
-        
+
 
 
         SparkUtil.tryUntilOk(slideMotor, 5,
