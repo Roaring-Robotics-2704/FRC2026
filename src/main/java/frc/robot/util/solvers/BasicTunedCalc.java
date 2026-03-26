@@ -81,10 +81,10 @@ public class BasicTunedCalc {
     public ShootingSolution getShootingSolution() {
         Pose2d robotPose = RobotState.getInstance().getPose();
         Logger.recordOutput("Calc/RobotPose", robotPose);
-        // Pose2d shooterPose = robotPose.transformBy(new Transform2d(VisionConstants.robotToCamera0.getMeasureX(),
-        //         VisionConstants.robotToCamera0.getMeasureY(),
-        //         VisionConstants.robotToCamera0.getRotation().toRotation2d()));
-        // Logger.recordOutput("Calc/ShooterPose", shooterPose);
+        Pose2d shooterPose = robotPose.transformBy(new Transform2d(VisionConstants.robotToCamera0.getMeasureX(),
+                 VisionConstants.robotToCamera0.getMeasureY(),
+                 VisionConstants.robotToCamera0.getRotation().toRotation2d()));
+        Logger.recordOutput("Calc/ShooterPose", shooterPose);
         Distance distancetoBlue = Meters.of(PoseUtil.distance(robotPose, blueHubPose));
         Distance distancetoRed = Meters.of(PoseUtil.distance(robotPose, FlippingUtil.flipFieldPose(blueHubPose)));
         Pose2d hubPose = blueHubPose;
