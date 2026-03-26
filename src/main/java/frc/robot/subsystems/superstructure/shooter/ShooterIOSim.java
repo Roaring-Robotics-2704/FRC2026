@@ -50,7 +50,7 @@ public class ShooterIOSim implements ShooterIO {
         flywheelMotorSim.update(Seconds.of(0.02));
         inputs.hoodAngle.mut_replace(hoodAngle);
         inputs.flywheelVelocity.mut_replace(RotationsPerSecond.of(flywheelSim.getAngularVelocityRPM() / 60));
-        inputs.flywheelAppliedVolts.mut_replace(Volts.of(flywheelSim.getInputVoltage()));
+        inputs.leftFlywheelAppliedVolts.mut_replace(Volts.of(flywheelSim.getInputVoltage()));
         inputs.atTargetAngle = true; // No hood in simulation, so always at target angle
         inputs.atTargetVelocity = true;
         // inputs.atTargetVelocity = MathUtil.isNear(
@@ -59,7 +59,7 @@ public class ShooterIOSim implements ShooterIO {
         //     50); // 50 RPM tolerance
         inputs.flywheelAcceleration.mut_replace(
             RotationsPerSecondPerSecond.of(flywheelSim.getAngularAccelerationRadPerSecSq()));
-        inputs.flywheelCurrentAmps.mut_replace(flywheelSim.getCurrentDrawAmps(), Amps);
+        inputs.leftFlywheelCurrentAmps.mut_replace(flywheelSim.getCurrentDrawAmps(), Amps);
         inputs.targetFlywheelVelocity.mut_replace(flywheelVelocity);
     }
 
