@@ -117,7 +117,7 @@ public class Robot extends LoggedRobot {
 
         // Start AdvantageKit logger
         Logger.start();
-
+        
         // Disable automatic Hoot logging
         SignalLogger.enableAutoLogging(false);
 
