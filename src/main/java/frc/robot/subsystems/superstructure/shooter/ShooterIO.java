@@ -28,8 +28,10 @@ public interface ShooterIO { // creates and sets baseline values of robot for lo
         public MutAngle hoodAngle = Degrees.mutable(0);
         public MutAngularVelocity flywheelVelocity = DegreesPerSecond.mutable(0);
         public MutAngularAcceleration flywheelAcceleration = DegreesPerSecondPerSecond.mutable(0);
-        public MutVoltage flywheelAppliedVolts = Volt.mutable(0);
-        public MutCurrent flywheelCurrentAmps = Amps.mutable(0);
+        public MutVoltage leftFlywheelAppliedVolts = Volt.mutable(0);
+        public MutVoltage rightFlywheelAppliedVolts = Volt.mutable(0);
+        public MutCurrent leftFlywheelCurrentAmps = Amps.mutable(0);
+        public MutCurrent rightFlywheelCurrentAmps = Amps.mutable(0);
 
         public boolean atTargetVelocity = false;
         public boolean atTargetAngle = false;
