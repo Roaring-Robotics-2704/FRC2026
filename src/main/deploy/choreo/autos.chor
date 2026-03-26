@@ -76,7 +76,7 @@
  },
  "generationFeatures":[],
  "codegen":{
-  "root":"../../java/frc/robot",
+  "root":"..\\..\\..\\..\\..\\..\\Desktop\\FRC2026",
   "genVars":true,
   "genTrajData":true,
   "useChoreoLib":true
