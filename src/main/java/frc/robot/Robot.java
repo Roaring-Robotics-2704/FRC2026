@@ -17,6 +17,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedPowerDistribution;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -108,7 +109,7 @@ public class Robot extends LoggedRobot {
 
         // Initialize URCL
          Logger.registerURCL(URCL.startExternal());
-        LoggedPowerDistribution.getInstance(50, ModuleType.kRev); // Example: PDH on CAN ID 50
+        LoggedPowerDistribution.getInstance(50, PowerDistribution.ModuleType.kRev); // Example: PDH on CAN ID 50
         // Start AdvantageKit logger
         Logger.start();
         
