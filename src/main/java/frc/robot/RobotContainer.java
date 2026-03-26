@@ -39,7 +39,6 @@ import frc.robot.subsystems.superstructure.Kicker;
 import frc.robot.subsystems.superstructure.climber.Climber;
 import frc.robot.subsystems.superstructure.climber.ClimberIO;
 import frc.robot.subsystems.superstructure.climber.ClimberIOReal;
-import frc.robot.subsystems.superstructure.climber.Climber.ClimberState;
 import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.hopper.HopperIO;
 import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
@@ -57,7 +56,6 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.util.solvers.BasicTunedCalc;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -242,6 +240,9 @@ public class RobotContainer {
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        controller.x().whileTrue(Commands.startEnd(
+                ()->LEDmanager.setPattern(LEDState.X_LOCK),()->LEDmanager.setPattern(LEDState.IDLE),LEDmanager
+            ));
 
         // controller.start().onTrue(Commands.runOnce(() -> RobotState.getInstance().resetPose(Pose2d.kZero)).ignoringDisable(true));
 
@@ -281,21 +282,25 @@ public class RobotContainer {
         controller2.rightTrigger().whileTrue(intake.retract());
         // Reset gyro to 0 deg when B button is pressed
 
-        controller2.b().onTrue(Commands.parallel(
+        controller2.b().whileTrue(Commands.parallel(
             Commands.sequence(
                 intake.retract().withTimeout(2),
-                climber.goToStateCommand(ClimberState.TOP)
+                climber.setClimber(6)
                 ),
             Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
                     () -> LEDmanager.setPattern(LEDState.IDLE))
-        ));
-        controller2.a().onTrue(Commands.parallel(
+        ).finallyDo(()->climber.enablehook(true)));
+        controller2.a().whileTrue(Commands.parallel(
             Commands.sequence(
                 intake.retract().withTimeout(0.5),
-                climber.goToStateCommand(ClimberState.BOTTOM)
-            ),
+                climber.setClimber(-6)
+                ),
             Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
                 () -> LEDmanager.setPattern(LEDState.IDLE))
+        ).finallyDo(()->climber.enablehook(false)));
+        controller2.x().whileTrue(Commands.startEnd(
+            () -> climber.enablehook(true),
+            () -> climber.enablehook(false)
         ));
 
     }

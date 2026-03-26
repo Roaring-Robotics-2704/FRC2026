@@ -42,34 +42,34 @@ import frc.robot.util.PoseUtil;
 
 /** Add your docs here. */
 public class BasicTunedCalc {
-    private InterpolatingDoubleTreeMap hoodPercentMap = new InterpolatingDoubleTreeMap();
-    private InterpolatingDoubleTreeMap flywheelSpeedMap = new InterpolatingDoubleTreeMap();
-    private InterpolatingDoubleTreeMap timeOfFlightMap = new InterpolatingDoubleTreeMap();
+    private final InterpolatingDoubleTreeMap hoodPercentMap = new InterpolatingDoubleTreeMap();
+    private final InterpolatingDoubleTreeMap flywheelSpeedMap = new InterpolatingDoubleTreeMap();
+    private final InterpolatingDoubleTreeMap timeOfFlightMap = new InterpolatingDoubleTreeMap();
 
     private final LinearFilter hoodPercentFilter = LinearFilter.movingAverage((int) (0.1 / 0.02));
     private final LinearFilter driveAngleFilter = LinearFilter.movingAverage((int) (0.1 / 0.02));
-    private Pose2d blueHubPose = new Pose2d(4.625, 4.03, Rotation2d.fromDegrees(0));
+    private final Pose2d blueHubPose = new Pose2d(4.625, 4.03, Rotation2d.fromDegrees(0));
 
     double lastHoodAngle = 0;
     double lastDriveAngle = 0;
 
     /** Basic interpolated map for shooter calculations. */
     public BasicTunedCalc() {
-        // Example data points (distance in meters, angle in degrees)d
+        // Example data points (distance in meters, angle in degrees
         hoodPercentMap.put(1.38, 0.0);// 6
-        flywheelSpeedMap.put(1.38, 2500.0);
+        flywheelSpeedMap.put(1.38, 2600.0);
         timeOfFlightMap.put(1.38, 0.9);
 
         hoodPercentMap.put(2.0, 10.0);// 9
-        flywheelSpeedMap.put(2.0, 2800.0);
+        flywheelSpeedMap.put(2.0, 2900.0);
         timeOfFlightMap.put(2.0, 1.26);
 
         hoodPercentMap.put(3.0, 15.0);
-        flywheelSpeedMap.put(3.0, 3100.0);
+        flywheelSpeedMap.put(3.0, 3200.0);
         timeOfFlightMap.put(3.0, 1.25);
 
         hoodPercentMap.put(4.0, 20.0);
-        flywheelSpeedMap.put(4.0, 3500.0);
+        flywheelSpeedMap.put(4.0, 3600.0);
         timeOfFlightMap.put(4.0, 1.25);
 
         // hoodPercentMap.put(15.0, 9.0);

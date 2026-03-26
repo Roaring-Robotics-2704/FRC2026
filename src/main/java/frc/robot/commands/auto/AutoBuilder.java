@@ -34,7 +34,6 @@ import frc.robot.subsystems.superstructure.hopper.Hopper;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.Kicker;
 import frc.robot.subsystems.superstructure.climber.Climber;
-import frc.robot.subsystems.superstructure.climber.Climber.ClimberState;
 // import frc.robot.subsystems.superstructure.hook.Hook;
 // import frc.robot.subsystems.superstructure.hook.Hook.HookState;
 import frc.robot.subsystems.superstructure.shooter.Shooter;
@@ -122,13 +121,15 @@ public class AutoBuilder {
     public Command climbCommandSequence() {
         return Commands.sequence(
                 Commands.runOnce(() -> {
-                    climber.setDesiredState(ClimberState.TOP);
+                    climber.enablehook(true);
                 }),
-                Commands.waitUntil(climber::isAtDesiredState),
+                climber.setClimber(6).withTimeout(4),
                 Commands.runOnce(() -> {
-                    climber.setDesiredState(ClimberState.BOTTOM);
+                    climber.setClimber(-6);
                 }),
-                Commands.waitUntil(climber::isAtDesiredState));
+            Commands.runOnce(() -> {
+                climber.enablehook(true);
+            }));
     }
 
     public Command retractIntakeCommandSequence() {

@@ -24,7 +24,7 @@ public class LEDManager extends SubsystemBase {
     private LEDState previousState = null;
 
     public enum LEDState {
-        IDLE, INTAKE, SHOOTING, CLIMBING
+        IDLE, INTAKE, SHOOTING, CLIMBING, X_LOCK
     }
 
     AddressableLED ledStrip;
@@ -34,6 +34,7 @@ public class LEDManager extends SubsystemBase {
     LEDPattern intakePattern;
     LEDPattern climbPattern;
     LEDPattern idlePattern;
+    LEDPattern Xpattern;
 
     public LEDManager() {
         ledStrip = new AddressableLED(8);
@@ -61,6 +62,8 @@ public class LEDManager extends SubsystemBase {
             case IDLE:
                 idlePattern.applyTo(ledBuffer);
                 break;
+            case X_LOCK:
+                Xpattern.applyTo(ledBuffer);
             default:
                 idlePattern.applyTo(ledBuffer);
                 break;
@@ -79,6 +82,8 @@ public class LEDManager extends SubsystemBase {
         climbPattern = LEDPattern.solid(Color.kAquamarine);
         idlePattern = LEDPattern.steps(Map.of(0,Color.kYellow,0.5,Color.kBlue))
                 .scrollAtRelativeSpeed(Percent.per(Seconds).of(25));
+        Xpattern = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kGreen,Color.kCyan);
+        Xpattern = Xpattern.blink(Seconds.of(0.25));
     }
 
     public void setPattern(LEDState state) {
