@@ -312,7 +312,7 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // Return the selected autonomous command
-        return Commands.runOnce(drive::stopWithX).andThen(autoChooser.get());
+        return autoChooser.get();
     }
 
 
