@@ -224,7 +224,7 @@ public class RobotContainer {
                         drive,
                         () -> -controller.getLeftY(),
                         () -> -controller.getLeftX(),
-                        () -> -controller.getRightX()));
+                        () -> -controller.getRightX()*0.5));
         vision.setDefaultCommand(vision.idle());
         // objectDetection.setDefaultCommand(objectDetection.idle());
 
