@@ -282,26 +282,26 @@ public class RobotContainer {
         controller2.rightTrigger().whileTrue(intake.retract());
         // Reset gyro to 0 deg when B button is pressed
 
-        controller2.b().whileTrue(Commands.parallel(
-            Commands.sequence(
-                intake.retract().withTimeout(2),
-                climber.setClimber(6)
-                ),
-            Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
-                    () -> LEDmanager.setPattern(LEDState.IDLE))
-        ).finallyDo(()->climber.enablehook(true)));
-        controller2.a().whileTrue(Commands.parallel(
-            Commands.sequence(
-                intake.retract().withTimeout(0.5),
-                climber.setClimber(-6)
-                ),
-            Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
-                () -> LEDmanager.setPattern(LEDState.IDLE))
-        ).finallyDo(()->climber.enablehook(false)));
-        controller2.x().whileTrue(Commands.startEnd(
-            () -> climber.enablehook(true),
-            () -> climber.enablehook(false)
-        ));
+        // controller2.b().whileTrue(Commands.parallel(
+        //     Commands.sequence(
+        //         intake.retract().withTimeout(2),
+        //         climber.setClimber(6)
+        //         ),
+        //     Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
+        //             () -> LEDmanager.setPattern(LEDState.IDLE))
+        // ).finallyDo(()->climber.enablehook(true)));
+        // controller2.a().whileTrue(Commands.parallel(
+        //     Commands.sequence(
+        //         intake.retract().withTimeout(0.5),
+        //         climber.setClimber(-6)
+        //         ),
+        //     Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
+        //         () -> LEDmanager.setPattern(LEDState.IDLE))
+        // ).finallyDo(()->climber.enablehook(false)));
+        // controller2.x().whileTrue(Commands.startEnd(
+        //     () -> climber.enablehook(true),
+        //     () -> climber.enablehook(false)
+        // ));
 
     }
 
