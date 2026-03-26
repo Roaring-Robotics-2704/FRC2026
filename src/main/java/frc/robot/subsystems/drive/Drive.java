@@ -55,8 +55,8 @@ public class Drive extends SubsystemBase {
     Orchestra orchestra;
     
     public static final PIDController turnController = new PIDController(4.0, 0.0, 0.4);
-    public static final PIDController driveXController = new PIDController(3, 0.0, 0.4);
-    public static final PIDController driveYController = new PIDController(3, 0.0, 0.4);
+    public static final PIDController driveXController = new PIDController(5, 0.0, 0.4);
+    public static final PIDController driveYController = new PIDController(5, 0.0, 0.4);
 
 
     static final Lock odometryLock = new ReentrantLock();
