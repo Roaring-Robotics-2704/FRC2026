@@ -133,7 +133,7 @@ public class AutoBuilder {
     }
 
     public Command retractIntakeCommandSequence() {
-        return intake.retract().withTimeout(2);
+        return intake.retract().withTimeout(3);
     }
 
     public Command extendIntakeCommandSequence() {
@@ -231,9 +231,11 @@ public class AutoBuilder {
         routine.active().onTrue(
                 Commands.sequence(
                         runAutoTrajectory(shootCollectShoot$0),
-                        runAutoTrajectory(shootCollectShoot$1)));
+                        AutoCommands.index(hopper,kicker,shooter,intake,manager,Seconds.of(5)),
+                        runAutoTrajectory(shootCollectShoot$1),
+                        AutoCommands.index(hopper,kicker,shooter,intake,manager,Seconds.of(7))));
 
-        shootCollectShoot$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
+        shootCollectShoot$0.atTime("Shoot Preloads").onTrue(Commands.none());
         shootCollectShoot$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
         shootCollectShoot$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
         shootCollectShoot$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
@@ -307,9 +309,12 @@ public class AutoBuilder {
         routine.active().onTrue(
                 Commands.sequence(
                         runAutoTrajectory(shootCollectShootMirrored$0),
-                        runAutoTrajectory(shootCollectShootMirrored$1)));
+                        AutoCommands.index(hopper,kicker,shooter,intake,manager,Seconds.of(5)),
+                        runAutoTrajectory(shootCollectShootMirrored$1),
+                        AutoCommands.index(hopper,kicker,shooter,intake,manager,Seconds.of(7))
+                    ));
 
-        shootCollectShootMirrored$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
+        shootCollectShootMirrored$0.atTime("Shoot Preloads").onTrue(Commands.none());
         shootCollectShootMirrored$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
         shootCollectShootMirrored$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
         shootCollectShootMirrored$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());

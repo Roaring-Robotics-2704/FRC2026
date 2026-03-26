@@ -57,19 +57,19 @@ public class BasicTunedCalc {
     public BasicTunedCalc() {
         // Example data points (distance in meters, angle in degrees
         hoodPercentMap.put(1.38, 0.0);// 6
-        flywheelSpeedMap.put(1.38, 2500.0);
+        flywheelSpeedMap.put(1.38, 2450.0);
         timeOfFlightMap.put(1.38, 0.9);
 
         hoodPercentMap.put(2.0, 10.0);// 9
-        flywheelSpeedMap.put(2.0, 2800.0);
+        flywheelSpeedMap.put(2.0, 2750.0);
         timeOfFlightMap.put(2.0, 1.26);
 
         hoodPercentMap.put(3.0, 15.0);
-        flywheelSpeedMap.put(3.0, 3100.0);
+        flywheelSpeedMap.put(3.0, 3000.0);
         timeOfFlightMap.put(3.0, 1.25);
 
         hoodPercentMap.put(4.0, 20.0);
-        flywheelSpeedMap.put(4.0, 3300.0);
+        flywheelSpeedMap.put(4.0, 3200.0);
         timeOfFlightMap.put(4.0, 1.25);
 
         // hoodPercentMap.put(15.0, 9.0);
