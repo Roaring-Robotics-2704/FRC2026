@@ -255,7 +255,7 @@ public class RobotContainer {
         controller.rightTrigger().whileTrue(Commands.parallel(
                 Commands.startEnd(() -> {
                     if (shooter.isAtDesiredState()) {
-                        kicker.setKickerVoltage(12);
+                        kicker.setKickerVoltage(10);
                     }
                 }, () -> kicker.setKickerVoltage(-1), kicker).withName("Kicker Shooting"),
                 Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.SHOOTING),

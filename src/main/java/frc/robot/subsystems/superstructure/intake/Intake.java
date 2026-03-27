@@ -62,7 +62,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void setRollersEnabled(boolean enabled) {
-        intakeIO.setRollerVoltage(Volts.of(enabled ? 12 : 0));
+        intakeIO.setRollerVoltage(Volts.of(enabled ? 10 : 0));
     }
 
     private void setSlideVoltage(double volts) {
