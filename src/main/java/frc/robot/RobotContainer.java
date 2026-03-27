@@ -224,7 +224,7 @@ public class RobotContainer {
                         drive,
                         () -> -controller.getLeftY(),
                         () -> -controller.getLeftX(),
-                        () -> -controller.getRightX()*0.5));
+                        () -> -controller.getRightX()*0.5).withName("Joystick Drive"));
         vision.setDefaultCommand(vision.idle());
         // objectDetection.setDefaultCommand(objectDetection.idle());
 
@@ -236,19 +236,19 @@ public class RobotContainer {
                                 drive,
                                 () -> -controller.getLeftY(),
                                 () -> -controller.getLeftX(),
-                                () -> shooter.getWantedRobotAngle().plus(Rotation2d.kCW_90deg)));
+                                () -> shooter.getWantedRobotAngle().plus(Rotation2d.kCW_90deg)).withName("Auto Aim"));
 
         // Switch to X pattern when X button is pressed
-        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive).withName("X Lock"));
         controller.x().whileTrue(Commands.startEnd(
                 ()->LEDmanager.setPattern(LEDState.X_LOCK),()->LEDmanager.setPattern(LEDState.IDLE),LEDmanager
-            ));
+            ).withName("X Lock LEDs"));
 
         // controller.start().onTrue(Commands.runOnce(() -> RobotState.getInstance().resetPose(Pose2d.kZero)).ignoringDisable(true));
 
-        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true).withName("Reset Gyro"));
         controller.start().and(controller.leftStick()).debounce(0.5)
-                .onTrue(Commands.runOnce(resetOdometry, drive).ignoringDisable(true));
+                .onTrue(Commands.runOnce(resetOdometry, drive).ignoringDisable(true).withName("Reset Odometry"));
 
         // Reset gyro to 0 deg when B button is pressed
 
@@ -257,35 +257,35 @@ public class RobotContainer {
                     if (shooter.isAtDesiredState()) {
                         kicker.setKickerVoltage(12);
                     }
-                }, () -> kicker.setKickerVoltage(-1), kicker),
+                }, () -> kicker.setKickerVoltage(-1), kicker).withName("Kicker Shooting"),
                 Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.SHOOTING),
-                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
+                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter).withName("Shooter Shooting"),
                 Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
-                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
+                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper).withName("Hopper Shooting"),
                 Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
-                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
+                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)).withName("Shooting LEDS").withName("Shoot Command"));
 
-        controller2.povDown().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)));
-        controller2.povUp().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)));
-        controller2.povLeft().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(-100)));
-        controller2.povRight().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(100)));
-        controller2.y().onTrue(Commands.run(() -> shooter.resetOverrides()));
+        controller2.povDown().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)).withName("Manual Lower hood"));
+        controller2.povUp().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)).withName("Manual Raise hood"));
+        controller2.povLeft().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(-100)).withName("Manual Decrease flywheel"));
+        controller2.povRight().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(100)).withName("Manual Increase flywheel"));
+        controller2.y().onTrue(Commands.run(() -> shooter.resetOverrides()).withName("Reset shooter overrides"));
 
         // controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
 
         controller.leftTrigger().or(controller2.leftTrigger()).whileTrue(Commands.parallel(
-            intake.intake(),
+            intake.intake().withName("Intake Intaking"),
             Commands.startEnd(
                 () -> LEDmanager.setPattern(LEDState.INTAKE),
                 () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)
-        ));
+        ).withName("LEDs intaking").withName("Intake Command"));
         controller.leftTrigger().or(controller2.leftTrigger()).whileTrue(
             DriveCommands.joystickDriveLimited(
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> -controller.getRightX()*0.5, 0.5));
-        controller2.rightTrigger().whileTrue(intake.retract());
+                () -> -controller.getRightX()*0.5, 0.5).withName("Drive Limited"));
+        controller2.rightTrigger().whileTrue(intake.retract().withName("Retract intake"));
         // Reset gyro to 0 deg when B button is pressed
 
         // controller2.b().whileTrue(Commands.parallel(
@@ -318,7 +318,7 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // Return the selected autonomous command
-        return autoChooser.get();
+        return autoChooser.get().withName("Autonomous Command");
     }
 
 

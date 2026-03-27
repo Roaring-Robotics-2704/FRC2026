@@ -86,17 +86,17 @@ public class AutoBuilder {
     public SendableChooser<Command> buildAutoChooser() {
         SendableChooser<Command> sendableChooser = new SendableChooser<Command>();
 
-        sendableChooser.addOption("Shoot only", minMovementShoot().cmd());
-        sendableChooser.addOption("Shoot, climb", shootAndClimb().cmd());
-        sendableChooser.addOption("Shoot, collect, climb", shootCollectClimb().cmd());
-        sendableChooser.addOption("Shoot, collect, climb (mirrored)", shootCollectClimbMirrored().cmd());
-        sendableChooser.addOption("Shoot, collect, pass, collect, pass", shootCollectPass().cmd());
-        sendableChooser.addOption("Shoot, collect, shoot", shootCollectShoot().cmd());
-        sendableChooser.addOption("Shoot, collect, shoot (mirrored)", shootCollectShootMirrored().cmd());
-        sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd());
-        sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd());
-        sendableChooser.addOption("Shoot, depot, climb", shootDepotClimb().cmd());
-        sendableChooser.addOption("Shoot, depot, shoot", shootDepotShoot().cmd());
+        sendableChooser.addOption("Shoot only", minMovementShoot().cmd().withName("Min Movement Shoot"));
+        sendableChooser.addOption("Shoot, climb", shootAndClimb().cmd().withName("Shoot and Climb"));
+        sendableChooser.addOption("Shoot, collect, climb", shootCollectClimb().cmd().withName("Shoot, Collect, Climb"));
+        sendableChooser.addOption("Shoot, collect, climb (mirrored)", shootCollectClimbMirrored().cmd().withName("Shoot, Collect, Climb Mirrored"));
+        sendableChooser.addOption("Shoot, collect, pass, collect, pass", shootCollectPass().cmd().withName("Shoot, Collect, Pass"));
+        sendableChooser.addOption("Shoot, collect, shoot", shootCollectShoot().cmd().withName("Shoot, Collect, Shoot"));
+        sendableChooser.addOption("Shoot, collect, shoot (mirrored)", shootCollectShootMirrored().cmd().withName("Shoot, Collect, Shoot Mirrored"));
+        sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd().withName("Shoot, Collect, Shoot, Climb"));
+        sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd().withName("Shoot, Collect, Shoot, Climb Mirrored"));
+        sendableChooser.addOption("Shoot, depot, climb", shootDepotClimb().cmd().withName("Shoot, Depot, Climb"));
+        sendableChooser.addOption("Shoot, depot, shoot", shootDepotShoot().cmd().withName("Shoot, Depot, Shoot"));
 
         return sendableChooser;
     }
@@ -108,14 +108,14 @@ public class AutoBuilder {
 
     public Command shootPreloadCommandSequence() {
         return Commands.sequence(
-                AutoCommands.index(hopper, kicker, shooter, intake, manager, Seconds.of(7))
-                );
+                AutoCommands.index(hopper, kicker, shooter, intake, manager, Seconds.of(7)).withName("Auto Shoot Preload")
+                ).withName("Shoot Preloaded Fuel");
     }
 
     public Command shootCollectedFuelCommandSequence() {
         return Commands.sequence(
-                AutoCommands.index(hopper, kicker, shooter, intake, manager, Seconds.of(12))
-                );
+                AutoCommands.index(hopper, kicker, shooter, intake, manager, Seconds.of(12)).withName("Auto Shoot Collected Fuel")
+                ).withName("Shoot Collected Fuel");
     }
 
     public Command climbCommandSequence() {
@@ -133,19 +133,18 @@ public class AutoBuilder {
     }
 
     public Command retractIntakeCommandSequence() {
-        return intake.retract().withTimeout(3);
+        return intake.retract().withTimeout(3).withName("Retract Intake Auto");
     }
 
     public Command extendIntakeCommandSequence() {
-        return intake.intake();
+        return intake.intake().withName("Extend Intake Auto");
     }
 
     public Command runAutoTrajectory(AutoTrajectory trajectory) {
         return Commands.sequence(
-                trajectory.resetOdometry(),
                 trajectory.cmd(),
                 Commands.waitUntil(trajectory.done()),
-                Commands.runOnce(drive::stopWithX));
+                Commands.runOnce(drive::stopWithX)).withName("Run Auto Trajectory: " + trajectory.toString());
     }
 
     public AutoRoutine minMovementShoot() {
@@ -154,7 +153,9 @@ public class AutoBuilder {
         // Load the routine's trajectories
         AutoTrajectory minMovementShootTrajectory = ChoreoTraj.MinMovementShoot.asAutoTraj(routine);
         // When the routine begins, reset odometry and start the first trajectory
-        routine.active().onTrue( runAutoTrajectory(minMovementShootTrajectory) );
+        routine.active().onTrue(Commands.sequence(
+            minMovementShootTrajectory.resetOdometry(),
+            minMovementShootTrajectory.cmd()));
         // Starting at the event marker named "intake", run the intake
         minMovementShootTrajectory.atTime("Shoot Preloaded Fuel").onTrue(shootPreloadCommandSequence());
 
@@ -169,6 +170,7 @@ public class AutoBuilder {
 
         routine.active().onTrue(
                 Commands.sequence(
+                        shootAndClimb$0.resetOdometry(),
                         runAutoTrajectory(shootAndClimb$0),
                         runAutoTrajectory(shootAndClimb$1)));
 
@@ -187,6 +189,7 @@ public class AutoBuilder {
 
         routine.active().onTrue(
                 Commands.sequence(
+                        shootCollectClimb$0.resetOdometry(),
                         runAutoTrajectory(shootCollectClimb$0),
                         runAutoTrajectory(shootCollectClimb$1)));
 
@@ -207,6 +210,7 @@ public class AutoBuilder {
 
         routine.active().onTrue(
                 Commands.sequence(
+                        shootCollectPass$0.resetOdometry(),
                         runAutoTrajectory(shootCollectPass$0),
                         runAutoTrajectory(shootCollectPass$1),
                         runAutoTrajectory(shootCollectPass$2)));
@@ -230,6 +234,7 @@ public class AutoBuilder {
 
         routine.active().onTrue(
                 Commands.sequence(
+                        shootCollectShoot$0.resetOdometry(),
                         runAutoTrajectory(shootCollectShoot$0),
                         AutoCommands.index(hopper,kicker,shooter,intake,manager,Seconds.of(5)),
                         runAutoTrajectory(shootCollectShoot$1),
@@ -251,6 +256,7 @@ public class AutoBuilder {
 
         routine.active().onTrue(
                 Commands.sequence(
+                        shootDepotClimb$0.resetOdometry(),
                         runAutoTrajectory(shootDepotClimb$0),
                         runAutoTrajectory(shootDepotClimb$1)));
 
@@ -270,6 +276,7 @@ public class AutoBuilder {
 
         routine.active().onTrue(
                 Commands.sequence(
+                        shootDepotShoot$0.resetOdometry(),
                         runAutoTrajectory(shootDepotShoot$0),
                         runAutoTrajectory(shootDepotShoot$1)));
 
@@ -289,6 +296,7 @@ public class AutoBuilder {
 
         routine.active().onTrue(
                 Commands.sequence(
+                        shootCollectClimbMirrored$0.resetOdometry(),
                         runAutoTrajectory(shootCollectClimbMirrored$0),
                         runAutoTrajectory(shootCollectClimbMirrored$1)));
 
@@ -308,6 +316,7 @@ public class AutoBuilder {
 
         routine.active().onTrue(
                 Commands.sequence(
+                        shootCollectShootMirrored$0.resetOdometry(),
                         runAutoTrajectory(shootCollectShootMirrored$0),
                         AutoCommands.index(hopper,kicker,shooter,intake,manager,Seconds.of(5)),
                         runAutoTrajectory(shootCollectShootMirrored$1),
@@ -331,6 +340,7 @@ public class AutoBuilder {
 
         routine.active().onTrue(
                 Commands.sequence(
+                        shootCollectShootClimb$0.resetOdometry(),
                         runAutoTrajectory(shootCollectShootClimb$0),
                         runAutoTrajectory(shootCollectShootClimb$1)));
 
@@ -355,6 +365,7 @@ public class AutoBuilder {
 
         routine.active().onTrue(
                 Commands.sequence(
+                        shootCollectShootClimbMirrored$0.resetOdometry(),
                         runAutoTrajectory(shootCollectShootClimbMirrored$0),
                         runAutoTrajectory(shootCollectShootClimbMirrored$1)));
 
