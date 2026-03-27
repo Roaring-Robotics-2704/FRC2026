@@ -202,21 +202,21 @@ public record ChoreoTraj(
 	public static final ChoreoTraj ShootCollectShootMirrored = new ChoreoTraj(
 	    "ShootCollectShootMirrored",
 	    OptionalInt.empty(),
-	    8.55401,
-	    new Pose2d(3.615, 0.64, Rotation2d.fromRadians(0)),
+	    8.76753,
+	    new Pose2d(3.629, 1.008, Rotation2d.fromRadians(0)),
 	    new Pose2d(2.809, 2.945, Rotation2d.fromRadians(-0.955))
 	);
 	public static final ChoreoTraj ShootCollectShootMirrored$0 = new ChoreoTraj(
 	    "ShootCollectShootMirrored",
 	    OptionalInt.of(0),
-	    0.65618,
-	    new Pose2d(3.615, 0.64, Rotation2d.fromRadians(0)),
+	    0.6169,
+	    new Pose2d(3.629, 1.008, Rotation2d.fromRadians(0)),
 	    new Pose2d(2.673, 1.073, Rotation2d.fromRadians(-0.807))
 	);
 	public static final ChoreoTraj ShootCollectShootMirrored$1 = new ChoreoTraj(
 	    "ShootCollectShootMirrored",
 	    OptionalInt.of(1),
-	    7.89783,
+	    8.150630000000001,
 	    new Pose2d(2.673, 1.073, Rotation2d.fromRadians(-0.807)),
 	    new Pose2d(2.809, 2.945, Rotation2d.fromRadians(-0.955))
 	);
