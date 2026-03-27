@@ -73,8 +73,11 @@ public class ShooterIOGreyT implements ShooterIO {
         MotorOutputConfigs motorOutput = new MotorOutputConfigs()
                 .withNeutralMode(NeutralModeValue.Coast).withInverted(InvertedValue.CounterClockwise_Positive);
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
-                .withStatorCurrentLimit(CURRENT_LIMIT)
+                .withSupplyCurrentLimit(CURRENT_LIMIT)
+                .withSupplyCurrentLimitEnable(true)
+                .withStatorCurrentLimit(100)
                 .withStatorCurrentLimitEnable(true);
+
         Slot0Configs pidConfigs = new Slot0Configs()
                 .withKP(SHOOTER_KP)
                 .withKD(SHOOTER_KD)
