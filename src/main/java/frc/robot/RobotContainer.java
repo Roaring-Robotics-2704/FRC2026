@@ -280,11 +280,11 @@ public class RobotContainer {
                 () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)
         ));
         controller.leftTrigger().or(controller2.leftTrigger()).whileTrue(
-            DriveCommands.joystickDrive(
+            DriveCommands.joystickDriveLimited(
                 drive,
-                () -> -controller.getLeftY()*0.5,
-                () -> -controller.getLeftX()*0.5,
-                () -> -controller.getRightX()*0.5));
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX()*0.5, 0.5));
         controller2.rightTrigger().whileTrue(intake.retract());
         // Reset gyro to 0 deg when B button is pressed
 
