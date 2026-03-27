@@ -94,6 +94,10 @@ public class Intake extends SubsystemBase {
         ).finallyDo(this::stopIntake);
     }
 
+    public Command reverseRollers() {
+        return Commands.run(() -> intakeIO.setRollerVoltage(Volts.of(-5))).finallyDo(() -> setRollersEnabled(false));
+    }
+
 
     /** This method will be called once per scheduler run. */
     @Override

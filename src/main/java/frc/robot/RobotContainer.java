@@ -287,7 +287,7 @@ public class RobotContainer {
                 () -> -controller.getRightX()*0.5, 0.5).withName("Drive Limited"));
         controller2.rightTrigger().whileTrue(intake.retract().withName("Retract intake"));
         // Reset gyro to 0 deg when B button is pressed
-
+        controller2.leftBumper().whileTrue(intake.reverseRollers().withName("Reverse intake rollers"));
         // controller2.b().whileTrue(Commands.parallel(
         //     Commands.sequence(
         //         intake.retract().withTimeout(2),
