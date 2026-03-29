@@ -102,6 +102,9 @@ public class Shooter extends SubsystemBase {
                     io.setHoodPercent(hoodOverride ? hoodOffset : hoodPercent);
                     io.setFlywheelVelocity(flywheelVelocity);
                     break;
+                case CENTERSHOOTING:
+                    io.setFlywheelVelocity(flywheelVelocity);
+                    break;
                 default:
                     break;
             }
@@ -144,7 +147,7 @@ public class Shooter extends SubsystemBase {
 
     /** Possible states for the shooter subsystem. */
     public enum ShooterState {
-        STATIONARY, IDLE, SHOOTING
+        STATIONARY, IDLE, SHOOTING,CENTERSHOOTING
     }
 
     public Rotation2d getWantedRobotAngle() {

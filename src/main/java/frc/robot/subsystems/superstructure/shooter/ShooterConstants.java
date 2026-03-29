@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class ShooterConstants {
     private ShooterConstants() {}
 
-    public static final Voltage MAX_SHOOTER_VOLTAGE = Volts.of(12); // max # of voltage in shooter, change dummy value later
+    public static final Voltage MAX_SHOOTER_VOLTAGE = Volts.of(12); // max # of voltage in shooter, change dummy value later//TODO does this need to be changed 
 
     public static final int FLYWHEEL_MOTOR_ONE = 22; // sets motor CAN ID, this is a dummy motor id, change this later
     public static final int FLYWHEEL_MOTOR_TWO = 23; // sets motor CAN ID, this is a dummy motor id, change this later
