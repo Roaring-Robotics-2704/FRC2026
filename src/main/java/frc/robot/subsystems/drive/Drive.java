@@ -52,12 +52,13 @@ public class Drive extends SubsystemBase {
     private final RobotState robotState = RobotState.getInstance();
     ChassisSpeeds currentSpeeds;
     SwerveModuleState[] currentStates;
+//    SwerveSetpoint previousSetpoint;
     Orchestra orchestra;
     
-    public static final PIDController turnController = new PIDController(4.0, 0.0, 0.4);
-    public static final PIDController driveXController = new PIDController(3, 0.0, 0.4);
-    public static final PIDController driveYController = new PIDController(3, 0.0, 0.4);
-
+    public static final PIDController turnController = new PIDController(5, 0.0, 0.4);
+    public static final PIDController driveXController = new PIDController(5, 0.0, 0.4);
+    public static final PIDController driveYController = new PIDController(5, 0.0, 0.4);
+//    private SwerveSetpointGenerator setpointGenerator;
 
     static final Lock odometryLock = new ReentrantLock();
     private final GyroIO gyroIO;
@@ -98,8 +99,15 @@ public class Drive extends SubsystemBase {
         PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
             Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
+
+//        setpointGenerator = new SwerveSetpointGenerator(
+//            DriveConstants.pathplannerConfig,
+//            RadiansPerSecond.of(DriveConstants.maxAngularSpeedRadPerSec));
         currentSpeeds = RobotState.getInstance().getRobotVelocity();
         currentStates = this.getModuleStates();
+//        previousSetpoint = new SwerveSetpoint(
+//            currentSpeeds, currentStates, DriveFeedforwards.zeros(DriveConstants.pathplannerConfig.numModules));
+
         orchestra = new Orchestra();
         for (var module : modules) {
             for (var motor : module.getMotors()) {
@@ -188,8 +196,12 @@ public class Drive extends SubsystemBase {
         speeds = ChassisSpeeds.discretize(speeds, 0.02);
         SwerveModuleState[] states = RobotState.getInstance().kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.linearFreeSpeed);
-
-        
+//
+//
+//        speeds = ChassisSpeeds.discretize(speeds, 0.02);
+//        previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, speeds, 0.02);
+//        SwerveModuleState[] setpointStates = previousSetpoint.moduleStates();
+//        SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.linearFreeSpeed);
         // Log unoptimized setpoints and setpoint speeds
         Logger.recordOutput("SwerveStates/Setpoints", states);
         Logger.recordOutput("SwerveChassisSpeeds/Setpoints", speeds);

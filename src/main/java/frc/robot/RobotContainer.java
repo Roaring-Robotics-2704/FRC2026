@@ -281,8 +281,8 @@ public class RobotContainer {
         ));
         controller2.leftBumper().whileTrue(intake.retract());
 
-        //NonCameraShooting test case - this is used to set the shooter to a fixed hood angle and flywheel velocity for when the camera is not working, so we can still shooting functionality without relying on the camera.
-        controller2.rightBumper().whileTrue(Commands.runOnce(() -> shooter.setDesiredState(Shooter.ShooterState.NonCameraShooting)));
+        //NonCameraShooting test case - this is used to set the shooter to a fixed hood angle and flywheel velocity for when the camera is not working, so we can still shooting functionality without relying on the camera. We can adjust the hood angle and flywheel velocity in the Shooter subsystem's periodic method under the NonCameraShooting case.
+        controller1.rightBumper().whileTrue(Commands.runOnce(() -> shooter.setDesiredState(Shooter.ShooterState.NonCameraShooting)));
 
         controller2.rightTrigger().whileTrue(intake.retract());
         // Reset gyro to 0 deg when B button is pressed

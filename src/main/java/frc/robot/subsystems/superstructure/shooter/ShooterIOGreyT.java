@@ -50,8 +50,11 @@ import frc.robot.util.PhoenixUtil;
 public class ShooterIOGreyT implements ShooterIO {
     private StatusSignal<AngularVelocity> flywheelVelocitySignal;
     private StatusSignal<AngularAcceleration> flywheelAccelerationSignal;
-    private StatusSignal<Voltage> flywheelAppliedVoltsSignal;
-    private StatusSignal<Current> flywheelCurrentAmpsSignal;
+    private StatusSignal<Voltage> leftFlywheelAppliedVoltsSignal;
+    private StatusSignal<Voltage> rightFlyWheelAppliedVoltsSignal;
+    private StatusSignal<Current> leftFlywheelCurrentAmpsSignal;
+    private StatusSignal<Current> rightFlywheelCurrentAmpsSignal;
+
     private StatusSignalCollection statusSignals = new StatusSignalCollection();
 
     private TalonFX flywheelMotor1;
@@ -70,8 +73,11 @@ public class ShooterIOGreyT implements ShooterIO {
         MotorOutputConfigs motorOutput = new MotorOutputConfigs()
                 .withNeutralMode(NeutralModeValue.Coast).withInverted(InvertedValue.CounterClockwise_Positive);
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
-                .withStatorCurrentLimit(CURRENT_LIMIT)
+                .withSupplyCurrentLimit(CURRENT_LIMIT)
+                .withSupplyCurrentLimitEnable(true)
+                .withStatorCurrentLimit(100)
                 .withStatorCurrentLimitEnable(true);
+
         Slot0Configs pidConfigs = new Slot0Configs()
                 .withKP(SHOOTER_KP)
                 .withKD(SHOOTER_KD)
@@ -93,14 +99,18 @@ public class ShooterIOGreyT implements ShooterIO {
 
         flywheelVelocitySignal = flywheelMotor1.getVelocity();
         flywheelAccelerationSignal = flywheelMotor1.getAcceleration();
-        flywheelAppliedVoltsSignal = flywheelMotor1.getMotorVoltage();
-        flywheelCurrentAmpsSignal = flywheelMotor1.getStatorCurrent();
+        leftFlywheelAppliedVoltsSignal = flywheelMotor1.getMotorVoltage();
+        rightFlyWheelAppliedVoltsSignal = flywheelMotor2.getMotorVoltage();
+        leftFlywheelCurrentAmpsSignal = flywheelMotor1.getStatorCurrent();
+        rightFlywheelCurrentAmpsSignal = flywheelMotor2.getStatorCurrent();
 
         statusSignals.addSignals(
                 flywheelVelocitySignal,
                 flywheelAccelerationSignal,
-                flywheelAppliedVoltsSignal,
-                flywheelCurrentAmpsSignal);
+                leftFlywheelAppliedVoltsSignal,
+                rightFlyWheelAppliedVoltsSignal,
+                leftFlywheelAppliedVoltsSignal,
+                rightFlywheelCurrentAmpsSignal);
 
         statusSignals.setUpdateFrequencyForAll(Hertz.of(50));
         ParentDevice.optimizeBusUtilizationForAll(flywheelMotor1, flywheelMotor2);
@@ -111,8 +121,10 @@ public class ShooterIOGreyT implements ShooterIO {
         statusSignals.refreshAll();
         inputs.flywheelVelocity.mut_replace(flywheelVelocitySignal.getValue());
         inputs.flywheelAcceleration.mut_replace(flywheelAccelerationSignal.getValue());
-        inputs.flywheelAppliedVolts.mut_replace(flywheelAppliedVoltsSignal.getValue());
-        inputs.flywheelCurrentAmps.mut_replace(flywheelCurrentAmpsSignal.getValue());
+        inputs.leftFlywheelAppliedVolts.mut_replace(leftFlywheelAppliedVoltsSignal.getValue());
+        inputs.rightFlywheelAppliedVolts.mut_replace(rightFlyWheelAppliedVoltsSignal.getValue());
+        inputs.leftFlywheelCurrentAmps.mut_replace(leftFlywheelCurrentAmpsSignal.getValue());
+        inputs.rightFlywheelCurrentAmps.mut_replace(rightFlywheelCurrentAmpsSignal.getValue());
 
         inputs.hoodAngle.mut_replace(MAX_ANGLE.minus(MIN_ANGLE).times(hoodServo1.get()));
         inputs.atTargetVelocity = flywheelMotor1.getClosedLoopError().getValue() < SHOOTER_TOLERANCE.in(RotationsPerSecond);
