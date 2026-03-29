@@ -102,6 +102,9 @@ public class Shooter extends SubsystemBase {
                     io.setHoodPercent(hoodOverride ? hoodOffset : hoodPercent);
                     io.setFlywheelVelocity(flywheelVelocity);
                     break;
+                case CENTERSHOOTING:
+                    io.setFlywheelVelocity(flywheelVelocity);
+                    break;
                 default:
                     break;
                     // This case is used when the camera is broken / vision cannot estimate the hood distance, so we just set the hood to a fixed angle and the flywheel to a fixed velocity. Not ideal, but better used when the camera is broken;
@@ -155,7 +158,7 @@ public class Shooter extends SubsystemBase {
 
     /** Possible states for the shooter subsystem. */
     public enum ShooterState {
-        STATIONARY, IDLE, SHOOTING
+        STATIONARY, IDLE, SHOOTING,CENTERSHOOTING
     }
 
     public Rotation2d getWantedRobotAngle() {

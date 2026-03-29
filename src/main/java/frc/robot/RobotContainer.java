@@ -265,11 +265,11 @@ public class RobotContainer {
                 Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
                         () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
 
-        controller2.povDown().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)));
-        controller2.povUp().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)));
-        controller2.povLeft().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(-100)));
-        controller2.povRight().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(100)));
-        controller2.y().onTrue(Commands.run(() -> shooter.resetOverrides()));
+        controller2.povDown().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)).withName("Manual Lower hood"));
+        controller2.povUp().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)).withName("Manual Raise hood"));
+        controller2.povLeft().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(-100)).withName("Manual Decrease flywheel"));
+        controller2.povRight().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(100)).withName("Manual Increase flywheel"));
+        controller2.y().onTrue(Commands.run(() -> shooter.resetOverrides()).withName("Reset shooter overrides"));
 
         // controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
 
