@@ -158,7 +158,7 @@ public class Shooter extends SubsystemBase {
 
     /** Possible states for the shooter subsystem. */
     public enum ShooterState {
-        STATIONARY, IDLE, SHOOTING,CENTERSHOOTING
+        STATIONARY, IDLE, SHOOTING,CENTERSHOOTING,NonCameraShooting
     }
 
     public Rotation2d getWantedRobotAngle() {
