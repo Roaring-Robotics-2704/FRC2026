@@ -279,6 +279,11 @@ public class RobotContainer {
                 () -> LEDmanager.setPattern(LEDState.INTAKE),
                 () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)
         ));
+        controller2.leftBumper().whileTrue(intake.retract());
+
+        //NonCameraShooting test case - this is used to set the shooter to a fixed hood angle and flywheel velocity for when the camera is not working, so we can still shooting functionality without relying on the camera.
+        controller2.rightBumper().whileTrue(Commands.runOnce(() -> shooter.setDesiredState(Shooter.ShooterState.NonCameraShooting)));
+
         controller2.rightTrigger().whileTrue(intake.retract());
         // Reset gyro to 0 deg when B button is pressed
 
