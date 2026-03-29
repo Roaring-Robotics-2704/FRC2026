@@ -110,6 +110,10 @@ public class Shooter extends SubsystemBase {
                     io.setHoodPercent(0);
                     io.setFlywheelVelocity(RPM.of(0));// still need to set the value going to get it after testing;
                     break;
+                    // case PassMode: 
+                    // io.setHoodPercent(0);
+                    // io.setFlywheelVelocity(RPM.of(0));//
+                    // break;
             }
             
             if (inputs.atTargetAngle && inputs.atTargetVelocity) {
