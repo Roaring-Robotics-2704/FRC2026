@@ -271,7 +271,7 @@ public class RobotContainer {
         controller2.povRight().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(100)).withName("Manual Increase flywheel"));
         controller2.y().onTrue(Commands.run(() -> shooter.resetOverrides()).withName("Reset shooter overrides"));
         
-        controller.rightBumper().whileTrue(Commands.run(() -> shooter.setDesiredState(Shooter.ShooterState.CENTERSHOOTING)));
+        controller.leftBumper().whileTrue(Commands.run(() -> shooter.setDesiredState(Shooter.ShooterState.CENTERSHOOTING)));
 
         // controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
 
