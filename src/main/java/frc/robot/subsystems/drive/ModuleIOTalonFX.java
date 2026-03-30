@@ -109,6 +109,9 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = -constants.SlipCurrent;
         driveConfig.CurrentLimits.StatorCurrentLimit = constants.SlipCurrent;
         driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        driveConfig.CurrentLimits.SupplyCurrentLimit = 40;
+        driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+//        driveConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0;
         //driveConfig.Feedback.SensorToMechanismRatio = constants.DriveMotorGearRatio;
         driveConfig.MotorOutput.Inverted = constants.DriveMotorInverted
                 ? InvertedValue.Clockwise_Positive
@@ -126,7 +129,10 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         turnConfig.Slot0 = constants.SteerMotorGains;
         if (Constants.currentMode == Constants.Mode.SIM)
             turnConfig.Slot0.withKD(0.5).withKS(0); // during simulation, gains are slightly different
-
+        turnConfig.CurrentLimits.StatorCurrentLimit = 60;
+        turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        turnConfig.CurrentLimits.SupplyCurrentLimit = 30;
+        turnConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         turnConfig.Feedback.FeedbackRemoteSensorID = constants.EncoderId;
         turnConfig.Feedback.FeedbackSensorSource = switch (constants.FeedbackSource) {
             case RemoteCANcoder -> FeedbackSensorSourceValue.RemoteCANcoder;

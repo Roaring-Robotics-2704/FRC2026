@@ -12,7 +12,7 @@ public final class Constants {
      * value of "simMode" to switch between "sim" (physics sim) and "replay" (log replay from a file).  
      * This is automatically updated by Justfile commands if they are used.
      */
-    public static final Mode simMode = Mode.SIM;
+    public static final Mode simMode = Mode.REPLAY;
     /** If the robot should log data to files in simulation. */
     public static final boolean logInSimulation = true;
 
@@ -23,7 +23,7 @@ public final class Constants {
     public static final boolean useNTLogs = true;
 
     /** If the robot is in "tuning mode". When in tuning mode, tunable constants are added to NetworkTables. */
-    public static boolean tuningMode = true;
+    public static boolean tuningMode = false;
 
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 

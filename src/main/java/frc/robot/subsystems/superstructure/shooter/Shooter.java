@@ -102,9 +102,25 @@ public class Shooter extends SubsystemBase {
                     io.setHoodPercent(hoodOverride ? hoodOffset : hoodPercent);
                     io.setFlywheelVelocity(flywheelVelocity);
                     break;
+                case CENTERSHOOTING:
+                    io.setFlywheelVelocity(flywheelVelocity);
+                    io.setHoodPercent(0);
+                    break;
+                 case NonCameraShooting:
+                    io.setHoodPercent(0);
+                    io.setFlywheelVelocity(RPM.of(2975));// still need to set the value going to get it after testing;
+                    break;
                 default:
                     break;
+                    // This case is used when the camera is broken / vision cannot estimate the hood distance, so we just set the hood to a fixed angle and the flywheel to a fixed velocity. Not ideal, but better used when the camera is broken;
+                    // xbox to call this case
+                
+                    // case PassMode: 
+                    // io.setHoodPercent(0);
+                    // io.setFlywheelVelocity(RPM.of(0));//
+                    // break;
             }
+            
             if (inputs.atTargetAngle && inputs.atTargetVelocity) {
                 currentState = desiredState;
             }
@@ -144,7 +160,7 @@ public class Shooter extends SubsystemBase {
 
     /** Possible states for the shooter subsystem. */
     public enum ShooterState {
-        STATIONARY, IDLE, SHOOTING
+        STATIONARY, IDLE, SHOOTING,CENTERSHOOTING,NonCameraShooting
     }
 
     public Rotation2d getWantedRobotAngle() {

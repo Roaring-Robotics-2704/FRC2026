@@ -74,6 +74,38 @@ public class DriveCommands {
         }, drive);
     }
 
+    public static Command joystickDriveLimited(
+        Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, double maxSpeed) {
+        RobotState robotState = RobotState.getInstance();
+        return Commands.run(() -> {
+            // Get linear velocity
+            Translation2d linearVelocity =
+                getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+
+            // Apply rotation deadband
+            double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+
+            // Square rotation value for more precise control
+            omega = Math.copySign(omega * omega, omega);
+
+            // Convert to field relative speeds & send command
+            ChassisSpeeds speeds = new ChassisSpeeds(
+                MathUtil.clamp(linearVelocity.getX() * DriveConstants.linearFreeSpeed.in(MetersPerSecond),
+                    -DriveConstants.linearFreeSpeed.in(MetersPerSecond) * maxSpeed,
+                    DriveConstants.linearFreeSpeed.in(MetersPerSecond) * maxSpeed),
+                MathUtil.clamp(linearVelocity.getY() * DriveConstants.linearFreeSpeed.in(MetersPerSecond),
+                    -DriveConstants.linearFreeSpeed.in(MetersPerSecond) * maxSpeed,
+                    DriveConstants.linearFreeSpeed.in(MetersPerSecond) * maxSpeed),
+                omega * DriveConstants.maxAngularSpeedRadPerSec);
+            boolean isFlipped = DriverStation.getAlliance().isPresent()
+                && DriverStation.getAlliance().get() == Alliance.Red;
+            // drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
+            drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
+                speeds,
+                isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()));
+        }, drive);
+    }
+
     /**
      * Field relative drive command using joystick for linear control and PID for angular control. Possible use cases
      * include snapping to an angle, aiming at a vision target, or controlling absolute rotation with a joystick.
