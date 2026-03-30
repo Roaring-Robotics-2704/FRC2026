@@ -277,6 +277,8 @@ public class RobotContainer {
                         () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
                 Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
                         () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
+controller.rightTrigger().onFalse(Commands.runOnce(()->System.out.println("start right trigger")));
+
 
         controller2.povDown().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)).withName("Manual Lower hood"));
         controller2.povUp().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)).withName("Manual Raise hood"));
