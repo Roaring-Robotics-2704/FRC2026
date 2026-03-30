@@ -107,7 +107,7 @@ public class Shooter extends SubsystemBase {
                     break;
                  case NonCameraShooting:
                     io.setHoodPercent(0);
-                    io.setFlywheelVelocity(RPM.of(2950));// still need to set the value going to get it after testing;
+                    io.setFlywheelVelocity(RPM.of(2975));// still need to set the value going to get it after testing;
                     break;
                 default:
                     break;
