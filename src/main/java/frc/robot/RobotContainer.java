@@ -219,14 +219,27 @@ public class RobotContainer {
                         : Rotation2d.k180deg)); // Zero gyro
 
         // Default command, normal field-relative drive
-        drive.setDefaultCommand(
+       // drive.setDefaultCommand(
+         //       DriveCommands.joystickDrive(
+           //             drive,
+             //           () -> -controller.getLeftY(),
+               //         () -> -controller.getLeftX(),
+                 //       () -> -controller.getRightX()));
+        vision.setDefaultCommand(vision.idle());
+        // objectDetection.setDefaultCommand(objectDetection.idle());
+        if ( (controller.getLeftX()<= 0.005)&&(controller.getLeftY()<= 0.005)){
+                Commands.runOnce(drive::stopWithX, drive);
+        }
+        else {
+                  drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
                         () -> -controller.getLeftY(),
                         () -> -controller.getLeftX(),
                         () -> -controller.getRightX()));
-        vision.setDefaultCommand(vision.idle());
-        // objectDetection.setDefaultCommand(objectDetection.idle());
+          }
+
+
 
         // Lock to 0 deg when A button is held
         controller
