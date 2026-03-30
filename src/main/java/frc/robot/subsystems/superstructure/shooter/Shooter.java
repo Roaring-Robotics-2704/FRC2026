@@ -111,7 +111,7 @@ public class Shooter extends SubsystemBase {
                     // xbox to call this case
                     case NonCameraShooting:
                     io.setHoodPercent(0);
-                    io.setFlywheelVelocity(RPM.of(0));// still need to set the value going to get it after testing;
+                    io.setFlywheelVelocity(RPM.of(1500));// still need to set the value going to get it after testing;
                     break;
                     // case PassMode: 
                     // io.setHoodPercent(0);
