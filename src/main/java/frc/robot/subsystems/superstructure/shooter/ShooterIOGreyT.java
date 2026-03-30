@@ -31,6 +31,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Servo;
 
@@ -56,6 +57,8 @@ public class ShooterIOGreyT implements ShooterIO {
     private StatusSignal<Voltage> rightFlyWheelAppliedVoltsSignal;
     private StatusSignal<Current> leftFlywheelCurrentAmpsSignal;
     private StatusSignal<Current> rightFlywheelCurrentAmpsSignal;
+    private StatusSignal<Temperature> rightTempSignal;
+    private StatusSignal<Temperature> leftTempSignal;
 
     private StatusSignalCollection statusSignals = new StatusSignalCollection();
 
@@ -125,14 +128,17 @@ public class ShooterIOGreyT implements ShooterIO {
         rightFlyWheelAppliedVoltsSignal = flywheelMotor2.getMotorVoltage();
         leftFlywheelCurrentAmpsSignal = flywheelMotor1.getStatorCurrent();
         rightFlywheelCurrentAmpsSignal = flywheelMotor2.getStatorCurrent();
-
-        statusSignals.addSignals(
+        leftTempSignal = flywheelMotor1.getDeviceTemp();
+        rightTempSignal = flywheelMotor2.getDeviceTemp();
+       statusSignals.addSignals(
                 flywheelVelocitySignal,
                 flywheelAccelerationSignal,
                 leftFlywheelAppliedVoltsSignal,
                 rightFlyWheelAppliedVoltsSignal,
                 leftFlywheelAppliedVoltsSignal,
-                rightFlywheelCurrentAmpsSignal);
+                rightFlywheelCurrentAmpsSignal,
+                leftTempSignal,
+                rightTempSignal);
 
         statusSignals.setUpdateFrequencyForAll(Hertz.of(50));
         ParentDevice.optimizeBusUtilizationForAll(flywheelMotor1, flywheelMotor2);
@@ -147,6 +153,9 @@ public class ShooterIOGreyT implements ShooterIO {
         inputs.rightFlywheelAppliedVolts.mut_replace(rightFlyWheelAppliedVoltsSignal.getValue());
         inputs.leftFlywheelCurrentAmps.mut_replace(leftFlywheelCurrentAmpsSignal.getValue());
         inputs.rightFlywheelCurrentAmps.mut_replace(rightFlywheelCurrentAmpsSignal.getValue());
+
+        inputs.lefTemp.mut_replace(leftTempSignal.getValue());
+        inputs.rightTemp.mut_replace(rightTempSignal.getValue());
 
         inputs.hoodAngle.mut_replace(MAX_ANGLE.minus(MIN_ANGLE).times(hoodServo1.get()));
         inputs.atTargetVelocity = flywheelMotor1.getClosedLoopError().getValue() < SHOOTER_TOLERANCE.in(RotationsPerSecond);
