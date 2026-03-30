@@ -103,8 +103,8 @@ public class Shooter extends SubsystemBase {
                     io.setFlywheelVelocity(flywheelVelocity);
                     break;
                 case CENTERSHOOTING:
-                    io.setFlywheelVelocity(RPM.of(3590));
-                    io.setHoodPercent(0);
+                    io.setFlywheelVelocity(RPM.of(3490));
+                    io.setHoodPercent(5);
                     break;
                  case NonCameraShooting:
                     io.setHoodPercent(0);
