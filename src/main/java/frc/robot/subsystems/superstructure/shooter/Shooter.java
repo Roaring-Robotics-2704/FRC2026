@@ -105,14 +105,15 @@ public class Shooter extends SubsystemBase {
                 case CENTERSHOOTING:
                     io.setFlywheelVelocity(flywheelVelocity);
                     break;
+                      case NonCameraShooting:
+                    io.setHoodPercent(0);
+                    io.setFlywheelVelocity(RPM.of(1500));// still need to set the value going to get it after testing;
+                    break;
                 default:
                     break;
                     // This case is used when the camera is broken / vision cannot estimate the hood distance, so we just set the hood to a fixed angle and the flywheel to a fixed velocity. Not ideal, but better used when the camera is broken;
                     // xbox to call this case
-                    case NonCameraShooting:
-                    io.setHoodPercent(0);
-                    io.setFlywheelVelocity(RPM.of(1500));// still need to set the value going to get it after testing;
-                    break;
+                
                     // case PassMode: 
                     // io.setHoodPercent(0);
                     // io.setFlywheelVelocity(RPM.of(0));//
