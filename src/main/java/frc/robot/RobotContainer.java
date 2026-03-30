@@ -292,7 +292,7 @@ public class RobotContainer {
                 () -> LEDmanager.setPattern(LEDState.INTAKE),
                 () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)
         ));
-        controller2.leftBumper().whileTrue(intake.retract());
+        controller2.leftBumper().whileTrue(intake.reverseRollers());
 
         //NonCameraShooting test case - this is used to set the shooter to a fixed hood angle and flywheel velocity for when the camera is not working, so we can still shooting functionality without relying on the camera. We can adjust the hood angle and flywheel velocity in the Shooter subsystem's periodic method under the NonCameraShooting case.
                controller.rightBumper().whileTrue(Commands.parallel(
