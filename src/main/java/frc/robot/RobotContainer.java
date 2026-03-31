@@ -194,6 +194,7 @@ public class RobotContainer {
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", autoBuilder.buildAutoChooser());
 
         DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
+        shooter.addTuningCommandsToAutoChooser(autoChooser);
 
         // Configure the button bindings
         configureButtonBindings();

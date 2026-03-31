@@ -32,8 +32,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 /** The shooter subsystem. */
 public class Shooter extends SubsystemBase {
 
-    private ShooterState currentState = ShooterState.STATIONARY;
-    private ShooterState desiredState = ShooterState.IDLE;
+    private static ShooterState currentState = ShooterState.STATIONARY;
+    private static ShooterState desiredState = ShooterState.IDLE;
 
     private double hoodPercent;
     private AngularVelocity flywheelVelocity;
@@ -148,7 +148,7 @@ public class Shooter extends SubsystemBase {
      *
      * @param state The desired ShooterState.
      */
-    public static void setDesiredState(ShooterState state) {
+    public void setDesiredState(ShooterState state) {
 
         this.desiredState = state;
 
@@ -197,20 +197,29 @@ public class Shooter extends SubsystemBase {
         flywheelOffset = RPM.zero();
     }
 
+
     public static Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-        return Commands.runOnce(()->setDesiredState(ShooterState.CALIBRATING)).andThen(routine.quasistatic(direction));
+        return Commands.runOnce(()-> {
+            desiredState = ShooterState.CALIBRATING;
+            currentState = ShooterState.CALIBRATING;
+        }).andThen(
+            routine.quasistatic(direction));
     }
 
      public static Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return Commands.runOnce(()->setDesiredState(ShooterState.CALIBRATING)).andThen(routine.dynamic(direction));
+         return Commands.runOnce(()-> {
+             desiredState = ShooterState.CALIBRATING;
+             currentState = ShooterState.CALIBRATING;
+         }).andThen(
+             routine.dynamic(direction));
      }
 
-    public static void addTuningCommandsToAutoChooser(LoggedDashboardChooser<Command> chooser) {
+    public void addTuningCommandsToAutoChooser(LoggedDashboardChooser<Command> chooser) {
         // These only apply to when we're doing "real" tuning
         if (Constants.tuningMode) {
             chooser.addOption("TUNING | Shooter SysId (Quasistatic Forward)",
                 sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-            chooser.addOption("TUNING | Shooter SysId (Quasistatic Reverse)",
+            chooser.addOption("TUNING | Shooter SysId (Quasistat.ic Reverse)",
                 sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
             chooser.addOption("TUNING | Shooter SysId (Dynamic Forward)",
                 sysIdDynamic(SysIdRoutine.Direction.kForward));
