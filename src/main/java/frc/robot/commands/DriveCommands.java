@@ -3,6 +3,8 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.dyn4j.geometry.Rotation;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -149,4 +151,8 @@ public class DriveCommands {
             // Reset PID controller when command starts
             .beforeStarting(() -> angleController.reset(robotState.getRotation().getRadians()));
     }
+    public static Command XWhileNotDriving( Drive drive, DoubleSupplier xSupplier,DoubleSupplier ySupplier,Supplier<Rotation2d> rotationSupplier){
+        RobotState robotState = RobotState.getInstance();
+        return Commands.runOnce(drive::stopWithX, drive);
+} 
 }

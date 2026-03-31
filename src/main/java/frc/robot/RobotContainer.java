@@ -219,14 +219,27 @@ public class RobotContainer {
                         : Rotation2d.k180deg)); // Zero gyro
 
         // Default command, normal field-relative drive
-        drive.setDefaultCommand(
-                DriveCommands.joystickDrive(
-                        drive,
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getLeftX(),
-                        () -> -controller.getRightX()*0.5).withName("Joystick Drive"));
+       drive.setDefaultCommand(
+               DriveCommands.joystickDrive(
+                       drive,
+                       () -> -controller.getLeftY(),
+                       () -> -controller.getLeftX(),
+                       () -> -controller.getRightX()));
         vision.setDefaultCommand(vision.idle());
-        // objectDetection.setDefaultCommand(objectDetection.idle());
+       // objectDetection.setDefaultCommand(objectDetection.idle());
+        // if ( (controller.getLeftX()<= 0.005)&&(controller.getLeftY()<= 0.005)){
+        //         Commands.runOnce(drive::stopWithX, drive);
+        // }
+        // else {
+        //           drive.setDefaultCommand(
+        //         DriveCommands.joystickDrive(
+        //                 drive,
+        //                 () -> -controller.getLeftY(),
+        //                 () -> -controller.getLeftX(),
+        //                 () -> -controller.getRightX()));
+        //   };
+
+
 
         // Lock to 0 deg when A button is held
         controller
@@ -236,34 +249,36 @@ public class RobotContainer {
                                 drive,
                                 () -> -controller.getLeftY(),
                                 () -> -controller.getLeftX(),
-                                () -> shooter.getWantedRobotAngle().plus(Rotation2d.kCW_90deg)).withName("Auto Aim"));
+                                () -> shooter.getWantedRobotAngle().plus(Rotation2d.kCW_90deg)));
 
         // Switch to X pattern when X button is pressed
-        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive).withName("X Lock"));
+        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
         controller.x().whileTrue(Commands.startEnd(
                 ()->LEDmanager.setPattern(LEDState.X_LOCK),()->LEDmanager.setPattern(LEDState.IDLE),LEDmanager
-            ).withName("X Lock LEDs"));
+            ));
 
         // controller.start().onTrue(Commands.runOnce(() -> RobotState.getInstance().resetPose(Pose2d.kZero)).ignoringDisable(true));
 
-        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true).withName("Reset Gyro"));
+        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
         controller.start().and(controller.leftStick()).debounce(0.5)
-                .onTrue(Commands.runOnce(resetOdometry, drive).ignoringDisable(true).withName("Reset Odometry"));
+                .onTrue(Commands.runOnce(resetOdometry, drive).ignoringDisable(true));
 
         // Reset gyro to 0 deg when B button is pressed
 
         controller.rightTrigger().whileTrue(Commands.parallel(
                 Commands.startEnd(() -> {
                     if (shooter.isAtDesiredState()) {
-                        kicker.setKickerVoltage(10);
+                        kicker.setKickerVoltage(12);
                     }
-                }, () -> kicker.setKickerVoltage(-1), kicker).withName("Kicker Shooting"),
+                }, () -> kicker.setKickerVoltage(-1), kicker),
                 Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.SHOOTING),
-                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter).withName("Shooter Shooting"),
+                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
                 Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
-                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper).withName("Hopper Shooting"),
+                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
                 Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
-                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)).withName("Shooting LEDS").withName("Shoot Command"));
+                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
+controller.rightTrigger().onFalse(Commands.runOnce(()->System.out.println("start right trigger")));
+
 
         controller2.povDown().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)).withName("Manual Lower hood"));
         controller2.povUp().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)).withName("Manual Raise hood"));
@@ -274,20 +289,42 @@ public class RobotContainer {
         // controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
 
         controller.leftTrigger().or(controller2.leftTrigger()).whileTrue(Commands.parallel(
-            intake.intake().withName("Intake Intaking"),
+            intake.intake(),
             Commands.startEnd(
                 () -> LEDmanager.setPattern(LEDState.INTAKE),
                 () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)
-        ).withName("LEDs intaking").withName("Intake Command"));
-        controller.leftTrigger().or(controller2.leftTrigger()).whileTrue(
-            DriveCommands.joystickDriveLimited(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> -controller.getRightX()*0.5, 0.5).withName("Drive Limited"));
-        controller2.rightTrigger().whileTrue(intake.retract().withName("Retract intake"));
+        ));
+        controller2.leftBumper().whileTrue(intake.reverseRollers());
+
+        //NonCameraShooting test case - this is used to set the shooter to a fixed hood angle and flywheel velocity for when the camera is not working, so we can still shooting functionality without relying on the camera. We can adjust the hood angle and flywheel velocity in the Shooter subsystem's periodic method under the NonCameraShooting case.
+               controller.rightBumper().whileTrue(Commands.parallel(
+                Commands.startEnd(() -> {
+                    if (shooter.isAtDesiredState()) {
+                        kicker.setKickerVoltage(12);
+                    }
+                }, () -> kicker.setKickerVoltage(-1), kicker),
+                Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.NonCameraShooting),
+                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
+                Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
+                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
+                Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
+                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
+
+         controller.leftBumper().whileTrue(Commands.parallel(
+                Commands.startEnd(() -> {
+                    if (shooter.isAtDesiredState()) {
+                        kicker.setKickerVoltage(12);
+                    }
+                }, () -> kicker.setKickerVoltage(-1), kicker),
+                Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.CENTERSHOOTING),
+                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
+                Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
+                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
+                Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
+                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
+        controller2.rightTrigger().whileTrue(intake.retract());
         // Reset gyro to 0 deg when B button is pressed
-        controller2.leftBumper().whileTrue(intake.reverseRollers().withName("Reverse intake rollers"));
+
         controller2.b().whileTrue(Commands.parallel(
             Commands.sequence(
                 intake.retract().withTimeout(2),
@@ -318,7 +355,7 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // Return the selected autonomous command
-        return autoChooser.get().withName("Autonomous Command");
+        return Commands.runOnce(drive::stopWithX).andThen(autoChooser.get());
     }
 
 
