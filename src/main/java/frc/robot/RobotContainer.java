@@ -264,13 +264,12 @@ public class RobotContainer {
         // Reset gyro to 0 deg when B button is pressed
 
         controller.rightTrigger().whileTrue(Commands.parallel(
-                Commands.startEnd(() -> {
-                    if (shooter.isAtDesiredState()) {
-                        kicker.setKickerVoltage(12);
-                    }
-                }, () -> kicker.setKickerVoltage(-1), kicker),
                 Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.SHOOTING),
-                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
+                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter)
+                        .alongWith(Commands.waitSeconds(0.5)
+                                .andThen(
+                                        Commands.startEnd(()->kicker.setKickerVoltage(10), ()->kicker.setKickerVoltage(-1), kicker)
+                                )),
                 Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
                         () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
                 Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
