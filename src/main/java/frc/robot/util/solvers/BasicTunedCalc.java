@@ -72,6 +72,10 @@ public class BasicTunedCalc {
         flywheelSpeedMap.put(4.0, 3430.0);
         timeOfFlightMap.put(4.0, 1.25);
 
+        hoodPercentMap.put(4.8, 22.0);
+        flywheelSpeedMap.put(4.8, 3500.0);
+        timeOfFlightMap.put(4.8, 1.25);
+
         // hoodPercentMap.put(15.0, 9.0);
         // flywheelSpeedMap.put(5.0, 5000.0);
         // timeOfFlightMap.put(5.0, 6.0);
