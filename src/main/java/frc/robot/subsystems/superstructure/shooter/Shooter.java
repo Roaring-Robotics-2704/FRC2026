@@ -33,7 +33,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class Shooter extends SubsystemBase {
 
     private static ShooterState currentState = ShooterState.STATIONARY;
-    private static ShooterState desiredState = ShooterState.IDLE;
+    private static ShooterState desiredState = ShooterState.STATIONARY;
 
     private double hoodPercent;
     private AngularVelocity flywheelVelocity;

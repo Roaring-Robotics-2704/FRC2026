@@ -112,7 +112,6 @@ public class Robot extends LoggedRobot {
         LoggedPowerDistribution.getInstance(50, PowerDistribution.ModuleType.kRev); // Example: PDH on CAN ID 50
         // Start AdvantageKit logger
         Logger.start();
-        
         // Disable automatic Hoot logging
         SignalLogger.enableAutoLogging(false);
 
