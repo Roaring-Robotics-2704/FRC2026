@@ -225,7 +225,20 @@ public class Shooter extends SubsystemBase {
                 sysIdDynamic(SysIdRoutine.Direction.kForward));
             chooser.addOption("TUNING | Shooter SysId (Dynamic Reverse)",
                 sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
+            chooser.addOption("TUNING | Shooter SysId ALL",
+                Commands.runOnce(()-> {
+                    desiredState = ShooterState.CALIBRATING;
+                    currentState = ShooterState.CALIBRATING;
+                }).andThen(Commands.sequence(
+                    routine.quasistatic(SysIdRoutine.Direction.kForward),
+                    Commands.waitSeconds(5),
+                    routine.quasistatic(SysIdRoutine.Direction.kReverse),
+                    Commands.waitSeconds(5),
+                    routine.dynamic(SysIdRoutine.Direction.kForward),
+                    Commands.waitSeconds(5),
+                    routine.dynamic(SysIdRoutine.Direction.kReverse),
+                    Commands.waitSeconds(5)
+                )));
         }
     }
 }
