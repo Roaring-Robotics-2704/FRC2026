@@ -231,13 +231,13 @@ public class Shooter extends SubsystemBase {
                     currentState = ShooterState.CALIBRATING;
                 }).andThen(Commands.sequence(
                     routine.quasistatic(SysIdRoutine.Direction.kForward),
-                    Commands.waitSeconds(5),
+                    Commands.waitSeconds(10),
                     routine.quasistatic(SysIdRoutine.Direction.kReverse),
-                    Commands.waitSeconds(5),
+                    Commands.waitSeconds(10),
                     routine.dynamic(SysIdRoutine.Direction.kForward),
-                    Commands.waitSeconds(5),
+                    Commands.waitSeconds(10),
                     routine.dynamic(SysIdRoutine.Direction.kReverse),
-                    Commands.waitSeconds(5)
+                    Commands.waitSeconds(10)
                 )));
         }
     }
