@@ -285,7 +285,13 @@ controller.rightTrigger().onFalse(Commands.runOnce(()->System.out.println("start
 
         // controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
 
-        controller.leftTrigger().or(controller2.leftTrigger()).whileTrue(Commands.parallel(
+        // controller.leftTrigger().or(controller2.leftTrigger()).whileTrue(Commands.parallel(
+        //     intake.intake(),
+        //     Commands.startEnd(
+        //         () -> LEDmanager.setPattern(LEDState.INTAKE),
+        //         () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)
+        // ));
+        controller2.leftTrigger().whileTrue(Commands.parallel(
             intake.intake(),
             Commands.startEnd(
                 () -> LEDmanager.setPattern(LEDState.INTAKE),
