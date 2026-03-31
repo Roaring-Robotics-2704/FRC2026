@@ -252,7 +252,7 @@ public class RobotContainer {
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
         controller.x().whileTrue(Commands.startEnd(
-                ()->LEDmanager.setPattern(LEDState.X_LOCK),()->LEDmanager.setPattern(LEDState.IDLE),LEDmanager
+                ()->LEDmanager.setPattern(LEDState.X_LOCK),()->LEDmanager.setPattern(LEDState.IDLE)
             ));
 
         // controller.start().onTrue(Commands.runOnce(() -> RobotState.getInstance().resetPose(Pose2d.kZero)).ignoringDisable(true));
@@ -273,7 +273,7 @@ public class RobotContainer {
                 Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
                         () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
                 Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
-                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
+                        () -> LEDmanager.setPattern(LEDState.IDLE))));
 controller.rightTrigger().onFalse(Commands.runOnce(()->System.out.println("start right trigger")));
 
 
@@ -295,7 +295,7 @@ controller.rightTrigger().onFalse(Commands.runOnce(()->System.out.println("start
             intake.intake(),
             Commands.startEnd(
                 () -> LEDmanager.setPattern(LEDState.INTAKE),
-                () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)
+                () -> LEDmanager.setPattern(LEDState.IDLE))
         ));
         controller2.leftBumper().whileTrue(intake.reverseRollers());
 
@@ -311,7 +311,7 @@ controller.rightTrigger().onFalse(Commands.runOnce(()->System.out.println("start
                 Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
                         () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
                 Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
-                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
+                        () -> LEDmanager.setPattern(LEDState.IDLE))));
 
          controller.leftBumper().whileTrue(Commands.parallel(
                 Commands.startEnd(() -> {
@@ -324,7 +324,7 @@ controller.rightTrigger().onFalse(Commands.runOnce(()->System.out.println("start
                 Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
                         () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
                 Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
-                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
+                        () -> LEDmanager.setPattern(LEDState.IDLE))));
         controller2.rightTrigger().whileTrue(intake.retract());
         // Reset gyro to 0 deg when B button is pressed
 
