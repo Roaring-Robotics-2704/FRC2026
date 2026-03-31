@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import frc.robot.subsystems.superstructure.shooter.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -46,10 +47,6 @@ import frc.robot.subsystems.superstructure.hopper.HopperIOSim;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
 import frc.robot.subsystems.superstructure.intake.IntakeIOReal;
-import frc.robot.subsystems.superstructure.shooter.Shooter;
-import frc.robot.subsystems.superstructure.shooter.ShooterIO;
-import frc.robot.subsystems.superstructure.shooter.ShooterIOGreyT;
-import frc.robot.subsystems.superstructure.shooter.ShooterIOSim;
 import frc.robot.subsystems.vision.Vision;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
@@ -126,7 +123,7 @@ public class RobotContainer {
                 // objectDetection = new FuelPoseEstimator(new
                 // ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
                 // ObjectDetectionConstants.cameraToRobotTransform));
-                shooter = new Shooter(new ShooterIOGreyT());
+                shooter = new Shooter(new ShooterIOLQR());
                 break;
 
             case SIM:
