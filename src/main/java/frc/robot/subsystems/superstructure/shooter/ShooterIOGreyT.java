@@ -180,7 +180,7 @@ public class ShooterIOGreyT implements ShooterIO {
     @Override
     public void setFlywheelVelocity(AngularVelocity velocity) {
         flywheelMotor1.setControl(new VelocityVoltage(velocity));
-        flywheelMotor2.setControl(new Follower(flywheelMotor1.getDeviceID(), MotorAlignmentValue.Opposed));
+        flywheelMotor2.setControl(new VelocityVoltage(velocity.unaryMinus()));
 
         targetFlywheelVelocity = velocity.in(RotationsPerSecond);
 
