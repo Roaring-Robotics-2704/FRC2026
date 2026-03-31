@@ -6,12 +6,6 @@ package frc.robot.subsystems.superstructure.shooter;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Fahrenheit;
-import static edu.wpi.first.units.Units.Volt;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
@@ -22,6 +16,8 @@ import edu.wpi.first.units.measure.MutTemperature;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+
+import static edu.wpi.first.units.Units.*;
 
 /** Creates a new ShooterIO. */
 public interface ShooterIO { // creates and sets baseline values of robot for logging
@@ -41,6 +37,7 @@ public interface ShooterIO { // creates and sets baseline values of robot for lo
         public MutTemperature lefTemp = Fahrenheit.mutable(0);
         public boolean atTargetVelocity = false;
         public boolean atTargetAngle = false;
+        public MutAngle position = Radians.mutable(0);
 
         public MutAngularVelocity targetFlywheelVelocity = DegreesPerSecond.mutable(0);
     }

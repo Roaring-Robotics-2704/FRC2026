@@ -64,6 +64,7 @@ public class ShooterIOGreyT implements ShooterIO {
     private StatusSignal<Current> rightFlywheelCurrentAmpsSignal;
     private StatusSignal<Temperature> rightTempSignal;
     private StatusSignal<Temperature> leftTempSignal;
+    private  StatusSignal<Angle> positionSignal;
 
     private StatusSignalCollection statusSignals = new StatusSignalCollection();
 
@@ -136,6 +137,7 @@ public class ShooterIOGreyT implements ShooterIO {
         rightFlywheelCurrentAmpsSignal = flywheelMotor2.getStatorCurrent();
         leftTempSignal = flywheelMotor1.getDeviceTemp();
         rightTempSignal = flywheelMotor2.getDeviceTemp();
+        positionSignal = flywheelMotor1.getPosition();
        statusSignals.addSignals(
                 leftflywheelVelocitySignal,
                 rightflywheelVelocitySignal,
@@ -145,7 +147,8 @@ public class ShooterIOGreyT implements ShooterIO {
                 leftFlywheelAppliedVoltsSignal,
                 rightFlywheelCurrentAmpsSignal,
                 leftTempSignal,
-                rightTempSignal);
+                rightTempSignal,
+           positionSignal);
 
         statusSignals.setUpdateFrequencyForAll(Hertz.of(50));
         ParentDevice.optimizeBusUtilizationForAll(flywheelMotor1, flywheelMotor2);
@@ -165,6 +168,7 @@ public class ShooterIOGreyT implements ShooterIO {
         inputs.rightVelocity.mut_replace(rightflywheelVelocitySignal.getValue());
         inputs.lefTemp.mut_replace(leftTempSignal.getValue());
         inputs.rightTemp.mut_replace(rightTempSignal.getValue());
+        inputs.position.mut_replace(positionSignal.getValue());
 
         inputs.hoodAngle.mut_replace(MAX_ANGLE.minus(MIN_ANGLE).times(hoodServo1.get()));
         inputs.atTargetVelocity = flywheelMotor1.getClosedLoopError().getValue() < SHOOTER_TOLERANCE.in(RotationsPerSecond);
