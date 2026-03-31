@@ -97,7 +97,6 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/Distance", solution.distance());
         Logger.recordOutput("Shooter/DesiredState", desiredState.toString());
         Logger.recordOutput("Shooter/CurrentState", currentState.toString());
-        if (currentState != desiredState) {
             switch (desiredState) {
                 case CALIBRATING:
                     currentState=ShooterState.CALIBRATING;
@@ -138,7 +137,7 @@ public class Shooter extends SubsystemBase {
                 currentState = desiredState;
             }
 
-        }
+        
 
         // This method will be called once per scheduler run
     }
