@@ -47,11 +47,15 @@ import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOT
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KS;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KV;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TOLERANCE;
+
+import java.io.ObjectInputFilter.Status;
+
 import frc.robot.util.PhoenixUtil;
 
 /** Add your docs here. */
 public class ShooterIOGreyT implements ShooterIO {
-    private StatusSignal<AngularVelocity> flywheelVelocitySignal;
+    private StatusSignal<AngularVelocity> leftflywheelVelocitySignal;
+    private StatusSignal<AngularVelocity> rightflywheelVelocitySignal;
     private StatusSignal<AngularAcceleration> flywheelAccelerationSignal;
     private StatusSignal<Voltage> leftFlywheelAppliedVoltsSignal;
     private StatusSignal<Voltage> rightFlyWheelAppliedVoltsSignal;
@@ -122,7 +126,8 @@ public class ShooterIOGreyT implements ShooterIO {
         PhoenixUtil.tryUntilOk(5, () -> flywheelMotor1.getConfigurator().apply(config));
         PhoenixUtil.tryUntilOk(5, () -> flywheelMotor2.getConfigurator().apply(config));
 
-        flywheelVelocitySignal = flywheelMotor1.getVelocity();
+        leftflywheelVelocitySignal = flywheelMotor1.getVelocity();
+        rightflywheelVelocitySignal = flywheelMotor2.getVelocity();
         flywheelAccelerationSignal = flywheelMotor1.getAcceleration();
         leftFlywheelAppliedVoltsSignal = flywheelMotor1.getMotorVoltage();
         rightFlyWheelAppliedVoltsSignal = flywheelMotor2.getMotorVoltage();
@@ -131,7 +136,8 @@ public class ShooterIOGreyT implements ShooterIO {
         leftTempSignal = flywheelMotor1.getDeviceTemp();
         rightTempSignal = flywheelMotor2.getDeviceTemp();
        statusSignals.addSignals(
-                flywheelVelocitySignal,
+                leftflywheelVelocitySignal,
+                rightflywheelVelocitySignal,
                 flywheelAccelerationSignal,
                 leftFlywheelAppliedVoltsSignal,
                 rightFlyWheelAppliedVoltsSignal,
@@ -147,13 +153,15 @@ public class ShooterIOGreyT implements ShooterIO {
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
         statusSignals.refreshAll();
-        inputs.flywheelVelocity.mut_replace(flywheelVelocitySignal.getValue());
+        inputs.flywheelVelocity.mut_replace(leftflywheelVelocitySignal.getValue());
         inputs.flywheelAcceleration.mut_replace(flywheelAccelerationSignal.getValue());
         inputs.leftFlywheelAppliedVolts.mut_replace(leftFlywheelAppliedVoltsSignal.getValue());
         inputs.rightFlywheelAppliedVolts.mut_replace(rightFlyWheelAppliedVoltsSignal.getValue());
         inputs.leftFlywheelCurrentAmps.mut_replace(leftFlywheelCurrentAmpsSignal.getValue());
         inputs.rightFlywheelCurrentAmps.mut_replace(rightFlywheelCurrentAmpsSignal.getValue());
 
+        inputs.leftVelocity.mut_replace(leftflywheelVelocitySignal.getValue());
+        inputs.rightVelocity.mut_replace(rightflywheelVelocitySignal.getValue());
         inputs.lefTemp.mut_replace(leftTempSignal.getValue());
         inputs.rightTemp.mut_replace(rightTempSignal.getValue());
 
