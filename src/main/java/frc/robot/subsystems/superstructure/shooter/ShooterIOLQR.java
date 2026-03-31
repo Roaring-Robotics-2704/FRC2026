@@ -202,7 +202,7 @@ public class ShooterIOLQR implements ShooterIO {
 
     @Override
     public void setPID(double kP, double kI, double kD, double kS, double kV, double kA) {
-        throw new UnsupportedOperationException("This method is not supported for LQR.");
+//        throw new UnsupportedOperationException("This method is not supported for LQR.");
     }
 
 
