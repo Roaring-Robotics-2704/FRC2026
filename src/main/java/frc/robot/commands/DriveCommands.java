@@ -70,7 +70,7 @@ public class DriveCommands {
             boolean isFlipped = DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == Alliance.Red;
             // drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
-            if (speeds.vxMetersPerSecond > 0.001 || speeds.vyMetersPerSecond > 0.001 || speeds.omegaRadiansPerSecond > 0.001) {
+            if (Math.abs(speeds.vxMetersPerSecond) > 0.0001 || Math.abs(speeds.vyMetersPerSecond) > 0.0001 || Math.abs(speeds.omegaRadiansPerSecond) > 0.0001) {
                 drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
                     speeds,
                     isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()));
@@ -107,9 +107,13 @@ public class DriveCommands {
             boolean isFlipped = DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == Alliance.Red;
             // drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
-            drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
-                speeds,
-                isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()));
+            if (Math.abs(speeds.vxMetersPerSecond) > 0.0001 || Math.abs(speeds.vyMetersPerSecond) > 0.0001 || Math.abs(speeds.omegaRadiansPerSecond) > 0.0001) {
+                drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
+                    speeds,
+                    isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()));
+            } else {
+                drive.stopWithX();
+            }
         }, drive);
     }
 

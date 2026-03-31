@@ -137,7 +137,7 @@ public class Shooter extends SubsystemBase {
                 currentState = desiredState;
             }
 
-        
+
 
         // This method will be called once per scheduler run
     }
