@@ -50,10 +50,10 @@ public class ShooterIOLQR implements ShooterIO {
 
 
     // Volts per (radian per second)
-    private static final double kFlywheelKv = 0.023;
+    private static final double kFlywheelKv = 0.01822;
 
     // Volts per (radian per second squared)
-    private static final double kFlywheelKa = 0.001;
+    private static final double kFlywheelKa = 0.0014421;
 
     // The plant holds a state-space model of our flywheel. This system has the following properties:
     //
