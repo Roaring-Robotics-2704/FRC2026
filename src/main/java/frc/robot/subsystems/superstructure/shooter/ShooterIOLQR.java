@@ -81,7 +81,7 @@ public class ShooterIOLQR implements ShooterIO {
             VecBuilder.fill(8.0), // qelms. Velocity error tolerance, in radians per second. Decrease
             // this to more heavily penalize state excursion, or make the controller behave more
             // aggressively.
-            VecBuilder.fill(12.0), // relms. Control effort (voltage) tolerance. Decrease this to more
+            VecBuilder.fill(11.0), // relms. Control effort (voltage) tolerance. Decrease this to more
             // heavily penalize control effort, or make the controller less aggressive. 12 is a good
             // starting point because that is the (approximate) maximum voltage of a battery.
             Constants.loopTimeSeconds); // Nominal time between loops. 0.020 for TimedRobot, but can be
