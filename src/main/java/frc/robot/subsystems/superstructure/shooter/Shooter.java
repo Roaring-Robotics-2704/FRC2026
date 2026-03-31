@@ -4,6 +4,11 @@
 
 package frc.robot.subsystems.superstructure.shooter;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
+import frc.robot.subsystems.drive.Drive;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -22,6 +27,7 @@ import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOT
 import frc.robot.util.solvers.BasicTunedCalc;
 import frc.robot.util.solvers.BasicTunedCalc.ShootingSolution;
 import frc.robot.util.tunables.LoggedTunableNumber;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /** The shooter subsystem. */
 public class Shooter extends SubsystemBase {
@@ -49,7 +55,7 @@ public class Shooter extends SubsystemBase {
     private double hoodOffset = 0;
     private AngularVelocity flywheelOffset = RPM.zero();
 
-
+    static SysIdRoutine routine;
     static {
         shootP.initDefault(ShooterConstants.SHOOTER_KP);
         shootD.initDefault(ShooterConstants.SHOOTER_KD);
@@ -63,6 +69,10 @@ public class Shooter extends SubsystemBase {
 
     public Shooter(ShooterIO io) {
         this.io = io;
+        routine = new SysIdRoutine(
+            new SysIdRoutine.Config(null, null, null,
+                (state) -> Logger.recordOutput("Shooter/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism(io::setFlywheelVoltage, null, this));
     }
 
     @Override
@@ -89,6 +99,9 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/CurrentState", currentState.toString());
         if (currentState != desiredState) {
             switch (desiredState) {
+                case CALIBRATING:
+                    currentState=ShooterState.CALIBRATING;
+                    break;
                 case STATIONARY:
                     io.setFlywheelVelocity(RPM.of(0));
                     io.setHoodPercent(0)
@@ -135,7 +148,7 @@ public class Shooter extends SubsystemBase {
      *
      * @param state The desired ShooterState.
      */
-    public void setDesiredState(ShooterState state) {
+    public static void setDesiredState(ShooterState state) {
 
         this.desiredState = state;
 
@@ -160,7 +173,7 @@ public class Shooter extends SubsystemBase {
 
     /** Possible states for the shooter subsystem. */
     public enum ShooterState {
-        STATIONARY, IDLE, SHOOTING,CENTERSHOOTING,NonCameraShooting
+        STATIONARY, IDLE, SHOOTING,CENTERSHOOTING,NonCameraShooting, CALIBRATING
     }
 
     public Rotation2d getWantedRobotAngle() {
@@ -184,4 +197,26 @@ public class Shooter extends SubsystemBase {
         flywheelOffset = RPM.zero();
     }
 
+    public static Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return Commands.runOnce(()->setDesiredState(ShooterState.CALIBRATING)).andThen(routine.quasistatic(direction));
+    }
+
+     public static Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return Commands.runOnce(()->setDesiredState(ShooterState.CALIBRATING)).andThen(routine.dynamic(direction));
+     }
+
+    public static void addTuningCommandsToAutoChooser(LoggedDashboardChooser<Command> chooser) {
+        // These only apply to when we're doing "real" tuning
+        if (Constants.tuningMode) {
+            chooser.addOption("TUNING | Shooter SysId (Quasistatic Forward)",
+                sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+            chooser.addOption("TUNING | Shooter SysId (Quasistatic Reverse)",
+                sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+            chooser.addOption("TUNING | Shooter SysId (Dynamic Forward)",
+                sysIdDynamic(SysIdRoutine.Direction.kForward));
+            chooser.addOption("TUNING | Shooter SysId (Dynamic Reverse)",
+                sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+        }
+    }
 }
