@@ -24,6 +24,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //port frc.robot.util.SparkUtil;
+import org.littletonrobotics.junction.Logger;
 
 public class Kicker extends SubsystemBase {
     Voltage desiredVoltage = Volts.of(-2);
@@ -58,7 +59,7 @@ public class Kicker extends SubsystemBase {
         //     kickerMotor.setVoltage(-1);
         // } else {
         //     timer.stop();
-        //kickerMotor.setVoltage(4);
+        kickerMotor.setVoltage(4);
         // // }
         // Logger.recordOutput("Kicker/Current", kickerMotor.getOutputCurrent());
         // Logger.recordOutput("Kicker/DesiredVoltage", kickerMotor.getMotorVoltage());
