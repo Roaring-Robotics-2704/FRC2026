@@ -330,7 +330,7 @@ controller.rightTrigger().onFalse(Commands.runOnce(()->System.out.println("start
 
         controller2.b().whileTrue(Commands.parallel(
             Commands.sequence(
-                intake.retract().withTimeout(2),
+                //intake.retract().withTimeout(2),
                 climber.setClimber(6)
                 ),
             Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
@@ -338,7 +338,7 @@ controller.rightTrigger().onFalse(Commands.runOnce(()->System.out.println("start
         ).finallyDo(()->climber.enablehook(true)));
         controller2.a().whileTrue(Commands.parallel(
             Commands.sequence(
-                intake.retract().withTimeout(0.5),
+                //intake.retract().withTimeout(0.5),
                 climber.setClimber(-6)
                 ),
             Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
