@@ -4,12 +4,12 @@
 
 package frc.robot.subsystems.superstructure;
 
-import org.littletonrobotics.junction.Logger;
+// import org.littletonrobotics.junction.Logger;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
+// import com.revrobotics.PersistMode;
+// import com.revrobotics.ResetMode;
+// import com.revrobotics.spark.SparkMax;
+// import com.revrobotics.spark.config.SparkMaxConfig;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -23,7 +23,7 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.SparkUtil;
+//port frc.robot.util.SparkUtil;
 
 public class Kicker extends SubsystemBase {
     Voltage desiredVoltage = Volts.of(-1);
@@ -58,7 +58,7 @@ public class Kicker extends SubsystemBase {
         //     kickerMotor.setVoltage(-1);
         // } else {
         //     timer.stop();
-        kickerMotor.setVoltage(-1);
+        kickerMotor.setVoltage(1);
         // // }
         // Logger.recordOutput("Kicker/Current", kickerMotor.getOutputCurrent());
         // Logger.recordOutput("Kicker/DesiredVoltage", kickerMotor.getMotorVoltage());
