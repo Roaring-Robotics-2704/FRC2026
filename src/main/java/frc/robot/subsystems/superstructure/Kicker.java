@@ -10,6 +10,14 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Voltage;
@@ -21,13 +29,21 @@ public class Kicker extends SubsystemBase {
     Voltage desiredVoltage = Volts.of(-1);
     Timer timer = new Timer();
     /** Creates a new Kicker. */
-    SparkMax kickerMotor = new SparkMax(31, SparkMax.MotorType.kBrushless);
+    TalonFX kickerMotor = new TalonFX(31);
 
     public Kicker() {
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.smartCurrentLimit(20);
-        SparkUtil.tryUntilOk(kickerMotor, 5,
-                () -> kickerMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+       MotorOutputConfigs motorOutput = new MotorOutputConfigs()
+                .withNeutralMode(NeutralModeValue.Coast).withInverted(InvertedValue.CounterClockwise_Positive);
+        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
+                .withSupplyCurrentLimit(40)
+                .withSupplyCurrentLimitEnable(true)
+                .withStatorCurrentLimit(100)
+                .withStatorCurrentLimitEnable(true);
+         TalonFXConfiguration config = new TalonFXConfiguration()
+                 .withMotorOutput(
+                        motorOutput)
+                .withCurrentLimits(
+                        currentLimits);
     }
 
     @Override
@@ -42,14 +58,14 @@ public class Kicker extends SubsystemBase {
         //     kickerMotor.setVoltage(-1);
         // } else {
         //     timer.stop();
-        kickerMotor.setVoltage(desiredVoltage);
-        // }
-        Logger.recordOutput("Kicker/Current", kickerMotor.getOutputCurrent());
-        Logger.recordOutput("Kicker/DesiredVoltage", kickerMotor.getAppliedOutput());
-        Logger.recordOutput("Kicker/Velocity", kickerMotor.getEncoder().getVelocity());
-        Logger.recordOutput("Kicker/Timer", timer.get());
-        Logger.recordOutput("Kicker/IsTimerRunning", timer.isRunning());
-        
+        kickerMotor.setVoltage(-1);
+        // // }
+        // Logger.recordOutput("Kicker/Current", kickerMotor.getOutputCurrent());
+        // Logger.recordOutput("Kicker/DesiredVoltage", kickerMotor.getMotorVoltage());
+        // Logger.recordOutput("Kicker/Velocity", kickerMotor.getVelocity());
+        // Logger.recordOutput("Kicker/Timer", timer.get());
+        // Logger.recordOutput("Kicker/IsTimerRunning", timer.isRunning());
+
     }
 
     public void setKickerVoltage(double voltage) {
