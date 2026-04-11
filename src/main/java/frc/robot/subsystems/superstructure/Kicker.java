@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //port frc.robot.util.SparkUtil;
 
 public class Kicker extends SubsystemBase {
-    Voltage desiredVoltage = Volts.of(-1);
+    Voltage desiredVoltage = Volts.of(0);
     Timer timer = new Timer();
     /** Creates a new Kicker. */
     TalonFX kickerMotor = new TalonFX(31);
