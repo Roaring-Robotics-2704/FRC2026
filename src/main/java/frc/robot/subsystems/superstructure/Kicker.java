@@ -59,7 +59,7 @@ public class Kicker extends SubsystemBase {
         //     kickerMotor.setVoltage(-1);
         // } else {
         //     timer.stop();
-        kickerMotor.setVoltage(1);
+        kickerMotor.setVoltage(4);
         // // }
         // Logger.recordOutput("Kicker/Current", kickerMotor.getOutputCurrent());
         // Logger.recordOutput("Kicker/DesiredVoltage", kickerMotor.getMotorVoltage());
