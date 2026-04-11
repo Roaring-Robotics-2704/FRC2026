@@ -161,6 +161,7 @@ public class Climber extends SubsystemBase {
     }
 
     public void stopClimber() {
+        climberIO.setClimberVoltage(0);
         climberIO.setHookVoltage(0);
     }
 
