@@ -45,6 +45,7 @@ public class Kicker extends SubsystemBase {
                         motorOutput)
                 .withCurrentLimits(
                         currentLimits);
+        setKickerVoltage(-2);
     }
 
     @Override
@@ -59,7 +60,7 @@ public class Kicker extends SubsystemBase {
         //     kickerMotor.setVoltage(-1);
         // } else {
         //     timer.stop();
-        kickerMotor.setVoltage(4);
+        //kickerMotor.setVoltage(4);
         // // }
         // Logger.recordOutput("Kicker/Current", kickerMotor.getOutputCurrent());
         // Logger.recordOutput("Kicker/DesiredVoltage", kickerMotor.getMotorVoltage());
@@ -68,6 +69,8 @@ public class Kicker extends SubsystemBase {
         // Logger.recordOutput("Kicker/IsTimerRunning", timer.isRunning());
 
     }
+
+
 
     public void setKickerVoltage(double voltage) {
         desiredVoltage = Volts.of(voltage);
