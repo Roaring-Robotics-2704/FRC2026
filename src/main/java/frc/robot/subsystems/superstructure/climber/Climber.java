@@ -164,7 +164,7 @@ public class Climber extends SubsystemBase {
     }
 
     public void enablehook(boolean enabled) {
-        climberIO.setHookVoltage(enabled ? 12 : 0);
+        climberIO.setHookVoltage(enabled ? 3 : 0);
     }
 }
 
