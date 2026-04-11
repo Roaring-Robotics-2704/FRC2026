@@ -97,6 +97,7 @@ public class AutoBuilder {
         sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd().withName("Shoot, Collect, Shoot, Climb Mirrored"));
         sendableChooser.addOption("Shoot, depot, climb", shootDepotClimb().cmd().withName("Shoot, Depot, Climb"));
         sendableChooser.addOption("Shoot, depot, shoot", shootDepotShoot().cmd().withName("Shoot, Depot, Shoot"));
+        sendableChooser.addOption("Collect, Shoot, Collect, Shoot", collectShootCollectShoot().cmd().withName("Collect, Shoot, Collect, Shoot"));
 
         return sendableChooser;
     }
@@ -377,4 +378,26 @@ public class AutoBuilder {
 
         return routine;
     }
-}
+
+    public AutoRoutine collectShootCollectShoot() {
+        AutoRoutine routine = autoFactory.newRoutine("CollectShootCollectShoot");
+
+        AutoTrajectory collectShootCollectShoot$0 = ChoreoTraj.CollectShootCollectShoot$0.asAutoTraj(routine);
+        AutoTrajectory collectShootCollectShoot$1 = ChoreoTraj.CollectShootCollectShoot$1.asAutoTraj(routine);
+
+        routine.active().onTrue(
+                Commands.sequence(
+                        collectShootCollectShoot$0.resetOdometry(),
+                        runAutoTrajectory(collectShootCollectShoot$0),
+                        AutoCommands.index(hopper,kicker,shooter,intake,manager,Seconds.of(5)),
+                        runAutoTrajectory(collectShootCollectShoot$1),
+                        AutoCommands.index(hopper,kicker,shooter,intake,manager,Seconds.of(7))));
+
+        collectShootCollectShoot$0.atTime("Shoot Preloads").onTrue(Commands.none());
+        collectShootCollectShoot$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
+        collectShootCollectShoot$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
+        collectShootCollectShoot$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
+
+        return routine;
+
+    }}
