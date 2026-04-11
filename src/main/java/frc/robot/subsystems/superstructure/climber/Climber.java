@@ -156,7 +156,8 @@ public class Climber extends SubsystemBase {
     }
 
     public Command setClimber(double voltage) {
-       return Commands.run(()->setVoltage(voltage)).finallyDo(this::stopClimber);
+       //return Commands.run(()->setVoltage(voltage)).finallyDo(this::stopClimber);
+       return Commands.startEnd(() -> setVoltage(voltage), this::stopClimber, this);
     }
 
     public void stopClimber() {
