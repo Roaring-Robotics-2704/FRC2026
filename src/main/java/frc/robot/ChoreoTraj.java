@@ -6,10 +6,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.Map;
 import java.util.OptionalInt;
 
-// If these imports cause errors because you're not using ChoreoLib,
-// turn off "Include ChoreoLib-specific Helpers" in Choreo's codegen settings.
-import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
 
 /**
  * A class containing the name, start pose, end pose, and total time of every Choreo trajectory.
@@ -24,7 +20,14 @@ public record ChoreoTraj(
     Pose2d initialPoseBlue,
     Pose2d endPoseBlue
 ) {
-    public static final ChoreoTraj MinMovementShoot = new ChoreoTraj(
+    public static final ChoreoTraj CollectShootCollectShoot = new ChoreoTraj(
+	    "CollectShootCollectShoot",
+	    OptionalInt.empty(),
+	    6.29535,
+	    new Pose2d(4.313, 7.463, Rotation2d.fromRadians(3.142)),
+	    new Pose2d(3.564, 7.396, Rotation2d.fromRadians(-2.878))
+	);
+	public static final ChoreoTraj MinMovementShoot = new ChoreoTraj(
 	    "MinMovementShoot",
 	    OptionalInt.empty(),
 	    0.6438,
@@ -206,21 +209,14 @@ public record ChoreoTraj(
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(1.75, 3.857, Rotation2d.fromRadians(-1.571))
 	);
-	public static final ChoreoTraj CollectShootCollectShoot = new ChoreoTraj(
-	    "CollectShootCollectShoot",
-	    OptionalInt.empty(),
-	    2.73497,
-	    new Pose2d(4.313, 7.463, Rotation2d.fromRadians(3.142)),
-	    new Pose2d(3.825, 7.434, Rotation2d.fromRadians(-2.944))
-	);
-   
 
     /**
      * A map between trajectory names and their corresponding data.
      * This allows for trajectory data to be looked up with strings during runtime.
      */
     public static final Map<String, ChoreoTraj> ALL_TRAJECTORIES = Map.ofEntries(
-    	Map.entry("MinMovementShoot", MinMovementShoot),
+    	Map.entry("CollectShootCollectShoot", CollectShootCollectShoot),
+		Map.entry("MinMovementShoot", MinMovementShoot),
 		Map.entry("ShootAndClimb", ShootAndClimb),
 		Map.entry("ShootAndClimb$0", ShootAndClimb$0),
 		Map.entry("ShootAndClimb$1", ShootAndClimb$1),
@@ -245,10 +241,7 @@ public record ChoreoTraj(
 		Map.entry("ShootDepotClimb$1", ShootDepotClimb$1),
 		Map.entry("ShootDepotShoot", ShootDepotShoot),
 		Map.entry("ShootDepotShoot$0", ShootDepotShoot$0),
-		Map.entry("ShootDepotShoot$1", ShootDepotShoot$1),
-		Map.entry("CollectShootCollectShoot", CollectShootCollectShoot),
-        Map.entry("CollectShootCollectShoot$0", CollectShootCollectShoot$0),
-        Map.entry("CollectShootCollectShoot$1", CollectShootCollectShoot$1)
+		Map.entry("ShootDepotShoot$1", ShootDepotShoot$1)
     );
 
     /**
@@ -263,15 +256,4 @@ public record ChoreoTraj(
         return traj;
     }
     
-    // If these methods cause errors because you're not using ChoreoLib,
-    // turn off "Include ChoreoLib-specific Helpers" in Choreo's codegen settings.
-    /**
-     * Load an AutoTrajectory directly from a ChoreoTraj, which may be a segment of a larger trajectory.
-     */
-    public AutoTrajectory asAutoTraj(AutoRoutine routine) {
-        if (this.segment.isPresent()) {
-            return routine.trajectory(this.name, this.segment.getAsInt());
-        }
-        return routine.trajectory(this.name);
-    }
 }

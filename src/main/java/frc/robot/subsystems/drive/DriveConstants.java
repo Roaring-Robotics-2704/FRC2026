@@ -210,7 +210,7 @@ public class DriveConstants {
     // This may need to be tuned to your individual robot
     private static final double coupleRatio = 3.375;
 
-    public static final double driveGearRatio = 5.2734375;
+    public static final double driveGearRatio = 6.03;
     public static final double steerGearRatio = 26.09;
     public static final Distance wheelRadius = Inches.of(2);
 

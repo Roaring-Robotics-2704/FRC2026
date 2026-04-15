@@ -152,7 +152,9 @@ public class AutoBuilder {
         AutoRoutine routine = autoFactory.newRoutine("MinMovementShoot");
 
         // Load the routine's trajectories
-        AutoTrajectory minMovementShootTrajectory = ChoreoTraj.MinMovementShoot.asAutoTraj(routine);
+        AutoTrajectory minMovementShootTrajectory = ChoreoTraj.MinMovementShoot
+        
+        (routine);
         // When the routine begins, reset odometry and start the first trajectory
         routine.active().onTrue(Commands.sequence(
             minMovementShootTrajectory.resetOdometry(),
@@ -380,24 +382,32 @@ public class AutoBuilder {
     }
 
     public AutoRoutine collectShootCollectShoot() {
-        AutoRoutine routine = autoFactory.newRoutine("CollectShootCollectShoot");
+    AutoRoutine routine = autoFactory.newRoutine("collectShootCollectShoot");
 
-        AutoTrajectory collectShootCollectShoot$0 = ChoreoTraj.CollectShootCollectShoot$0.asAutoTraj(routine);
-        AutoTrajectory collectShootCollectShoot$1 = ChoreoTraj.CollectShootCollectShoot$1.asAutoTraj(routine);
+    AutoTrajectory collectShootCollectShoot =
+        ChoreoTraj.CollectShootCollectShoot.asAutoTraj(routine);
 
-        routine.active().onTrue(
-                Commands.sequence(
-                        collectShootCollectShoot$0.resetOdometry(),
-                        runAutoTrajectory(collectShootCollectShoot$0),
-                        AutoCommands.index(hopper,kicker,shooter,intake,manager,Seconds.of(5)),
-                        runAutoTrajectory(collectShootCollectShoot$1),
-                        AutoCommands.index(hopper,kicker,shooter,intake,manager,Seconds.of(7))));
+    routine.active().onTrue(
+        Commands.sequence(
+            collectShootCollectShoot.resetOdometry(),
+            runAutoTrajectory(collectShootCollectShoot)
+        )
+    );
 
-        collectShootCollectShoot$0.atTime("Shoot Preloads").onTrue(Commands.none());
-        collectShootCollectShoot$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
-        collectShootCollectShoot$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
-        collectShootCollectShoot$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
 
-        return routine;
+    collectShootCollectShoot.atTime("Shoot Preloads")
+        .onTrue(shootCollectedFuelCommandSequence());
 
-    }}
+    collectShootCollectShoot.atTime("Open Intake")
+        .onTrue(extendIntakeCommandSequence());
+
+    collectShootCollectShoot.atTime("Retract Intake")
+        .onTrue(retractIntakeCommandSequence());
+
+    collectShootCollectShoot.atTime("Shoot Collected Fuel")
+        .onTrue(shootCollectedFuelCommandSequence());
+
+    return routine;
+}
+
+    }
