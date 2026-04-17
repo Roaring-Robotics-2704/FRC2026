@@ -45,7 +45,7 @@
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
-    {"from":"first", "to":"last", "data":{"type":"KeepInRectangle", "props":{"x":{"exp":"0 m", "val":0.0}, "y":{"exp":"0 m", "val":0.0}, "w":{"exp":"16.541 m", "val":16.541}, "h":{"exp":"8.0692 m", "val":8.0692}}}, "enabled":true},
+    {"from":"first", "to":"last", "data":{"type":"KeepInRectangle", "props":{"x":{"exp":"2.559309959411621 m", "val":2.559309959411621}, "y":{"exp":"-3.8245863914489746 m", "val":-3.8245863914489746}, "w":{"exp":"16.541 m", "val":16.541}, "h":{"exp":"8.0692 m", "val":8.0692}}}, "enabled":true},
     {"from":1, "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":2, "to":3, "data":{"type":"MaxAngularVelocity", "props":{"max":{"exp":"0 rad / s", "val":0.0}}}, "enabled":true},
     {"from":2, "to":3, "data":{"type":"KeepOutCircle", "props":{"x":{"exp":"4.710899233818054 m", "val":4.710899233818054}, "y":{"exp":"8.96243667602539 m", "val":8.96243667602539}, "r":{"exp":"1 m", "val":1.0}}}, "enabled":true},

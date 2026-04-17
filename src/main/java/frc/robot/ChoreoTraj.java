@@ -6,6 +6,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.Map;
 import java.util.OptionalInt;
 
+// If these imports cause errors because you're not using ChoreoLib,
+// turn off "Include ChoreoLib-specific Helpers" in Choreo's codegen settings.
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 
 /**
  * A class containing the name, start pose, end pose, and total time of every Choreo trajectory.
@@ -100,28 +104,28 @@ public record ChoreoTraj(
 	public static final ChoreoTraj ShootCollectPass = new ChoreoTraj(
 	    "ShootCollectPass",
 	    OptionalInt.empty(),
-	    5.872,
+	    24.22937,
 	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(5.71, 5.843, Rotation2d.fromRadians(1.571))
 	);
 	public static final ChoreoTraj ShootCollectPass$0 = new ChoreoTraj(
 	    "ShootCollectPass",
 	    OptionalInt.of(0),
-	    0.6438,
+	    2.52046,
 	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
 	);
 	public static final ChoreoTraj ShootCollectPass$1 = new ChoreoTraj(
 	    "ShootCollectPass",
 	    OptionalInt.of(1),
-	    3.30698,
+	    13.532039999999999,
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(5.647, 2.534, Rotation2d.fromRadians(1.571))
 	);
 	public static final ChoreoTraj ShootCollectPass$2 = new ChoreoTraj(
 	    "ShootCollectPass",
 	    OptionalInt.of(2),
-	    1.92122,
+	    8.176870000000001,
 	    new Pose2d(5.647, 2.534, Rotation2d.fromRadians(1.571)),
 	    new Pose2d(5.71, 5.843, Rotation2d.fromRadians(1.571))
 	);
@@ -256,4 +260,15 @@ public record ChoreoTraj(
         return traj;
     }
     
+    // If these methods cause errors because you're not using ChoreoLib,
+    // turn off "Include ChoreoLib-specific Helpers" in Choreo's codegen settings.
+    /**
+     * Load an AutoTrajectory directly from a ChoreoTraj, which may be a segment of a larger trajectory.
+     */
+    public AutoTrajectory asAutoTraj(AutoRoutine routine) {
+        if (this.segment.isPresent()) {
+            return routine.trajectory(this.name, this.segment.getAsInt());
+        }
+        return routine.trajectory(this.name);
+    }
 }

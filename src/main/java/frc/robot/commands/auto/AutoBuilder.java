@@ -93,8 +93,8 @@ public class AutoBuilder {
         sendableChooser.addOption("Shoot, collect, pass, collect, pass", shootCollectPass().cmd().withName("Shoot, Collect, Pass"));
         sendableChooser.addOption("Shoot, collect, shoot", shootCollectShoot().cmd().withName("Shoot, Collect, Shoot"));
         sendableChooser.addOption("Shoot, collect, shoot (mirrored)", shootCollectShootMirrored().cmd().withName("Shoot, Collect, Shoot Mirrored"));
-        sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd().withName("Shoot, Collect, Shoot, Climb"));
-        sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd().withName("Shoot, Collect, Shoot, Climb Mirrored"));
+        //sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd().withName("Shoot, Collect, Shoot, Climb"));
+        //sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd().withName("Shoot, Collect, Shoot, Climb Mirrored"));
         sendableChooser.addOption("Shoot, depot, climb", shootDepotClimb().cmd().withName("Shoot, Depot, Climb"));
         sendableChooser.addOption("Shoot, depot, shoot", shootDepotShoot().cmd().withName("Shoot, Depot, Shoot"));
         sendableChooser.addOption("Collect, Shoot, Collect, Shoot", collectShootCollectShoot().cmd().withName("Collect, Shoot, Collect, Shoot"));
@@ -152,9 +152,8 @@ public class AutoBuilder {
         AutoRoutine routine = autoFactory.newRoutine("MinMovementShoot");
 
         // Load the routine's trajectories
-        AutoTrajectory minMovementShootTrajectory = ChoreoTraj.MinMovementShoot
+        AutoTrajectory minMovementShootTrajectory = ChoreoTraj.MinMovementShoot.asAutoTraj(routine);
         
-        (routine);
         // When the routine begins, reset odometry and start the first trajectory
         routine.active().onTrue(Commands.sequence(
             minMovementShootTrajectory.resetOdometry(),
@@ -334,7 +333,7 @@ public class AutoBuilder {
         return routine;
     }
 
-    public AutoRoutine shootCollectShootClimb() {
+    /*public AutoRoutine shootCollectShootClimb() {
         AutoRoutine routine = autoFactory.newRoutine("ShootCollectShootClimb");
 
         AutoTrajectory shootCollectShootClimb$0 = ChoreoTraj.ShootCollectShootClimb$0.asAutoTraj(routine);
@@ -354,9 +353,9 @@ public class AutoBuilder {
         shootCollectShootClimb$2.atTime("Climb").onTrue(climbCommandSequence());
 
         return routine;
-    }
+    }*/
 
-    public AutoRoutine shootCollectShootClimbMirrored() {
+    /*public AutoRoutine shootCollectShootClimbMirrored() {
         AutoRoutine routine = autoFactory.newRoutine("ShootCollectShootClimbMirrored");
 
         AutoTrajectory shootCollectShootClimbMirrored$0 = ChoreoTraj.ShootCollectShootClimbMirrored$0
@@ -379,7 +378,7 @@ public class AutoBuilder {
         shootCollectShootClimbMirrored$2.atTime("Climb").onTrue(climbCommandSequence());
 
         return routine;
-    }
+    }*/
 
     public AutoRoutine collectShootCollectShoot() {
     AutoRoutine routine = autoFactory.newRoutine("collectShootCollectShoot");

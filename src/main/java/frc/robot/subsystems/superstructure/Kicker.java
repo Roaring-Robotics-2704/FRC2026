@@ -9,6 +9,7 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkSim;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import static edu.wpi.first.units.Units.Volts;
@@ -42,22 +43,26 @@ public class Kicker extends SubsystemBase {
         //     kickerMotor.setVoltage(-1);
         // } else {
         //     timer.stop();
-        kickerMotor.setVoltage(desiredVoltage);
+        //kickerMotor.setVoltage(desiredVoltage);
         // }
+        
         Logger.recordOutput("Kicker/Current", kickerMotor.getOutputCurrent());
-        Logger.recordOutput("Kicker/DesiredVoltage", kickerMotor.getAppliedOutput());
+        Logger.recordOutput("Kicker/RealVoltage", kickerMotor.getAppliedOutput());
         Logger.recordOutput("Kicker/Velocity", kickerMotor.getEncoder().getVelocity());
         Logger.recordOutput("Kicker/Timer", timer.get());
         Logger.recordOutput("Kicker/IsTimerRunning", timer.isRunning());
+        Logger.recordOutput("Kicker/DesiredVoltage", desiredVoltage);
         
     }
 
     public void setKickerVoltage(double voltage) {
         desiredVoltage = Volts.of(voltage);
+        kickerMotor.setVoltage(voltage);
     }
 
     public void stopKicker() {
         desiredVoltage = Volts.of(0);
+        kickerMotor.setVoltage(0);
     }
 
 }
