@@ -45,9 +45,9 @@ public class DriveTrajectory extends Command {
         this.drive = drive;
         this.trajectory = trajectory;
         this.omegaOverride = omegaOverride;
-        xController = new PIDController(linearkP.get(), 0, linearkD.get(), 0.02);
-        yController = new PIDController(linearkP.get(), 0, linearkD.get(), 0.02);
-        thetaController = new PIDController(thetakP.get(), 0, thetakD.get(), 0.02);
+        xController = new PIDController(linearkP.get(), 0, linearkD.get(), Constants.loopTimeSeconds);
+        yController = new PIDController(linearkP.get(), 0, linearkD.get(), Constants.loopTimeSeconds);
+        thetaController = new PIDController(thetakP.get(), 0, thetakD.get(), Constants.loopTimeSeconds);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
         addRequirements(drive);
     }

@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import frc.robot.subsystems.superstructure.shooter.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -46,10 +47,6 @@ import frc.robot.subsystems.superstructure.hopper.HopperIOSim;
 import frc.robot.subsystems.superstructure.intake.Intake;
 import frc.robot.subsystems.superstructure.intake.IntakeIO;
 import frc.robot.subsystems.superstructure.intake.IntakeIOReal;
-import frc.robot.subsystems.superstructure.shooter.Shooter;
-import frc.robot.subsystems.superstructure.shooter.ShooterIO;
-import frc.robot.subsystems.superstructure.shooter.ShooterIOGreyT;
-import frc.robot.subsystems.superstructure.shooter.ShooterIOSim;
 import frc.robot.subsystems.vision.Vision;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
@@ -126,7 +123,7 @@ public class RobotContainer {
                 // objectDetection = new FuelPoseEstimator(new
                 // ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
                 // ObjectDetectionConstants.cameraToRobotTransform));
-                shooter = new Shooter(new ShooterIOGreyT());
+                shooter = new Shooter(new ShooterIOLQR());
                 break;
 
             case SIM:
@@ -194,6 +191,7 @@ public class RobotContainer {
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", autoBuilder.buildAutoChooser());
 
         DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
+        shooter.addTuningCommandsToAutoChooser(autoChooser);
 
         // Configure the button bindings
         configureButtonBindings();
@@ -219,14 +217,27 @@ public class RobotContainer {
                         : Rotation2d.k180deg)); // Zero gyro
 
         // Default command, normal field-relative drive
-        drive.setDefaultCommand(
-                DriveCommands.joystickDrive(
-                        drive,
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getLeftX(),
-                        () -> -controller.getRightX()));
+       drive.setDefaultCommand(
+               DriveCommands.joystickDrive(
+                       drive,
+                       () -> -controller.getLeftY(),
+                       () -> -controller.getLeftX(),
+                       () -> -controller.getRightX()));
         vision.setDefaultCommand(vision.idle());
-        // objectDetection.setDefaultCommand(objectDetection.idle());
+       // objectDetection.setDefaultCommand(objectDetection.idle());
+        // if ( (controller.getLeftX()<= 0.005)&&(controller.getLeftY()<= 0.005)){
+        //         Commands.runOnce(drive::stopWithX, drive);
+        // }
+        // else {
+        //           drive.setDefaultCommand(
+        //         DriveCommands.joystickDrive(
+        //                 drive,
+        //                 () -> -controller.getLeftY(),
+        //                 () -> -controller.getLeftX(),
+        //                 () -> -controller.getRightX()));
+        //   };
+
+
 
         // Lock to 0 deg when A button is held
         controller
@@ -241,7 +252,7 @@ public class RobotContainer {
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
         controller.x().whileTrue(Commands.startEnd(
-                ()->LEDmanager.setPattern(LEDState.X_LOCK),()->LEDmanager.setPattern(LEDState.IDLE),LEDmanager
+                ()->LEDmanager.setPattern(LEDState.X_LOCK),()->LEDmanager.setPattern(LEDState.IDLE)
             ));
 
         // controller.start().onTrue(Commands.runOnce(() -> RobotState.getInstance().resetPose(Pose2d.kZero)).ignoringDisable(true));
@@ -253,17 +264,18 @@ public class RobotContainer {
         // Reset gyro to 0 deg when B button is pressed
 
         controller.rightTrigger().whileTrue(Commands.parallel(
-                Commands.startEnd(() -> {
-                    if (shooter.isAtDesiredState()) {
-                        kicker.setKickerVoltage(12);
-                    }
-                }, () -> kicker.setKickerVoltage(-1), kicker),
                 Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.SHOOTING),
-                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
+                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter)
+                        .alongWith(Commands.waitSeconds(0.1)
+                                .andThen(
+                                        Commands.startEnd(()->kicker.setKickerVoltage(10), ()->kicker.setKickerVoltage(-2), kicker)
+                                )),
                 Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
                         () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
                 Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
-                        () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)));
+                        () -> LEDmanager.setPattern(LEDState.IDLE))));
+controller.rightTrigger().onFalse(Commands.runOnce(()->System.out.println("start right trigger")));
+
 
         controller2.povDown().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)).withName("Manual Lower hood"));
         controller2.povUp().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)).withName("Manual Raise hood"));
@@ -273,32 +285,61 @@ public class RobotContainer {
 
         // controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
 
-        controller.leftTrigger().or(controller2.leftTrigger()).whileTrue(Commands.parallel(
+        // controller.leftTrigger().or(controller2.leftTrigger()).whileTrue(Commands.parallel(
+        //     intake.intake(),
+        //     Commands.startEnd(
+        //         () -> LEDmanager.setPattern(LEDState.INTAKE),
+        //         () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)
+        // ));
+        controller2.leftTrigger().whileTrue(Commands.parallel(
             intake.intake(),
             Commands.startEnd(
                 () -> LEDmanager.setPattern(LEDState.INTAKE),
-                () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)
+                () -> LEDmanager.setPattern(LEDState.IDLE))
         ));
-        controller2.leftBumper().whileTrue(intake.retract());
+        controller2.leftBumper().whileTrue(intake.reverseRollers());
 
         //NonCameraShooting test case - this is used to set the shooter to a fixed hood angle and flywheel velocity for when the camera is not working, so we can still shooting functionality without relying on the camera. We can adjust the hood angle and flywheel velocity in the Shooter subsystem's periodic method under the NonCameraShooting case.
-        controller.rightBumper().whileTrue(Commands.runOnce(() -> shooter.setDesiredState(Shooter.ShooterState.NonCameraShooting)));
+               controller.rightBumper().whileTrue(Commands.parallel(
+                Commands.startEnd(() -> {
+                    if (shooter.isAtDesiredState()) {
+                        kicker.setKickerVoltage(12);
+                    }
+                }, () -> kicker.setKickerVoltage(-1), kicker),
+                Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.NonCameraShooting),
+                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
+                Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
+                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
+                Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
+                        () -> LEDmanager.setPattern(LEDState.IDLE))));
 
+         controller.leftBumper().whileTrue(Commands.parallel(
+                Commands.startEnd(() -> {
+                    if (shooter.isAtDesiredState()) {
+                        kicker.setKickerVoltage(12);
+                    }
+                }, () -> kicker.setKickerVoltage(-1), kicker),
+                Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.CENTERSHOOTING),
+                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
+                Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
+                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
+                Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
+                        () -> LEDmanager.setPattern(LEDState.IDLE))));
         controller2.rightTrigger().whileTrue(intake.retract());
         // Reset gyro to 0 deg when B button is pressed
 
         controller2.b().whileTrue(Commands.parallel(
             Commands.sequence(
-                intake.retract().withTimeout(2),
-                climber.setClimber(6)
+                //intake.retract().withTimeout(2),
+                climber.setClimber(8)
                 ),
             Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
                     () -> LEDmanager.setPattern(LEDState.IDLE))
         ).finallyDo(()->climber.enablehook(true)));
         controller2.a().whileTrue(Commands.parallel(
             Commands.sequence(
-                intake.retract().withTimeout(0.5),
-                climber.setClimber(-6)
+                //intake.retract().withTimeout(0.5),
+                climber.setClimber(-8)
                 ),
             Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
                 () -> LEDmanager.setPattern(LEDState.IDLE))

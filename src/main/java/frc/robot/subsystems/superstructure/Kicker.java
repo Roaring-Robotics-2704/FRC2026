@@ -4,31 +4,53 @@
 
 package frc.robot.subsystems.superstructure;
 
-import org.littletonrobotics.junction.Logger;
+// import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkSim;
 import com.revrobotics.spark.config.SparkMaxConfig;
+// import com.revrobotics.PersistMode;
+// import com.revrobotics.ResetMode;
+// import com.revrobotics.spark.SparkMax;
+// import com.revrobotics.spark.config.SparkMaxConfig;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.SparkUtil;
+//port frc.robot.util.SparkUtil;
+import org.littletonrobotics.junction.Logger;
 
 public class Kicker extends SubsystemBase {
-    Voltage desiredVoltage = Volts.of(-1);
+    Voltage desiredVoltage = Volts.of(-2);
     Timer timer = new Timer();
     /** Creates a new Kicker. */
-    SparkMax kickerMotor = new SparkMax(31, SparkMax.MotorType.kBrushless);
+    TalonFX kickerMotor = new TalonFX(31);
 
     public Kicker() {
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.smartCurrentLimit(20);
-        SparkUtil.tryUntilOk(kickerMotor, 5,
-                () -> kickerMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+       MotorOutputConfigs motorOutput = new MotorOutputConfigs()
+                .withNeutralMode(NeutralModeValue.Coast).withInverted(InvertedValue.CounterClockwise_Positive);
+        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
+                .withSupplyCurrentLimit(40)
+                .withSupplyCurrentLimitEnable(true)
+                .withStatorCurrentLimit(100)
+                .withStatorCurrentLimitEnable(true);
+         TalonFXConfiguration config = new TalonFXConfiguration()
+                 .withMotorOutput(
+                        motorOutput)
+                .withCurrentLimits(
+                        currentLimits);
+        //setKickerVoltage(-2);
     }
 
     @Override
@@ -46,14 +68,16 @@ public class Kicker extends SubsystemBase {
         //kickerMotor.setVoltage(desiredVoltage);
         // }
         
-        Logger.recordOutput("Kicker/Current", kickerMotor.getOutputCurrent());
-        Logger.recordOutput("Kicker/RealVoltage", kickerMotor.getAppliedOutput());
-        Logger.recordOutput("Kicker/Velocity", kickerMotor.getEncoder().getVelocity());
-        Logger.recordOutput("Kicker/Timer", timer.get());
-        Logger.recordOutput("Kicker/IsTimerRunning", timer.isRunning());
-        Logger.recordOutput("Kicker/DesiredVoltage", desiredVoltage);
+        //Logger.recordOutput("Kicker/Current", kickerMotor.getOutputCurrent());
+        //Logger.recordOutput("Kicker/RealVoltage", kickerMotor.getAppliedOutput());
+        //Logger.recordOutput("Kicker/Velocity", kickerMotor.getEncoder().getVelocity());
+        //Logger.recordOutput("Kicker/Timer", timer.get());
+        //Logger.recordOutput("Kicker/IsTimerRunning", timer.isRunning());
+        //Logger.recordOutput("Kicker/DesiredVoltage", desiredVoltage);
         
     }
+
+
 
     public void setKickerVoltage(double voltage) {
         desiredVoltage = Volts.of(voltage);

@@ -4,6 +4,11 @@
 
 package frc.robot.subsystems.superstructure.shooter;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
+import frc.robot.subsystems.drive.Drive;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -22,12 +27,13 @@ import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOT
 import frc.robot.util.solvers.BasicTunedCalc;
 import frc.robot.util.solvers.BasicTunedCalc.ShootingSolution;
 import frc.robot.util.tunables.LoggedTunableNumber;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /** The shooter subsystem. */
 public class Shooter extends SubsystemBase {
 
-    private ShooterState currentState = ShooterState.STATIONARY;
-    private ShooterState desiredState = ShooterState.IDLE;
+    private static ShooterState currentState = ShooterState.STATIONARY;
+    private static ShooterState desiredState = ShooterState.IDLE;
 
     private double hoodPercent;
     private AngularVelocity flywheelVelocity;
@@ -49,7 +55,7 @@ public class Shooter extends SubsystemBase {
     private double hoodOffset = 0;
     private AngularVelocity flywheelOffset = RPM.zero();
 
-
+    static SysIdRoutine routine;
     static {
         shootP.initDefault(ShooterConstants.SHOOTER_KP);
         shootD.initDefault(ShooterConstants.SHOOTER_KD);
@@ -63,6 +69,10 @@ public class Shooter extends SubsystemBase {
 
     public Shooter(ShooterIO io) {
         this.io = io;
+        routine = new SysIdRoutine(
+            new SysIdRoutine.Config(null, null, null,
+                (state) -> Logger.recordOutput("Shooter/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism(io::setFlywheelVoltage, null, this));
     }
 
     @Override
@@ -87,8 +97,10 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter/Distance", solution.distance());
         Logger.recordOutput("Shooter/DesiredState", desiredState.toString());
         Logger.recordOutput("Shooter/CurrentState", currentState.toString());
-        if (currentState != desiredState) {
             switch (desiredState) {
+                case CALIBRATING:
+                    currentState=ShooterState.CALIBRATING;
+                    break;
                 case STATIONARY:
                     io.setFlywheelVelocity(RPM.of(0));
                     io.setHoodPercent(0)
@@ -103,16 +115,18 @@ public class Shooter extends SubsystemBase {
                     io.setFlywheelVelocity(flywheelVelocity);
                     break;
                 case CENTERSHOOTING:
-                    io.setFlywheelVelocity(flywheelVelocity);
+                    io.setFlywheelVelocity(RPM.of(3490));
+                    io.setHoodPercent(7);
+                    break;
+                 case NonCameraShooting:
+                    io.setHoodPercent(0);
+                    io.setFlywheelVelocity(RPM.of(3175));// still need to set the value going to get it after testing;
                     break;
                 default:
                     break;
                     // This case is used when the camera is broken / vision cannot estimate the hood distance, so we just set the hood to a fixed angle and the flywheel to a fixed velocity. Not ideal, but better used when the camera is broken;
                     // xbox to call this case
-                    case NonCameraShooting:
-                    io.setHoodPercent(0);
-                    io.setFlywheelVelocity(RPM.of(0));// still need to set the value going to get it after testing;
-                    break;
+                
                     // case PassMode: 
                     // io.setHoodPercent(0);
                     // io.setFlywheelVelocity(RPM.of(0));//
@@ -123,7 +137,7 @@ public class Shooter extends SubsystemBase {
                 currentState = desiredState;
             }
 
-        }
+
 
         // This method will be called once per scheduler run
     }
@@ -158,7 +172,7 @@ public class Shooter extends SubsystemBase {
 
     /** Possible states for the shooter subsystem. */
     public enum ShooterState {
-        STATIONARY, IDLE, SHOOTING,CENTERSHOOTING,NonCameraShooting
+        STATIONARY, IDLE, SHOOTING,CENTERSHOOTING,NonCameraShooting, CALIBRATING
     }
 
     public Rotation2d getWantedRobotAngle() {
@@ -182,4 +196,48 @@ public class Shooter extends SubsystemBase {
         flywheelOffset = RPM.zero();
     }
 
+
+    public static Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return Commands.runOnce(()-> {
+            desiredState = ShooterState.CALIBRATING;
+            currentState = ShooterState.CALIBRATING;
+        }).andThen(
+            routine.quasistatic(direction));
+    }
+
+     public static Command sysIdDynamic(SysIdRoutine.Direction direction) {
+         return Commands.runOnce(()-> {
+             desiredState = ShooterState.CALIBRATING;
+             currentState = ShooterState.CALIBRATING;
+         }).andThen(
+             routine.dynamic(direction));
+     }
+
+    public void addTuningCommandsToAutoChooser(LoggedDashboardChooser<Command> chooser) {
+        // These only apply to when we're doing "real" tuning
+        if (Constants.tuningMode) {
+            chooser.addOption("TUNING | Shooter SysId (Quasistatic Forward)",
+                sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+            chooser.addOption("TUNING | Shooter SysId (Quasistat.ic Reverse)",
+                sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+            chooser.addOption("TUNING | Shooter SysId (Dynamic Forward)",
+                sysIdDynamic(SysIdRoutine.Direction.kForward));
+            chooser.addOption("TUNING | Shooter SysId (Dynamic Reverse)",
+                sysIdDynamic(SysIdRoutine.Direction.kReverse));
+            chooser.addOption("TUNING | Shooter SysId ALL",
+                Commands.runOnce(()-> {
+                    desiredState = ShooterState.CALIBRATING;
+                    currentState = ShooterState.CALIBRATING;
+                }).andThen(Commands.sequence(
+                    routine.quasistatic(SysIdRoutine.Direction.kForward),
+                    Commands.waitSeconds(10),
+                    routine.quasistatic(SysIdRoutine.Direction.kReverse),
+                    Commands.waitSeconds(10),
+                    routine.dynamic(SysIdRoutine.Direction.kForward),
+                    Commands.waitSeconds(10),
+                    routine.dynamic(SysIdRoutine.Direction.kReverse),
+                    Commands.waitSeconds(10)
+                )));
+        }
+    }
 }

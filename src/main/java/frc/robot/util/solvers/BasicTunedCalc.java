@@ -46,8 +46,8 @@ public class BasicTunedCalc {
     private final InterpolatingDoubleTreeMap flywheelSpeedMap = new InterpolatingDoubleTreeMap();
     private final InterpolatingDoubleTreeMap timeOfFlightMap = new InterpolatingDoubleTreeMap();
 
-    private final LinearFilter hoodPercentFilter = LinearFilter.movingAverage((int) (0.1 / 0.02));
-    private final LinearFilter driveAngleFilter = LinearFilter.movingAverage((int) (0.1 / 0.02));
+    private final LinearFilter hoodPercentFilter = LinearFilter.movingAverage((int) (0.1 / Constants.loopTimeSeconds));
+    private final LinearFilter driveAngleFilter = LinearFilter.movingAverage((int) (0.1 / Constants.loopTimeSeconds));
     private final Pose2d blueHubPose = new Pose2d(4.625, 4.03, Rotation2d.fromDegrees(0));
 
     double lastHoodAngle = 0;
@@ -65,12 +65,16 @@ public class BasicTunedCalc {
         timeOfFlightMap.put(2.0, 1.26);
 
         hoodPercentMap.put(3.0, 15.0);
-        flywheelSpeedMap.put(3.0, 3050.0);
+        flywheelSpeedMap.put(3.0, 3200.0);
         timeOfFlightMap.put(3.0, 1.25);
 
         hoodPercentMap.put(4.0, 20.0);
-        flywheelSpeedMap.put(4.0, 3250.0);
+        flywheelSpeedMap.put(4.0, 3430.0);
         timeOfFlightMap.put(4.0, 1.25);
+
+        hoodPercentMap.put(4.8, 22.0);
+        flywheelSpeedMap.put(4.8, 3600.0);
+        timeOfFlightMap.put(4.8, 1.25);
 
         // hoodPercentMap.put(15.0, 9.0);
         // flywheelSpeedMap.put(5.0, 5000.0);

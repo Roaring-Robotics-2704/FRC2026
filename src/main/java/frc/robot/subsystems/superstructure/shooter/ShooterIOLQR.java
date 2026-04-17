@@ -6,55 +6,31 @@ package frc.robot.subsystems.superstructure.shooter;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.StatusSignalCollection;
-import com.ctre.phoenix6.configs.AudioConfigs;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Hertz;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Servo;
-
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.CURRENT_LIMIT;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.FLYWHEEL_MOTOR_ONE;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.FLYWHEEL_MOTOR_TWO;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.HOOD_SERVO1_PORT;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MAX_ANGLE;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KA;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KD;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KP;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KS;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_KV;
-import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.SHOOTER_TOLERANCE;
-
-import java.io.ObjectInputFilter.Status;
-
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.LinearQuadraticRegulator;
+import edu.wpi.first.math.estimator.KalmanFilter;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.LinearSystemLoop;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.*;
+import frc.robot.Constants;
 import frc.robot.util.PhoenixUtil;
 
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.*;
+
 /** Add your docs here. */
-public class ShooterIOGreyT implements ShooterIO {
+public class ShooterIOLQR implements ShooterIO {
     private StatusSignal<AngularVelocity> leftflywheelVelocitySignal;
     private StatusSignal<AngularVelocity> rightflywheelVelocitySignal;
     private StatusSignal<AngularAcceleration> flywheelAccelerationSignal;
@@ -64,7 +40,6 @@ public class ShooterIOGreyT implements ShooterIO {
     private StatusSignal<Current> rightFlywheelCurrentAmpsSignal;
     private StatusSignal<Temperature> rightTempSignal;
     private StatusSignal<Temperature> leftTempSignal;
-    private  StatusSignal<Angle> positionSignal;
 
     private StatusSignalCollection statusSignals = new StatusSignalCollection();
 
@@ -73,11 +48,54 @@ public class ShooterIOGreyT implements ShooterIO {
 
     private double targetFlywheelVelocity = 0.0;
 
+
+    // Volts per (radian per second)
+    private static final double kFlywheelKv = 0.01822;
+
+    // Volts per (radian per second squared)
+    private static final double kFlywheelKa = 0.0014421;
+
+    // The plant holds a state-space model of our flywheel. This system has the following properties:
+    //
+    // States: [velocity], in radians per second.
+    // Inputs (what we can "put in"): [voltage], in volts.
+    // Outputs (what we can measure): [velocity], in radians per second.
+    //
+    // The Kv and Ka constants are found using the FRC Characterization toolsuite.
+    private final LinearSystem<N1, N1, N1> flywheelPlant =
+        LinearSystemId.identifyVelocitySystem(kFlywheelKv, kFlywheelKa);
+
+    private final KalmanFilter<N1, N1, N1> observer =
+        new KalmanFilter<>(
+            Nat.N1(),
+            Nat.N1(),
+            flywheelPlant,
+            VecBuilder.fill(3.0), // How accurate we think our model is
+            VecBuilder.fill(0.01), // How accurate we think our encoder
+            // data is
+            Constants.loopTimeSeconds);
+
+    private final LinearQuadraticRegulator<N1, N1, N1> controller =
+        new LinearQuadraticRegulator<>(
+            flywheelPlant,
+            VecBuilder.fill(8.0), // qelms. Velocity error tolerance, in radians per second. Decrease
+            // this to more heavily penalize state excursion, or make the controller behave more
+            // aggressively.
+            VecBuilder.fill(11.0), // relms. Control effort (voltage) tolerance. Decrease this to more
+            // heavily penalize control effort, or make the controller less aggressive. 12 is a good
+            // starting point because that is the (approximate) maximum voltage of a battery.
+            Constants.loopTimeSeconds); // Nominal time between loops. 0.020 for TimedRobot, but can be
+    // lower if using notifiers.
+
+    // The state-space loop combines a controller, observer, feedforward and plant for easy control.
+    private final LinearSystemLoop<N1, N1, N1> m_loop =
+        new LinearSystemLoop<>(flywheelPlant, controller, observer, 10.0, Constants.loopTimeSeconds);
+
     /** Instantiates the GreyT Shooter hardware. */
     private LinearServo hoodServo1 = new LinearServo(HOOD_SERVO1_PORT,50, 6);
 
     /** Constructs the GreyT shooter code. */
-    public ShooterIOGreyT() {
+    public ShooterIOLQR() {
         flywheelMotor1 = new TalonFX(FLYWHEEL_MOTOR_ONE);
         flywheelMotor2 = new TalonFX(FLYWHEEL_MOTOR_TWO);
 
@@ -88,32 +106,8 @@ public class ShooterIOGreyT implements ShooterIO {
                 .withSupplyCurrentLimitEnable(true)
                 .withStatorCurrentLimit(100)
                 .withStatorCurrentLimitEnable(true);
-
-        Slot0Configs pidConfigs = new Slot0Configs()
-                .withKP(SHOOTER_KP)
-                .withKD(SHOOTER_KD)
-                .withKV(SHOOTER_KV)
-                .withKA(SHOOTER_KA)
-                .withKS(SHOOTER_KS);
         // in init function
-// var talonFXConfigs = new TalonFXConfiguration();
-// // set slot 0 gains
-// var slot0Configs = talonFXConfigs.Slot0;
-// slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
-// slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-// slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
-// slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12 V output
-// slot0Configs.kI = 0; // no output for integrated error
-// slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
-// //TODO set magic motion values 
-// //set Motion Magic settings
-// MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
-// motionMagicConfigs.MotionMagicCruiseVelocity = 80; // Target cruise velocity of 80 rps
-// motionMagicConfigs.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s (0.5 seconds)
-// motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
-// flywheelMotor1.getConfigurator().apply(talonFXConfigs);
-// flywheelMotor2.getConfigurator().apply(talonFXConfigs);
 
         AudioConfigs audioConfigs = new AudioConfigs().withAllowMusicDurDisable(true).withBeepOnConfig(true).withBeepOnBoot(true);
 
@@ -122,8 +116,7 @@ public class ShooterIOGreyT implements ShooterIO {
                         motorOutput)
                 .withCurrentLimits(
                         currentLimits)
-                .withSlot0(
-                        pidConfigs).withAudio(audioConfigs);
+            .withAudio(audioConfigs);
 
         PhoenixUtil.tryUntilOk(5, () -> flywheelMotor1.getConfigurator().apply(config));
         PhoenixUtil.tryUntilOk(5, () -> flywheelMotor2.getConfigurator().apply(config));
@@ -137,7 +130,6 @@ public class ShooterIOGreyT implements ShooterIO {
         rightFlywheelCurrentAmpsSignal = flywheelMotor2.getStatorCurrent();
         leftTempSignal = flywheelMotor1.getDeviceTemp();
         rightTempSignal = flywheelMotor2.getDeviceTemp();
-        positionSignal = flywheelMotor1.getPosition();
        statusSignals.addSignals(
                 leftflywheelVelocitySignal,
                 rightflywheelVelocitySignal,
@@ -147,8 +139,7 @@ public class ShooterIOGreyT implements ShooterIO {
                 leftFlywheelAppliedVoltsSignal,
                 rightFlywheelCurrentAmpsSignal,
                 leftTempSignal,
-                rightTempSignal,
-           positionSignal);
+                rightTempSignal);
 
         statusSignals.setUpdateFrequencyForAll(Hertz.of(50));
         ParentDevice.optimizeBusUtilizationForAll(flywheelMotor1, flywheelMotor2);
@@ -168,7 +159,6 @@ public class ShooterIOGreyT implements ShooterIO {
         inputs.rightVelocity.mut_replace(rightflywheelVelocitySignal.getValue());
         inputs.lefTemp.mut_replace(leftTempSignal.getValue());
         inputs.rightTemp.mut_replace(rightTempSignal.getValue());
-        inputs.position.mut_replace(positionSignal.getValue());
 
         inputs.hoodAngle.mut_replace(MAX_ANGLE.minus(MIN_ANGLE).times(hoodServo1.get()));
         inputs.atTargetVelocity = flywheelMotor1.getClosedLoopError().getValue() < SHOOTER_TOLERANCE.in(RotationsPerSecond);
@@ -184,11 +174,11 @@ public class ShooterIOGreyT implements ShooterIO {
      */
     @Override
     public void setFlywheelVelocity(AngularVelocity velocity) {
-        flywheelMotor1.setControl(new VelocityVoltage(velocity));
-        flywheelMotor2.setControl(new VelocityVoltage(velocity.unaryMinus()));
-
-        targetFlywheelVelocity = velocity.in(RotationsPerSecond);
-
+        m_loop.setNextR(VecBuilder.fill(velocity.in(RadiansPerSecond)));
+        m_loop.correct(VecBuilder.fill(leftflywheelVelocitySignal.getValue().in(RadiansPerSecond)));
+        m_loop.predict(Constants.loopTimeSeconds);
+        double nextVoltage = m_loop.getU(0);
+        flywheelMotor1.setControl(new VoltageOut(Volts.of(nextVoltage)));
     }
 
     @Override
@@ -196,11 +186,10 @@ public class ShooterIOGreyT implements ShooterIO {
         flywheelMotor1.setControl(new VoltageOut(voltage));
         flywheelMotor2.setControl(new VoltageOut(voltage.unaryMinus()));
     }
-
     /**
      * Sets the hood angle by converting the desired angle to servo positions.
      *
-     * @param angle
+     * @param percent
      *            The target angle for the hood.
      */
     @Override
@@ -213,14 +202,7 @@ public class ShooterIOGreyT implements ShooterIO {
 
     @Override
     public void setPID(double kP, double kI, double kD, double kS, double kV, double kA) {
-        Slot0Configs pidConfigs = new Slot0Configs()
-                .withKP(kP)
-                .withKI(kI)
-                .withKD(kD)
-                .withKV(kV)
-                .withKA(kA)
-                .withKS(kS);
-        PhoenixUtil.tryUntilOk(5, () -> flywheelMotor1.getConfigurator().apply(pidConfigs));
+//        throw new UnsupportedOperationException("This method is not supported for LQR.");
     }
 
 

@@ -55,9 +55,9 @@ public class Drive extends SubsystemBase {
 //    SwerveSetpoint previousSetpoint;
     Orchestra orchestra;
     
-    public static final PIDController turnController = new PIDController(5, 0.0, 0.4);
-    public static final PIDController driveXController = new PIDController(5, 0.0, 0.4);
-    public static final PIDController driveYController = new PIDController(5, 0.0, 0.4);
+    public static final PIDController turnController = new PIDController(5, 0.0, 0.4, Constants.loopTimeSeconds);
+    public static final PIDController driveXController = new PIDController(5, 0.0, 0.4, Constants.loopTimeSeconds);
+    public static final PIDController driveYController = new PIDController(5, 0.0, 0.4, Constants.loopTimeSeconds);
 //    private SwerveSetpointGenerator setpointGenerator;
 
     static final Lock odometryLock = new ReentrantLock();
@@ -193,7 +193,7 @@ public class Drive extends SubsystemBase {
     @SuppressWarnings("unused")
     public void runVelocity(ChassisSpeeds speeds, double[] accelerationsMps2) {
         // Calculate module setpoints
-        speeds = ChassisSpeeds.discretize(speeds, 0.02);
+        speeds = ChassisSpeeds.discretize(speeds, Constants.loopTimeSeconds);
         SwerveModuleState[] states = RobotState.getInstance().kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.linearFreeSpeed);
 //

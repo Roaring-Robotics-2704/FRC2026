@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure.shooter;
 
+import frc.robot.Constants;
 import org.ironmaple.simulation.motorsims.MapleMotorSim;
 import org.ironmaple.simulation.motorsims.SimMotorConfigs;
 
@@ -33,7 +34,7 @@ public class ShooterIOSim implements ShooterIO {
     MapleMotorSim flywheelMotorSim = new MapleMotorSim(
         new SimMotorConfigs(SHOOTER_MOTOR_TYPE, 1, KilogramSquareMeters.of(0.001), Volts.of(0.5)));
     private FlywheelSim flywheelSim = new FlywheelSim(flywheelSystem, SHOOTER_MOTOR_TYPE, 0.02);
-    private PIDController flywheelPID = new PIDController(SHOOTER_KP, 0, SHOOTER_KD);
+    private PIDController flywheelPID = new PIDController(SHOOTER_KP, 0, SHOOTER_KD, Constants.loopTimeSeconds);
 
     private SimpleMotorFeedforward flywheelFeedforward = new SimpleMotorFeedforward(SHOOTER_KS, SHOOTER_KV, SHOOTER_KA);
 
@@ -46,8 +47,8 @@ public class ShooterIOSim implements ShooterIO {
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
         flywheelSim.setInputVoltage(flywheelMotorSim.getAppliedVoltage().in(Volts));
-        flywheelSim.update(0.02);
-        flywheelMotorSim.update(Seconds.of(0.02));
+        flywheelSim.update(Constants.loopTimeSeconds);
+        flywheelMotorSim.update(Seconds.of(Constants.loopTimeSeconds));
         inputs.hoodAngle.mut_replace(hoodAngle);
         inputs.flywheelVelocity.mut_replace(RotationsPerSecond.of(flywheelSim.getAngularVelocityRPM() / 60));
         inputs.leftFlywheelAppliedVolts.mut_replace(Volts.of(flywheelSim.getInputVoltage()));

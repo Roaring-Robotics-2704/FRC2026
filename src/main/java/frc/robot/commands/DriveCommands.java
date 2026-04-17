@@ -3,6 +3,8 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.dyn4j.geometry.Rotation;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -68,9 +70,14 @@ public class DriveCommands {
             boolean isFlipped = DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == Alliance.Red;
             // drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
-            drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
-                speeds,
-                isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()));
+            if (Math.abs(speeds.vxMetersPerSecond) > 0.0001 || Math.abs(speeds.vyMetersPerSecond) > 0.0001 || Math.abs(speeds.omegaRadiansPerSecond) > 0.0001) {
+                drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
+                    speeds,
+                    isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()));
+            } else {
+                drive.stopWithX();
+            }
+
         }, drive);
     }
 
@@ -100,9 +107,13 @@ public class DriveCommands {
             boolean isFlipped = DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == Alliance.Red;
             // drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
-            drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
-                speeds,
-                isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()));
+            if (Math.abs(speeds.vxMetersPerSecond) > 0.0001 || Math.abs(speeds.vyMetersPerSecond) > 0.0001 || Math.abs(speeds.omegaRadiansPerSecond) > 0.0001) {
+                drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
+                    speeds,
+                    isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()));
+            } else {
+                drive.stopWithX();
+            }
         }, drive);
     }
 
@@ -149,4 +160,8 @@ public class DriveCommands {
             // Reset PID controller when command starts
             .beforeStarting(() -> angleController.reset(robotState.getRotation().getRadians()));
     }
+    public static Command XWhileNotDriving( Drive drive, DoubleSupplier xSupplier,DoubleSupplier ySupplier,Supplier<Rotation2d> rotationSupplier){
+        RobotState robotState = RobotState.getInstance();
+        return Commands.runOnce(drive::stopWithX, drive);
+} 
 }

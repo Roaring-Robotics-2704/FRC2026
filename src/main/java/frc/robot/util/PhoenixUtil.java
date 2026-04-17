@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
 import java.util.function.Supplier;
+
+import frc.robot.Constants;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
@@ -84,7 +86,7 @@ public final class PhoenixUtil {
         final double[] odometryTimeStamps = new double[SimulatedArena.getSimulationSubTicksIn1Period()];
         for (int i = 0; i < odometryTimeStamps.length; i++) {
             odometryTimeStamps[i] = Timer.getFPGATimestamp()
-                    - 0.02
+                    - Constants.loopTimeSeconds
                     + i * SimulatedArena.getSimulationDt().in(Seconds);
         }
         return odometryTimeStamps;

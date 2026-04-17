@@ -81,9 +81,9 @@ public class DriveToPose extends Command {
     private final Supplier<Optional<Double>> omegaOverride;
 
     private TrapezoidProfile driveProfile;
-    private final PIDController driveController = new PIDController(0.0, 0.0, 0.0, 0.02);
+    private final PIDController driveController = new PIDController(0.0, 0.0, 0.0, Constants.loopTimeSeconds);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
+            0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), Constants.loopTimeSeconds);
 
     private Translation2d lastSetpointTranslation = Translation2d.kZero;
     private Translation2d lastSetpointVelocity = Translation2d.kZero;
