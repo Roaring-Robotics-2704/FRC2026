@@ -103,11 +103,11 @@ public class BasicTunedCalc {
         hoodPercent = hoodPercentFilter.calculate(hoodPercent);
 
         Pose2d robotPoseLookAhead = RobotState.getInstance().getLookaheadPose(timeOfFlightMap.get(distance));
-        double dx = blueHubPose.getX() - robotPose.getX();
-        double dy = blueHubPose.getY() - robotPose.getY();
+        double dx = blueHubPose.getX() - shooterPose.getX();
+        double dy = blueHubPose.getY() - shooterPose.getY();
         double targetAngle = Math.atan2(dy, dx);
         targetAngle = driveAngleFilter.calculate(targetAngle);
-
+Logger.recordOutput("target angle", targetAngle);
         return new ShootingSolution(flywheelVelocity, hoodPercent, Rotation2d.fromRadians(targetAngle), distance);
     }
 
