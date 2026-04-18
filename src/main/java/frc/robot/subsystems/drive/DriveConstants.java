@@ -210,15 +210,15 @@ public class DriveConstants {
     // This may need to be tuned to your individual robot
     private static final double coupleRatio = 3.375;
 
-    public static final double driveGearRatio = 5.2734375;
+    public static final double driveGearRatio = 6.026785714285714;
     public static final double steerGearRatio = 26.09;
     public static final Distance wheelRadius = Inches.of(2);
 
     private static final int pigeonId = 13;
 
     // These are only used for simulation
-    public static final MomentOfInertia steerInertia = KilogramSquareMeters.of(0.05);
-    public static final MomentOfInertia driveInertia = KilogramSquareMeters.of(0.05);
+    public static final MomentOfInertia steerInertia = KilogramSquareMeters.of(0.01);
+    public static final MomentOfInertia driveInertia = KilogramSquareMeters.of(0.01);
     // Simulated voltage necessary to overcome friction
     public static final Voltage steerFrictionVoltage = Volts.of(0.2);
     public static final Voltage driveFrictionVoltage = Volts.of(0.2);
@@ -235,7 +235,7 @@ public class DriveConstants {
     public static final SwerveModuleConfig backLeftConfig = new SwerveModuleConfig(3, 7, 10,
             Rotations.of(0.119873046875), trackWidth.div(2.0), wheelBase.div(-2.0), false);
     public static final SwerveModuleConfig backRightConfig = new SwerveModuleConfig(4, 8, 12,
-            Rotations.of(0.41943359375), trackWidth.div(-2.0), wheelBase.div(-2.0), true);
+            Rotations.of(-0.478515625), trackWidth.div(-2.0), wheelBase.div(-2.0), true);
     
     public static final ArrayList<SwerveModuleConfig> moduleConfigs = new ArrayList<>(Arrays.asList(
             frontLeftConfig,
