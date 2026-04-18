@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drive;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -19,6 +20,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 public class Module {
     private static final LoggedTunableNumber driveP = new LoggedTunableNumber("Drive/DriveP");
+    private static final LoggedTunableNumber driveI = new LoggedTunableNumber("Drive/DriveI");
     private static final LoggedTunableNumber driveD = new LoggedTunableNumber("Drive/DriveD");
 
     private static final LoggedTunableNumber driveS = new LoggedTunableNumber("Drive/DriveS");
@@ -26,10 +28,12 @@ public class Module {
     private static final LoggedTunableNumber driveA = new LoggedTunableNumber("Drive/DriveA");
 
     private static final LoggedTunableNumber turnP = new LoggedTunableNumber("Drive/TurnP");
+    private static final LoggedTunableNumber turnI = new LoggedTunableNumber("Drive/TurnI");
     private static final LoggedTunableNumber turnD = new LoggedTunableNumber("Drive/TurnD");
 
     static {
         driveP.initDefault(DriveConstants.driveGains.kP);
+        driveI.initDefault(DriveConstants.driveGains.kI);
         driveD.initDefault(DriveConstants.driveGains.kD);
 
         driveS.initDefault(DriveConstants.driveGains.kS);
@@ -37,6 +41,7 @@ public class Module {
         driveA.initDefault(DriveConstants.driveGains.kA);
 
         turnP.initDefault(DriveConstants.steerGains.kP);
+        turnI.initDefault(DriveConstants.steerGains.kI);
         turnD.initDefault(DriveConstants.steerGains.kD);
     }
 
@@ -58,12 +63,12 @@ public class Module {
     }
 
     public void periodic() {
-        if(driveP.hasChanged(hashCode()) || driveD.hasChanged(hashCode()) ||
+        if(driveP.hasChanged(hashCode()) || driveI.hasChanged(hashCode()) || driveD.hasChanged(hashCode()) ||
             driveS.hasChanged(hashCode()) || driveV.hasChanged(hashCode()) || driveA.hasChanged(hashCode())) {
-            io.setDrivePID(driveP.get(), 0, driveD.get(), driveS.get(), driveV.get(), driveA.get());
+            io.setDrivePID(driveP.get(), driveI.get(), driveD.get(), driveS.get(), driveV.get(), driveA.get());
         }
-        if(turnP.hasChanged(hashCode()) || turnD.hasChanged(hashCode())) {
-            io.setTurnPID(turnP.get(), 0, turnD.get());
+        if(turnP.hasChanged(hashCode()) || turnI.hasChanged(hashCode()) || turnD.hasChanged(hashCode())) {
+            io.setTurnPID(turnP.get(), turnI.get(), turnD.get());
         }
 
         io.updateInputs(inputs);

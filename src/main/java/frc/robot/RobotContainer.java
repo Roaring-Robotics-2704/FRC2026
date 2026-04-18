@@ -268,7 +268,7 @@ public class RobotContainer {
                         () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter)
                         .alongWith(Commands.waitSeconds(0.1)
                                 .andThen(
-                                        Commands.startEnd(()->kicker.setKickerVoltage(10), ()->kicker.setKickerVoltage(-2), kicker)
+                                        Commands.startEnd(()->kicker.setKickerVoltage(8), ()->kicker.setKickerVoltage(-2), kicker)
                                 )),
                 Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
                         () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),

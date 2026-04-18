@@ -93,10 +93,11 @@ public class AutoBuilder {
         sendableChooser.addOption("Shoot, collect, pass, collect, pass", shootCollectPass().cmd().withName("Shoot, Collect, Pass"));
         sendableChooser.addOption("Shoot, collect, shoot", shootCollectShoot().cmd().withName("Shoot, Collect, Shoot"));
         sendableChooser.addOption("Shoot, collect, shoot (mirrored)", shootCollectShootMirrored().cmd().withName("Shoot, Collect, Shoot Mirrored"));
-        sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd().withName("Shoot, Collect, Shoot, Climb"));
-        sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd().withName("Shoot, Collect, Shoot, Climb Mirrored"));
+       // sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd().withName("Shoot, Collect, Shoot, Climb"));
+       // sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd().withName("Shoot, Collect, Shoot, Climb Mirrored"));
         sendableChooser.addOption("Shoot, depot, climb", shootDepotClimb().cmd().withName("Shoot, Depot, Climb"));
         sendableChooser.addOption("Shoot, depot, shoot", shootDepotShoot().cmd().withName("Shoot, Depot, Shoot"));
+        sendableChooser.addOption("Shoot, collect, shoot (new)", shootCollectShootNew().cmd().withName("Shoot, Collect, Shoot New"));
 
         return sendableChooser;
     }
@@ -248,6 +249,28 @@ public class AutoBuilder {
         return routine;
     }
 
+     public AutoRoutine shootCollectShootNew() {
+        AutoRoutine routine = autoFactory.newRoutine("ShootCollectShootNew");
+
+        AutoTrajectory shootCollectShootNew = ChoreoTraj.ShootCollectShootNew.asAutoTraj(routine);
+       // AutoTrajectory shootCollectShootNew$1 = ChoreoTraj.ShootCollectShootNew$1.asAutoTraj(routine);
+
+        routine.active().onTrue(
+                Commands.sequence(
+                        shootCollectShootNew.resetOdometry(),
+                        runAutoTrajectory(shootCollectShootNew),
+                        AutoCommands.index(hopper,kicker,shooter,intake,manager,Seconds.of(5))));
+                        // runAutoTrajectory(shootCollectShootNew$1),
+                        // AutoCommands.index(hopper,kicker,shooter,intake,manager,Seconds.of(7))));
+
+        shootCollectShootNew.atTime("Shoot Preloads").onTrue(Commands.none());
+        // shootCollectShoot$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
+        // shootCollectShoot$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
+        // shootCollectShoot$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
+
+        return routine;
+    }
+
     public AutoRoutine shootDepotClimb() {
         AutoRoutine routine = autoFactory.newRoutine("ShootDepotClimb");
 
@@ -331,50 +354,50 @@ public class AutoBuilder {
         return routine;
     }
 
-    public AutoRoutine shootCollectShootClimb() {
-        AutoRoutine routine = autoFactory.newRoutine("ShootCollectShootClimb");
+    // public AutoRoutine shootCollectShootClimb() {
+    //     AutoRoutine routine = autoFactory.newRoutine("ShootCollectShootClimb");
 
-        AutoTrajectory shootCollectShootClimb$0 = ChoreoTraj.ShootCollectShootClimb$0.asAutoTraj(routine);
-        AutoTrajectory shootCollectShootClimb$1 = ChoreoTraj.ShootCollectShootClimb$1.asAutoTraj(routine);
-        AutoTrajectory shootCollectShootClimb$2 = ChoreoTraj.ShootCollectShootClimb$2.asAutoTraj(routine);
+        // AutoTrajectory shootCollectShootClimb$0 = ChoreoTraj.ShootCollectShootClimb$0.asAutoTraj(routine);
+        // AutoTrajectory shootCollectShootClimb$1 = ChoreoTraj.ShootCollectShootClimb$1.asAutoTraj(routine);
+        // AutoTrajectory shootCollectShootClimb$2 = ChoreoTraj.ShootCollectShootClimb$2.asAutoTraj(routine);
 
-        routine.active().onTrue(
-                Commands.sequence(
-                        shootCollectShootClimb$0.resetOdometry(),
-                        runAutoTrajectory(shootCollectShootClimb$0),
-                        runAutoTrajectory(shootCollectShootClimb$1)));
+        // routine.active().onTrue(
+        //         Commands.sequence(
+        //                 shootCollectShootClimb$0.resetOdometry(),
+        //                 runAutoTrajectory(shootCollectShootClimb$0),
+        //                 runAutoTrajectory(shootCollectShootClimb$1)));
 
-        shootCollectShootClimb$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
-        shootCollectShootClimb$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
-        shootCollectShootClimb$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
-        shootCollectShootClimb$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
-        shootCollectShootClimb$2.atTime("Climb").onTrue(climbCommandSequence());
+        // shootCollectShootClimb$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
+        // shootCollectShootClimb$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
+        // shootCollectShootClimb$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
+        // shootCollectShootClimb$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
+        // shootCollectShootClimb$2.atTime("Climb").onTrue(climbCommandSequence());
 
-        return routine;
-    }
+        // return routine;
+    //}
 
-    public AutoRoutine shootCollectShootClimbMirrored() {
-        AutoRoutine routine = autoFactory.newRoutine("ShootCollectShootClimbMirrored");
+    // public AutoRoutine shootCollectShootClimbMirrored() {
+    //     AutoRoutine routine = autoFactory.newRoutine("ShootCollectShootClimbMirrored");
 
-        AutoTrajectory shootCollectShootClimbMirrored$0 = ChoreoTraj.ShootCollectShootClimbMirrored$0
-                .asAutoTraj(routine);
-        AutoTrajectory shootCollectShootClimbMirrored$1 = ChoreoTraj.ShootCollectShootClimbMirrored$1
-                .asAutoTraj(routine);
-        AutoTrajectory shootCollectShootClimbMirrored$2 = ChoreoTraj.ShootCollectShootClimbMirrored$2
-                .asAutoTraj(routine);
+    //     // AutoTrajectory shootCollectShootClimbMirrored$0 = ChoreoTraj.ShootCollectShootClimbMirrored$0
+    //     //         .asAutoTraj(routine);
+    //     // AutoTrajectory shootCollectShootClimbMirrored$1 = ChoreoTraj.ShootCollectShootClimbMirrored$1
+    //     //         .asAutoTraj(routine);
+    //     // AutoTrajectory shootCollectShootClimbMirrored$2 = ChoreoTraj.ShootCollectShootClimbMirrored$2
+    //     //         .asAutoTraj(routine);
 
-        routine.active().onTrue(
-                Commands.sequence(
-                        shootCollectShootClimbMirrored$0.resetOdometry(),
-                        runAutoTrajectory(shootCollectShootClimbMirrored$0),
-                        runAutoTrajectory(shootCollectShootClimbMirrored$1)));
+    //     routine.active().onTrue(
+    //             Commands.sequence(
+    //                     shootCollectShootClimbMirrored$0.resetOdometry(),
+    //                     runAutoTrajectory(shootCollectShootClimbMirrored$0),
+    //                     runAutoTrajectory(shootCollectShootClimbMirrored$1)));
 
-        shootCollectShootClimbMirrored$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
-        shootCollectShootClimbMirrored$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
-        shootCollectShootClimbMirrored$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
-        shootCollectShootClimbMirrored$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
-        shootCollectShootClimbMirrored$2.atTime("Climb").onTrue(climbCommandSequence());
+    //     shootCollectShootClimbMirrored$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
+    //     shootCollectShootClimbMirrored$1.atTime("Open Intake").onTrue(extendIntakeCommandSequence());
+    //     shootCollectShootClimbMirrored$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
+    //     shootCollectShootClimbMirrored$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
+    //     shootCollectShootClimbMirrored$2.atTime("Climb").onTrue(climbCommandSequence());
 
-        return routine;
-    }
+    //     return routine;
+    // }
 }
