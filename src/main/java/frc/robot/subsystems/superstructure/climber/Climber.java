@@ -46,7 +46,10 @@ public class Climber extends SubsystemBase {
         Logger.processInputs("Climber", inputs);
         if (!hasCalibrated && DriverStation.isEnabled()) {
             startTimer();
-            climberIO.setClimberVoltage(-1);
+            // Commented out for now because it snapped the string on the climber, because the motor was
+            // continuously trying to retract the climber, and there was no other command to turn it off.
+            // @TODO Fix this code to turn off the climber motor when not in use
+            // climberIO.setClimberVoltage(-1);
             climberIO.setHookVoltage(0);
             if (((inputs.climberVelocity.in(InchesPerSecond) == 0.0)
                 || inputs.climberCurrent.in(Amps) > 15)
