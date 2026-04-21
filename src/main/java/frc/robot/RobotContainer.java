@@ -7,168 +7,382 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
+import frc.robot.subsystems.superstructure.shooter.*;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.generated.TunerConstants;
+import frc.robot.commands.DriveTuningCommands;
+import frc.robot.commands.auto.AutoBuilder;
+import frc.robot.subsystems.LED.LEDManager;
+import frc.robot.subsystems.LED.LEDManager.LEDState;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import frc.robot.subsystems.drive.ModuleIOTalonFXReal;
+import frc.robot.subsystems.drive.ModuleIOTalonFXSim;
+import frc.robot.subsystems.superstructure.Kicker;
+import frc.robot.subsystems.superstructure.climber.Climber;
+import frc.robot.subsystems.superstructure.climber.ClimberIO;
+import frc.robot.subsystems.superstructure.climber.ClimberIOReal;
+import frc.robot.subsystems.superstructure.hopper.Hopper;
+import frc.robot.subsystems.superstructure.hopper.HopperIO;
+import frc.robot.subsystems.superstructure.hopper.HopperIOReal;
+import frc.robot.subsystems.superstructure.hopper.HopperIOSim;
+import frc.robot.subsystems.superstructure.intake.Intake;
+import frc.robot.subsystems.superstructure.intake.IntakeIO;
+import frc.robot.subsystems.superstructure.intake.IntakeIOReal;
+import frc.robot.subsystems.vision.Vision;
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // Subsystems
-  private final Drive drive;
+    // Subsystems
+    private final Drive drive;
+    private SwerveDriveSimulation driveSimulation = null;
+    private final Hopper hopper;
+    private final Kicker kicker = new Kicker();
+    private final Intake intake;
+    private final Shooter shooter;
+    private final Climber climber;
 
-  // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+    LEDManager LEDmanager;
+    private final Vision vision;
+    // private final FuelPoseEstimator objectDetection;
 
-  // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+    // SuperStructure
+    // private final SuperStructure superStructure;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    switch (Constants.currentMode) {
-      case REAL:
-        // Real robot, instantiate hardware IO implementations
-        // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
-        // a CANcoder
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight));
+    // Controller
+    private final CommandXboxController controller = new CommandXboxController(0);
+    private final CommandXboxController controller2 = new CommandXboxController(1);
 
-        // The ModuleIOTalonFXS implementation provides an example implementation for
-        // TalonFXS controller connected to a CANdi with a PWM encoder. The
-        // implementations
-        // of ModuleIOTalonFX, ModuleIOTalonFXS, and ModuleIOSpark (from the Spark
-        // swerve
-        // template) can be freely intermixed to support alternative hardware
-        // arrangements.
-        // Please see the AdvantageKit template documentation for more information:
-        // https://docs.advantagekit.org/getting-started/template-projects/talonfx-swerve-template#custom-module-implementations
-        //
-        // drive =
-        // new Drive(
-        // new GyroIOPigeon2(),
-        // new ModuleIOTalonFXS(TunerConstants.FrontLeft),
-        // new ModuleIOTalonFXS(TunerConstants.FrontRight),
-        // new ModuleIOTalonFXS(TunerConstants.BackLeft),
-        // new ModuleIOTalonFXS(TunerConstants.BackRight));
-        break;
+    // Dashboard inputs
+    private final LoggedDashboardChooser<Command> autoChooser;
+    //
 
-      case SIM:
-        // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
-        break;
-
-      default:
-        // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
-        break;
+    public boolean noAutoSelected() {
+        var selected = autoChooser.getSendableChooser().getSelected();
+        return selected == null || selected == "None";
     }
 
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    // Choreo auto factory library
+    // private final AutoFactory autoFactory;
+    private final AutoBuilder autoBuilder;
 
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
 
-    // Configure the button bindings
-    configureButtonBindings();
-  }
+    public RobotContainer() {
+        RobotState.getInstance(); // Ensure RobotState is initialized
+        LEDmanager = new LEDManager(); // Initialize LED Manager
+        switch (Constants.currentMode) {
+            case REAL:
+                // Real robot, instantiate hardware IO implementations
+                // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
+                // a CANcoder
+                drive = new Drive(
+                        new GyroIOPigeon2(),
+                        new ModuleIOTalonFXReal(DriveConstants.frontLeftConfig),
+                        new ModuleIOTalonFXReal(DriveConstants.frontRightConfig),
+                        new ModuleIOTalonFXReal(DriveConstants.backLeftConfig),
+                        new ModuleIOTalonFXReal(DriveConstants.backRightConfig));
+                intake = new Intake(new IntakeIOReal());
+                hopper = new Hopper(new HopperIOReal());
+                climber = new Climber(new ClimberIOReal());
+                vision = new Vision(
+                        new VisionIOPhotonVision(camera0Name, robotToCamera0));
+                // objectDetection = new FuelPoseEstimator(new
+                // ObjectDetectionIOReal(ObjectDetectionConstants.cameraName,
+                // ObjectDetectionConstants.cameraToRobotTransform));
+                shooter = new Shooter(new ShooterIOLQR());
+                break;
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-  private void configureButtonBindings() {
-    // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> controller.getLeftY(),
-            () -> controller.getLeftX(),
-            () -> -controller.getRightX()));
+            case SIM:
+                // Sim robot, instantiate physics sim IO implementations
+                driveSimulation = new SwerveDriveSimulation(DriveConstants.mapleSimConfig,
+                        new Pose2d(3, 3, Rotation2d.fromDegrees(360)));
 
-    // Lock to 0 deg when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
+                drive = new Drive(
+                        new GyroIOSim(driveSimulation.getGyroSimulation()),
+                        new ModuleIOTalonFXSim(DriveConstants.frontLeftConfig, driveSimulation.getModules()[0]),
+                        new ModuleIOTalonFXSim(DriveConstants.frontRightConfig, driveSimulation.getModules()[1]),
+                        new ModuleIOTalonFXSim(DriveConstants.backLeftConfig, driveSimulation.getModules()[2]),
+                        new ModuleIOTalonFXSim(DriveConstants.backRightConfig, driveSimulation.getModules()[3]));
 
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+                intake = new Intake(new IntakeIO() {
+                });
+                hopper = new Hopper(new HopperIOSim());
+                climber = new Climber(new ClimberIO() {
+                });
 
-    // Reset gyro to 0 deg when B button is pressed
+                vision = new Vision(
+                        new VisionIOPhotonVisionSim(camera0Name, robotToCamera0,
+                                driveSimulation::getSimulatedDriveTrainPose));
+                // objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
+                // });
+                shooter = new Shooter(new ShooterIOSim());
+                break;
 
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
-  }
+            default:
+                // Replayed robot, disable IO implementations
+                drive = new Drive(
+                        new GyroIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        });
+                intake = new Intake(new IntakeIO() {
+                });
+                hopper = new Hopper(new HopperIO() {
+                });
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    return autoChooser.get();
-  }
+                vision = new Vision(new VisionIO() {
+                });
+                // objectDetection = new FuelPoseEstimator(new ObjectDetectionIO() {
+                // });
+
+                climber = new Climber(new ClimberIO() {
+                });
+
+                shooter = new Shooter(new ShooterIO() {
+                });
+                break;
+        }
+
+        // Set up superstructure
+        // superStructure = new SuperStructure(intake, hopper, kicker, shooter,
+        // climber);
+
+        autoBuilder = new AutoBuilder(drive, intake, hopper, kicker, shooter, climber, LEDmanager);
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", autoBuilder.buildAutoChooser());
+
+        DriveTuningCommands.addTuningCommandsToAutoChooser(drive, autoChooser);
+        shooter.addTuningCommandsToAutoChooser(autoChooser);
+
+        // Configure the button bindings
+        configureButtonBindings();
+
+    }
+
+    /**
+     * Use this method to define your button->command mappings. Buttons can be
+     * created by
+     * instantiating a {@link GenericHID} or one of its subclasses ({@link
+     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+     * it to a {@link
+     * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     */
+    private void configureButtonBindings() {
+
+        // Reset gyro or odometry if in simulation
+        final Runnable resetGyro = () -> drive.setPose(new Pose2d(RobotState.getInstance().getPose().getTranslation(),
+                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero
+                        : Rotation2d.k180deg)); // Zero gyro
+        final Runnable resetOdometry = () -> drive.setPose(
+                new Pose2d(0, 0, DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero
+                        : Rotation2d.k180deg)); // Zero gyro
+
+        // Default command, normal field-relative drive
+       drive.setDefaultCommand(
+               DriveCommands.joystickDrive(
+                       drive,
+                       () -> -controller.getLeftY(),
+                       () -> -controller.getLeftX(),
+                       () -> -controller.getRightX()));
+        vision.setDefaultCommand(vision.idle());
+       // objectDetection.setDefaultCommand(objectDetection.idle());
+        // if ( (controller.getLeftX()<= 0.005)&&(controller.getLeftY()<= 0.005)){
+        //         Commands.runOnce(drive::stopWithX, drive);
+        // }
+        // else {
+        //           drive.setDefaultCommand(
+        //         DriveCommands.joystickDrive(
+        //                 drive,
+        //                 () -> -controller.getLeftY(),
+        //                 () -> -controller.getLeftX(),
+        //                 () -> -controller.getRightX()));
+        //   };
+
+
+
+        // Lock to 0 deg when A button is held
+        controller
+                .a()
+                .whileTrue(
+                        DriveCommands.joystickDriveAtAngle(
+                                drive,
+                                () -> -controller.getLeftY(),
+                                () -> -controller.getLeftX(),
+                                () -> shooter.getWantedRobotAngle().plus(Rotation2d.kCW_90deg)));
+
+        // Switch to X pattern when X button is pressed
+        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        controller.x().whileTrue(Commands.startEnd(
+                ()->LEDmanager.setPattern(LEDState.X_LOCK),()->LEDmanager.setPattern(LEDState.IDLE)
+            ));
+
+        // controller.start().onTrue(Commands.runOnce(() -> RobotState.getInstance().resetPose(Pose2d.kZero)).ignoringDisable(true));
+
+        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        controller.start().and(controller.leftStick()).debounce(0.5)
+                .onTrue(Commands.runOnce(resetOdometry, drive).ignoringDisable(true));
+
+        // Reset gyro to 0 deg when B button is pressed
+
+        controller.rightTrigger().whileTrue(Commands.parallel(
+                Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.SHOOTING),
+                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter)
+                        .alongWith(Commands.waitSeconds(0.2)
+                                .andThen(
+                                        Commands.startEnd(()->kicker.setKickerVoltage(10), ()->kicker.setKickerVoltage(-1), kicker)
+                                )),
+                Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
+                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
+                Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
+                        () -> LEDmanager.setPattern(LEDState.IDLE))));
+//controller.rightTrigger().onFalse(Commands.runOnce(()->System.out.println("start right trigger")));
+
+
+        controller2.povDown().onTrue(Commands.run(() -> shooter.incrementHoodAngle(-5)).withName("Manual Lower hood"));
+        controller2.povUp().onTrue(Commands.run(() -> shooter.incrementHoodAngle(5)).withName("Manual Raise hood"));
+        controller2.povLeft().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(-100)).withName("Manual Decrease flywheel"));
+        controller2.povRight().onTrue(Commands.run(() -> shooter.incrementFlywheelSpeed(100)).withName("Manual Increase flywheel"));
+        controller2.y().onTrue(Commands.run(() -> shooter.resetOverrides()).withName("Reset shooter overrides"));
+
+        // controller.y().onTrue(OrchestraManager.getInstance().playOrchestraCommand("thx").ignoringDisable(true));
+
+        // controller.leftTrigger().or(controller2.leftTrigger()).whileTrue(Commands.parallel(
+        //     intake.intake(),
+        //     Commands.startEnd(
+        //         () -> LEDmanager.setPattern(LEDState.INTAKE),
+        //         () -> LEDmanager.setPattern(LEDState.IDLE), LEDmanager)
+        // ));
+        controller2.leftTrigger().and(controller.rightTrigger().negate()).whileTrue(Commands.parallel(
+            intake.intake(),
+            Commands.startEnd(
+                () -> LEDmanager.setPattern(LEDState.INTAKE),
+                () -> LEDmanager.setPattern(LEDState.IDLE))
+        ));
+
+        controller2.leftBumper().whileTrue(intake.extendSlide());
+        controller2.rightBumper().whileTrue(intake.reverseRollers());
+
+        //NonCameraShooting test case - this is used to set the shooter to a fixed hood angle and flywheel velocity for when the camera is not working, so we can still shooting functionality without relying on the camera. We can adjust the hood angle and flywheel velocity in the Shooter subsystem's periodic method under the NonCameraShooting case.
+               controller.rightBumper().whileTrue(Commands.parallel(
+                Commands.startEnd(() -> {
+                    if (shooter.isAtDesiredState()) {
+                        kicker.setKickerVoltage(12);
+                    }
+                }, () -> kicker.setKickerVoltage(-1), kicker),
+                Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.NonCameraShooting),
+                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
+                Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
+                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
+                Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
+                        () -> LEDmanager.setPattern(LEDState.IDLE))));
+
+         controller.leftBumper().whileTrue(Commands.parallel(
+                Commands.startEnd(() -> {
+                    if (shooter.isAtDesiredState()) {
+                        kicker.setKickerVoltage(12);
+                    }
+                }, () -> kicker.setKickerVoltage(-1), kicker),
+                Commands.startEnd(() -> shooter.setDesiredState(Shooter.ShooterState.CENTERSHOOTING),
+                        () -> shooter.setDesiredState(Shooter.ShooterState.IDLE), shooter),
+                Commands.startEnd(() -> hopper.setDesiredState(Hopper.HopperState.FEEDING),
+                        () -> hopper.setDesiredState(Hopper.HopperState.IDLE), hopper),
+                Commands.startEnd(() -> LEDmanager.setPattern(LEDState.SHOOTING),
+                        () -> LEDmanager.setPattern(LEDState.IDLE))));
+        controller2.rightTrigger().whileTrue(intake.retract());
+        // Reset gyro to 0 deg when B button is pressed
+
+        controller2.b().whileTrue(Commands.parallel(
+            Commands.sequence(
+                intake.retract().withTimeout(2),
+                climber.setClimber(6)
+                ),
+            Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
+                    () -> LEDmanager.setPattern(LEDState.IDLE))
+        ).finallyDo(()->climber.enablehook(true)));
+        controller2.a().whileTrue(Commands.parallel(
+            Commands.sequence(
+                intake.retract().withTimeout(0.5),
+                climber.setClimber(-6)
+                ),
+            Commands.startEnd( () -> LEDmanager.setPattern(LEDState.CLIMBING),
+                () -> LEDmanager.setPattern(LEDState.IDLE))
+        ).finallyDo(()->climber.enablehook(false)));
+        controller2.x().whileTrue(Commands.startEnd(
+            () -> climber.enablehook(true),
+            () -> climber.enablehook(false)
+        ));
+
+    }
+
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
+    public Command getAutonomousCommand() {
+        // Return the selected autonomous command
+        return Commands.runOnce(drive::stopWithX).andThen(autoChooser.get());
+    }
+
+
+    /** Reset the simulation field. */
+    public void resetSimulationField() {
+        if (Constants.currentMode != Constants.Mode.SIM) {
+            return;
+        }
+
+        driveSimulation.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()));
+        SimulatedArena.getInstance().resetFieldForAuto();
+    }
+
+    /** Update the simulation. */
+    public void updateSimulation() {
+        if (Constants.currentMode != Constants.Mode.SIM) {
+            return;
+        }
+
+        SimulatedArena.getInstance().simulationPeriodic();
+        Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
+        Logger.recordOutput(
+                "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
+    }
 }
