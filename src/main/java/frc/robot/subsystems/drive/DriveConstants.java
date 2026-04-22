@@ -10,6 +10,7 @@ import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -178,7 +179,15 @@ public class DriveConstants {
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these
     // cannot be null. Some configs will be overwritten.
-    private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration();
+    private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration()
+            .withOpenLoopRamps(new OpenLoopRampsConfigs() {{
+                DutyCycleOpenLoopRampPeriod = 0.25;
+                VoltageOpenLoopRampPeriod = 0.25;
+            }})
+            .withClosedLoopRamps(new com.ctre.phoenix6.configs.ClosedLoopRampsConfigs() {{
+                DutyCycleClosedLoopRampPeriod = 0.02;
+                VoltageClosedLoopRampPeriod = 0.02;
+            }});
     private static final TalonFXConfiguration steerInitialConfigs = new TalonFXConfiguration()
             .withCurrentLimits(new CurrentLimitsConfigs()
                     // Swerve azimuth does not require much torque output, so we can set a
