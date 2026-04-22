@@ -63,11 +63,11 @@ public class Module {
     }
 
     public void periodic() {
-        if(driveP.hasChanged(hashCode()) || driveI.hasChanged(hashCode()) || driveD.hasChanged(hashCode()) ||
+        if(driveP.hasChanged(hashCode()) || driveD.hasChanged(hashCode()) ||
             driveS.hasChanged(hashCode()) || driveV.hasChanged(hashCode()) || driveA.hasChanged(hashCode())) {
             io.setDrivePID(driveP.get(), driveI.get(), driveD.get(), driveS.get(), driveV.get(), driveA.get());
         }
-        if(turnP.hasChanged(hashCode()) || turnI.hasChanged(hashCode()) || turnD.hasChanged(hashCode())) {
+        if(turnP.hasChanged(hashCode()) || turnD.hasChanged(hashCode())) {
             io.setTurnPID(turnP.get(), turnI.get(), turnD.get());
         }
 
