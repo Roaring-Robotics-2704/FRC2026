@@ -132,44 +132,93 @@ public record ChoreoTraj(
 	public static final ChoreoTraj ShootCollectShoot = new ChoreoTraj(
 	    "ShootCollectShoot",
 	    OptionalInt.empty(),
-	    8.46929,
-	    new Pose2d(3.615, 7.44, Rotation2d.fromRadians(3.142)),
-	    new Pose2d(2.825, 5.127, Rotation2d.fromRadians(-2.186))
+	    2.77982,
+	    new Pose2d(4.4, 7.4, Rotation2d.fromRadians(-0.017)),
+	    new Pose2d(4.357, 7.495, Rotation2d.fromRadians(0))
 	);
-	public static final ChoreoTraj ShootCollectShoot$0 = new ChoreoTraj(
-	    "ShootCollectShoot",
+	public static final ChoreoTraj ShootCollectShootClimb = new ChoreoTraj(
+	    "ShootCollectShootClimb",
+	    OptionalInt.empty(),
+	    37.04921,
+	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(1.648, 4.034, Rotation2d.fromRadians(1.571))
+	);
+	public static final ChoreoTraj ShootCollectShootClimb$0 = new ChoreoTraj(
+	    "ShootCollectShootClimb",
 	    OptionalInt.of(0),
-	    0.51257,
-	    new Pose2d(3.615, 7.44, Rotation2d.fromRadians(3.142)),
-	    new Pose2d(2.976, 7.05, Rotation2d.fromRadians(-2.632))
+	    3.36648,
+	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
 	);
-	public static final ChoreoTraj ShootCollectShoot$1 = new ChoreoTraj(
-	    "ShootCollectShoot",
+	public static final ChoreoTraj ShootCollectShootClimb$1 = new ChoreoTraj(
+	    "ShootCollectShootClimb",
 	    OptionalInt.of(1),
-	    7.956720000000001,
-	    new Pose2d(2.976, 7.05, Rotation2d.fromRadians(-2.632)),
-	    new Pose2d(2.825, 5.127, Rotation2d.fromRadians(-2.186))
+	    25.87931,
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.809, 5.055, Rotation2d.fromRadians(-2.31))
+	);
+	public static final ChoreoTraj ShootCollectShootClimb$2 = new ChoreoTraj(
+	    "ShootCollectShootClimb",
+	    OptionalInt.of(2),
+	    7.803420000000003,
+	    new Pose2d(2.809, 5.055, Rotation2d.fromRadians(-2.31)),
+	    new Pose2d(1.648, 4.034, Rotation2d.fromRadians(1.571))
+	);
+	public static final ChoreoTraj ShootCollectShootClimbMirrored = new ChoreoTraj(
+	    "ShootCollectShootClimbMirrored",
+	    OptionalInt.empty(),
+	    54.85926,
+	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(1.678, 4.041, Rotation2d.fromRadians(1.571))
+	);
+	public static final ChoreoTraj ShootCollectShootClimbMirrored$0 = new ChoreoTraj(
+	    "ShootCollectShootClimbMirrored",
+	    OptionalInt.of(0),
+	    3.66897,
+	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj ShootCollectShootClimbMirrored$1 = new ChoreoTraj(
+	    "ShootCollectShootClimbMirrored",
+	    OptionalInt.of(1),
+	    45.65717,
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.809, 2.945, Rotation2d.fromRadians(-1.036))
+	);
+	public static final ChoreoTraj ShootCollectShootClimbMirrored$2 = new ChoreoTraj(
+	    "ShootCollectShootClimbMirrored",
+	    OptionalInt.of(2),
+	    5.533119999999997,
+	    new Pose2d(2.809, 2.945, Rotation2d.fromRadians(-1.036)),
+	    new Pose2d(1.678, 4.041, Rotation2d.fromRadians(1.571))
 	);
 	public static final ChoreoTraj ShootCollectShootMirrored = new ChoreoTraj(
 	    "ShootCollectShootMirrored",
 	    OptionalInt.empty(),
-	    8.76753,
+	    33.58422,
 	    new Pose2d(3.629, 1.008, Rotation2d.fromRadians(0)),
 	    new Pose2d(2.809, 2.945, Rotation2d.fromRadians(-0.955))
 	);
 	public static final ChoreoTraj ShootCollectShootMirrored$0 = new ChoreoTraj(
 	    "ShootCollectShootMirrored",
 	    OptionalInt.of(0),
-	    0.6169,
+	    4.20959,
 	    new Pose2d(3.629, 1.008, Rotation2d.fromRadians(0)),
 	    new Pose2d(2.673, 1.073, Rotation2d.fromRadians(-0.807))
 	);
 	public static final ChoreoTraj ShootCollectShootMirrored$1 = new ChoreoTraj(
 	    "ShootCollectShootMirrored",
 	    OptionalInt.of(1),
-	    8.150630000000001,
+	    29.374630000000003,
 	    new Pose2d(2.673, 1.073, Rotation2d.fromRadians(-0.807)),
 	    new Pose2d(2.809, 2.945, Rotation2d.fromRadians(-0.955))
+	);
+	public static final ChoreoTraj ShootCollectShootNew = new ChoreoTraj(
+	    "ShootCollectShootNew",
+	    OptionalInt.empty(),
+	    0.83751,
+	    new Pose2d(4.4, 7.4, Rotation2d.fromRadians(0)),
+	    new Pose2d(6.968, 7.402, Rotation2d.fromRadians(0))
 	);
 	public static final ChoreoTraj ShootDepotClimb = new ChoreoTraj(
 	    "ShootDepotClimb",
@@ -213,13 +262,6 @@ public record ChoreoTraj(
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(1.75, 3.857, Rotation2d.fromRadians(-1.571))
 	);
-	public static final ChoreoTraj ShootCollectShootNew = new ChoreoTraj(
-	    "ShootCollectShootNew",
-	    OptionalInt.empty(),
-	    0.83751,
-	    new Pose2d(4.4, 7.4, Rotation2d.fromRadians(-0.017)),
-	    new Pose2d(6.968, 7.402, Rotation2d.fromRadians(0))
-	);
 
     /**
      * A map between trajectory names and their corresponding data.
@@ -242,18 +284,24 @@ public record ChoreoTraj(
 		Map.entry("ShootCollectPass$1", ShootCollectPass$1),
 		Map.entry("ShootCollectPass$2", ShootCollectPass$2),
 		Map.entry("ShootCollectShoot", ShootCollectShoot),
-		Map.entry("ShootCollectShoot$0", ShootCollectShoot$0),
-		Map.entry("ShootCollectShoot$1", ShootCollectShoot$1),
+		Map.entry("ShootCollectShootClimb", ShootCollectShootClimb),
+		Map.entry("ShootCollectShootClimb$0", ShootCollectShootClimb$0),
+		Map.entry("ShootCollectShootClimb$1", ShootCollectShootClimb$1),
+		Map.entry("ShootCollectShootClimb$2", ShootCollectShootClimb$2),
+		Map.entry("ShootCollectShootClimbMirrored", ShootCollectShootClimbMirrored),
+		Map.entry("ShootCollectShootClimbMirrored$0", ShootCollectShootClimbMirrored$0),
+		Map.entry("ShootCollectShootClimbMirrored$1", ShootCollectShootClimbMirrored$1),
+		Map.entry("ShootCollectShootClimbMirrored$2", ShootCollectShootClimbMirrored$2),
 		Map.entry("ShootCollectShootMirrored", ShootCollectShootMirrored),
 		Map.entry("ShootCollectShootMirrored$0", ShootCollectShootMirrored$0),
 		Map.entry("ShootCollectShootMirrored$1", ShootCollectShootMirrored$1),
+		Map.entry("ShootCollectShootNew", ShootCollectShootNew),
 		Map.entry("ShootDepotClimb", ShootDepotClimb),
 		Map.entry("ShootDepotClimb$0", ShootDepotClimb$0),
 		Map.entry("ShootDepotClimb$1", ShootDepotClimb$1),
 		Map.entry("ShootDepotShoot", ShootDepotShoot),
 		Map.entry("ShootDepotShoot$0", ShootDepotShoot$0),
-		Map.entry("ShootDepotShoot$1", ShootDepotShoot$1),
-		Map.entry("ShootCollectShootNew", ShootCollectShootNew)
+		Map.entry("ShootDepotShoot$1", ShootDepotShoot$1)
     );
 
     /**
