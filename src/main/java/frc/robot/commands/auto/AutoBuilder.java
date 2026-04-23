@@ -91,7 +91,7 @@ public class AutoBuilder {
         sendableChooser.addOption("Shoot, collect, climb", shootCollectClimb().cmd().withName("Shoot, Collect, Climb"));
         sendableChooser.addOption("Shoot, collect, climb (mirrored)", shootCollectClimbMirrored().cmd().withName("Shoot, Collect, Climb Mirrored"));
         sendableChooser.addOption("Shoot, collect, pass, collect, pass", shootCollectPass().cmd().withName("Shoot, Collect, Pass"));
-        sendableChooser.addOption("Shoot, collect, shoot", shootCollectShoot().cmd().withName("Shoot, Collect, Shoot"));
+        //sendableChooser.addOption("Shoot, collect, shoot", shootCollectShoot().cmd().withName("Shoot, Collect, Shoot"));
         sendableChooser.addOption("Shoot, collect, shoot (mirrored)", shootCollectShootMirrored().cmd().withName("Shoot, Collect, Shoot Mirrored"));
        // sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd().withName("Shoot, Collect, Shoot, Climb"));
        // sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd().withName("Shoot, Collect, Shoot, Climb Mirrored"));
@@ -227,7 +227,7 @@ public class AutoBuilder {
         return routine;
     }
 
-    public AutoRoutine shootCollectShoot() {
+    /*public AutoRoutine shootCollectShoot() {
         AutoRoutine routine = autoFactory.newRoutine("ShootCollectShoot");
 
         AutoTrajectory shootCollectShoot$0 = ChoreoTraj.ShootCollectShoot$0.asAutoTraj(routine);
@@ -247,7 +247,7 @@ public class AutoBuilder {
         shootCollectShoot$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
 
         return routine;
-    }
+    }*/
 
      public AutoRoutine shootCollectShootNew() {
         AutoRoutine routine = autoFactory.newRoutine("ShootCollectShootNew");
