@@ -244,21 +244,21 @@ public record ChoreoTraj(
 	public static final ChoreoTraj ShootDepotShoot = new ChoreoTraj(
 	    "ShootDepotShoot",
 	    OptionalInt.empty(),
-	    2.42434,
+	    14.44279,
 	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(1.75, 3.857, Rotation2d.fromRadians(-1.571))
 	);
 	public static final ChoreoTraj ShootDepotShoot$0 = new ChoreoTraj(
 	    "ShootDepotShoot",
 	    OptionalInt.of(0),
-	    0.45822,
+	    3.07818,
 	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
 	);
 	public static final ChoreoTraj ShootDepotShoot$1 = new ChoreoTraj(
 	    "ShootDepotShoot",
 	    OptionalInt.of(1),
-	    1.9661199999999999,
+	    11.36461,
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(1.75, 3.857, Rotation2d.fromRadians(-1.571))
 	);

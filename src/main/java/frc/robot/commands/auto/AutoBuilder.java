@@ -301,7 +301,9 @@ public class AutoBuilder {
                 Commands.sequence(
                         shootDepotShoot$0.resetOdometry(),
                         runAutoTrajectory(shootDepotShoot$0),
-                        runAutoTrajectory(shootDepotShoot$1)));
+                        //AutoCommands.index(hopper, kicker, shooter, intake, manager, Seconds.of(7)),
+                        runAutoTrajectory(shootDepotShoot$1)
+                    ));
 
         shootDepotShoot$0.atTime("Shoot 1").onTrue(shootPreloadCommandSequence());
         shootDepotShoot$1.atTime("Extend Intake").onTrue(extendIntakeCommandSequence());

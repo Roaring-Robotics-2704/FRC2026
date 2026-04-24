@@ -45,7 +45,8 @@ import frc.robot.util.tunables.LoggedTunableNumber;
 import frc.robot.util.geometry.AllianceFlipUtil;
 
 public class AutoCommands {
-    static Timer clock = new Timer();
+    //static Timer clock = new Timer();
+    static Timer waitUntilTimer = new Timer();
     private static final LoggedTunableNumber autoDriveLaunchKp = new LoggedTunableNumber("AutoCommands/Launching/kP",
             8.0);
     private static final LoggedTunableNumber autoDriveLaunchKd = new LoggedTunableNumber("AutoCommands/Launching/kD",
@@ -91,6 +92,7 @@ public class AutoCommands {
 
     public static Command index(Hopper hopper, Kicker kicker, Shooter shooter, Intake intake, LEDManager leds,
             Time shootTime) {
+        Timer clock = new Timer();
         return Commands.repeatingSequence(
                 Commands.runOnce(() -> {
                     clock.reset();
