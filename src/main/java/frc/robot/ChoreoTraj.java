@@ -279,23 +279,44 @@ public record ChoreoTraj(
 	public static final ChoreoTraj TheCoolerShootDepotShoot = new ChoreoTraj(
 	    "TheCoolerShootDepotShoot",
 	    OptionalInt.empty(),
-	    3.47431,
+	    16.74272,
 	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(2.159, 3.857, Rotation2d.fromRadians(-1.571))
 	);
 	public static final ChoreoTraj TheCoolerShootDepotShoot$0 = new ChoreoTraj(
 	    "TheCoolerShootDepotShoot",
 	    OptionalInt.of(0),
-	    0.6316,
+	    3.07665,
 	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
 	);
 	public static final ChoreoTraj TheCoolerShootDepotShoot$1 = new ChoreoTraj(
 	    "TheCoolerShootDepotShoot",
 	    OptionalInt.of(1),
-	    2.84271,
+	    13.666069999999998,
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(2.159, 3.857, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj AAATheCoolerShootDepotShoot = new ChoreoTraj(
+	    "AAATheCoolerShootDepotShoot",
+	    OptionalInt.empty(),
+	    9.91729,
+	    new Pose2d(3.543, 3.857, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj AAATheCoolerShootDepotShoot$0 = new ChoreoTraj(
+	    "AAATheCoolerShootDepotShoot",
+	    OptionalInt.of(0),
+	    1.56432,
+	    new Pose2d(3.543, 3.857, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj AAATheCoolerShootDepotShoot$1 = new ChoreoTraj(
+	    "AAATheCoolerShootDepotShoot",
+	    OptionalInt.of(1),
+	    8.35297,
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
 	);
 
     /**
@@ -341,7 +362,10 @@ public record ChoreoTraj(
 		Map.entry("MinMovementShoot", MinMovementShoot),
 		Map.entry("TheCoolerShootDepotShoot", TheCoolerShootDepotShoot),
 		Map.entry("TheCoolerShootDepotShoot$0", TheCoolerShootDepotShoot$0),
-		Map.entry("TheCoolerShootDepotShoot$1", TheCoolerShootDepotShoot$1)
+		Map.entry("TheCoolerShootDepotShoot$1", TheCoolerShootDepotShoot$1),
+		Map.entry("AAATheCoolerShootDepotShoot", AAATheCoolerShootDepotShoot),
+		Map.entry("AAATheCoolerShootDepotShoot$0", AAATheCoolerShootDepotShoot$0),
+		Map.entry("AAATheCoolerShootDepotShoot$1", AAATheCoolerShootDepotShoot$1)
     );
 
     /**
