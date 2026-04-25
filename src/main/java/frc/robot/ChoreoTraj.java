@@ -276,6 +276,27 @@ public record ChoreoTraj(
 	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
 	);
+	public static final ChoreoTraj TheCoolerShootDepotShoot = new ChoreoTraj(
+	    "TheCoolerShootDepotShoot",
+	    OptionalInt.empty(),
+	    3.47431,
+	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.159, 3.857, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj TheCoolerShootDepotShoot$0 = new ChoreoTraj(
+	    "TheCoolerShootDepotShoot",
+	    OptionalInt.of(0),
+	    0.6316,
+	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj TheCoolerShootDepotShoot$1 = new ChoreoTraj(
+	    "TheCoolerShootDepotShoot",
+	    OptionalInt.of(1),
+	    2.84271,
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.159, 3.857, Rotation2d.fromRadians(-1.571))
+	);
 
     /**
      * A map between trajectory names and their corresponding data.
@@ -317,7 +338,10 @@ public record ChoreoTraj(
 		Map.entry("ShootAndClimb", ShootAndClimb),
 		Map.entry("ShootAndClimb$0", ShootAndClimb$0),
 		Map.entry("ShootAndClimb$1", ShootAndClimb$1),
-		Map.entry("MinMovementShoot", MinMovementShoot)
+		Map.entry("MinMovementShoot", MinMovementShoot),
+		Map.entry("TheCoolerShootDepotShoot", TheCoolerShootDepotShoot),
+		Map.entry("TheCoolerShootDepotShoot$0", TheCoolerShootDepotShoot$0),
+		Map.entry("TheCoolerShootDepotShoot$1", TheCoolerShootDepotShoot$1)
     );
 
     /**

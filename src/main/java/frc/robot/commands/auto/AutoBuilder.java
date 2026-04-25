@@ -86,17 +86,18 @@ public class AutoBuilder {
     public SendableChooser<Command> buildAutoChooser() {
         SendableChooser<Command> sendableChooser = new SendableChooser<Command>();
 
-        sendableChooser.addOption("Shoot only", minMovementShoot().cmd().withName("Min Movement Shoot"));
-        sendableChooser.addOption("Shoot, climb", shootAndClimb().cmd().withName("Shoot and Climb"));
-        sendableChooser.addOption("Shoot, collect, climb", shootCollectClimb().cmd().withName("Shoot, Collect, Climb"));
-        sendableChooser.addOption("Shoot, collect, climb (mirrored)", shootCollectClimbMirrored().cmd().withName("Shoot, Collect, Climb Mirrored"));
-        sendableChooser.addOption("Shoot, collect, pass, collect, pass", shootCollectPass().cmd().withName("Shoot, Collect, Pass"));
-        sendableChooser.addOption("Shoot, collect, shoot", shootCollectShoot().cmd().withName("Shoot, Collect, Shoot"));
-        sendableChooser.addOption("Shoot, collect, shoot (mirrored)", shootCollectShootMirrored().cmd().withName("Shoot, Collect, Shoot Mirrored"));
-        sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd().withName("Shoot, Collect, Shoot, Climb"));
-        sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd().withName("Shoot, Collect, Shoot, Climb Mirrored"));
-        sendableChooser.addOption("Shoot, depot, climb", shootDepotClimb().cmd().withName("Shoot, Depot, Climb"));
-        sendableChooser.addOption("Shoot, depot, shoot", shootDepotShoot().cmd().withName("Shoot, Depot, Shoot"));
+        sendableChooser.addOption("Shoot only", minMovementShoot().cmd());
+        sendableChooser.addOption("Shoot, climb", shootAndClimb().cmd());
+        sendableChooser.addOption("Shoot, collect, climb", shootCollectClimb().cmd());
+        sendableChooser.addOption("Shoot, collect, climb (mirrored)", shootCollectClimbMirrored().cmd());
+        sendableChooser.addOption("Shoot, collect, pass, collect, pass", shootCollectPass().cmd());
+        sendableChooser.addOption("Shoot, collect, shoot", shootCollectShoot().cmd());
+        sendableChooser.addOption("Shoot, collect, shoot (mirrored)", shootCollectShootMirrored().cmd());
+        sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd());
+        sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd());
+        sendableChooser.addOption("Shoot, depot, climb", shootDepotClimb().cmd());
+        sendableChooser.addOption("Shoot, depot, shoot", shootDepotShoot().cmd());
+        sendableChooser.addOption("The Cooler Shoot, Depot, Shoot", theCoolerShootDepotShoot().cmd());
 
         return sendableChooser;
     }
@@ -373,6 +374,27 @@ public class AutoBuilder {
         shootCollectShootClimbMirrored$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
         shootCollectShootClimbMirrored$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
         shootCollectShootClimbMirrored$2.atTime("Climb").onTrue(climbCommandSequence());
+
+        return routine;
+    }
+
+    public AutoRoutine theCoolerShootDepotShoot()
+    {
+        AutoRoutine routine = autoFactory.newRoutine("TheCoolerShootDepotShoot");
+
+        AutoTrajectory theCoolerShootDepotShoot$0 = ChoreoTraj.TheCoolerShootDepotShoot$0.asAutoTraj(routine);
+        AutoTrajectory theCoolerShootDepotShoot$1 = ChoreoTraj.TheCoolerShootDepotShoot$1.asAutoTraj(routine);
+
+        routine.active().onTrue(
+                Commands.sequence(
+                        theCoolerShootDepotShoot$0.resetOdometry(),
+                        runAutoTrajectory(theCoolerShootDepotShoot$0),
+                        runAutoTrajectory(theCoolerShootDepotShoot$1)));
+        
+        theCoolerShootDepotShoot$0.atTime("Shoot Preloads").onTrue(shootPreloadCommandSequence());
+        theCoolerShootDepotShoot$1.atTime("Extend Intake").onTrue(extendIntakeCommandSequence());
+        theCoolerShootDepotShoot$1.atTime("Retract Intake").onTrue(retractIntakeCommandSequence());
+        theCoolerShootDepotShoot$1.atTime("Shoot Collected Fuel").onTrue(shootCollectedFuelCommandSequence());
 
         return routine;
     }
