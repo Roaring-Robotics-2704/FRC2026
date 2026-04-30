@@ -89,9 +89,9 @@ public class AutoBuilder {
         sendableChooser.addOption("Shoot only", minMovementShoot().cmd().withName("Shoot only"));
         sendableChooser.addOption("Shoot, climb", shootAndClimb().cmd().withName("Shoot, climb"));
         sendableChooser.addOption("Shoot, collect, climb", shootCollectClimb().cmd().withName("Shoot, collect, climb"));
-        sendableChooser.addOption("Shoot, collect, climb (mirrored)", shootCollectClimbMirrored().cmd().withName("Shoot, collect, climb (mirrored)"));
+        sendableChooser.addOption("RIGHT - Shoot, collect, climb", shootCollectClimbMirrored().cmd().withName("RIGHT - Shoot, collect, climb"));
         sendableChooser.addOption("Shoot, collect, pass, collect, pass", shootCollectPass().cmd().withName("Shoot, collect, pass, collect, pass"));
-        sendableChooser.addOption("Shoot, collect, shoot", shootCollectShoot().cmd().withName("Shoot, collect, shoot"));
+        sendableChooser.addOption("LEFT - Shoot, collect, shoot", shootCollectShoot().cmd().withName("LEFT - Shoot, collect, shoot"));
         sendableChooser.addOption("Shoot, collect, shoot (mirrored)", shootCollectShootMirrored().cmd().withName("Shoot, collect, shoot (mirrored)"));
         sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd().withName("Shoot, collect, shoot, climb"));
         sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd().withName("Shoot, collect, shoot, climb (mirrored)"));
