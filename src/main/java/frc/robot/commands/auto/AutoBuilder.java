@@ -87,17 +87,17 @@ public class AutoBuilder {
         SendableChooser<Command> sendableChooser = new SendableChooser<Command>();
 
         sendableChooser.addOption("Shoot only", minMovementShoot().cmd().withName("Shoot only"));
-        sendableChooser.addOption("Shoot, climb", shootAndClimb().cmd().withName("Shoot, climb"));
-        sendableChooser.addOption("Shoot, collect, climb", shootCollectClimb().cmd().withName("Shoot, collect, climb"));
-        sendableChooser.addOption("RIGHT - Shoot, collect, climb", shootCollectClimbMirrored().cmd().withName("RIGHT - Shoot, collect, climb"));
-        sendableChooser.addOption("Shoot, collect, pass, collect, pass", shootCollectPass().cmd().withName("Shoot, collect, pass, collect, pass"));
+        //sendableChooser.addOption("Shoot, climb", shootAndClimb().cmd().withName("Shoot, climb"));
+        //sendableChooser.addOption("Shoot, collect, climb", shootCollectClimb().cmd().withName("Shoot, collect, climb"));
+        //sendableChooser.addOption("RIGHT - Shoot, collect, climb", shootCollectClimbMirrored().cmd().withName("RIGHT - Shoot, collect, climb"));
+        //sendableChooser.addOption("Shoot, collect, pass, collect, pass", shootCollectPass().cmd().withName("Shoot, collect, pass, collect, pass"));
         sendableChooser.addOption("LEFT - Shoot, collect, shoot", shootCollectShoot().cmd().withName("LEFT - Shoot, collect, shoot"));
-        sendableChooser.addOption("Shoot, collect, shoot (mirrored)", shootCollectShootMirrored().cmd().withName("Shoot, collect, shoot (mirrored)"));
-        sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd().withName("Shoot, collect, shoot, climb"));
-        sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd().withName("Shoot, collect, shoot, climb (mirrored)"));
-        sendableChooser.addOption("Shoot, depot, climb", shootDepotClimb().cmd().withName("Shoot, depot, climb"));
-        sendableChooser.addOption("Shoot, depot, shoot", shootDepotShoot().cmd().withName("Shoot, depot, shoot"));
-        sendableChooser.addOption("The cooler shoot, depot, shoot", theCoolerShootDepotShoot().cmd().withName("The cooler shoot, depot, shoot"));
+        sendableChooser.addOption("RIGHT - Shoot, collect, shoot", shootCollectShootMirrored().cmd().withName("RIGHT - Shoot, collect, shoot"));
+        //sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd().withName("Shoot, collect, shoot, climb"));
+        //sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd().withName("Shoot, collect, shoot, climb (mirrored)"));
+        //sendableChooser.addOption("Shoot, depot, climb", shootDepotClimb().cmd().withName("Shoot, depot, climb"));
+        //sendableChooser.addOption("Shoot, depot, shoot", shootDepotShoot().cmd().withName("Shoot, depot, shoot"));
+        //sendableChooser.addOption("The cooler shoot, depot, shoot", theCoolerShootDepotShoot().cmd().withName("The cooler shoot, depot, shoot"));
         sendableChooser.addOption("AAA the cooler shoot, depot, shoot", aaaTheCoolerShootDepotShoot().cmd().withName("AAA the cooler shoot, depot, shoot"));
 
         return sendableChooser;
