@@ -12,6 +12,8 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.MIN_ANGLE;
 
+import java.util.Optional;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.config.RobotConfig;
@@ -32,6 +34,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotState;
@@ -103,9 +107,26 @@ public class BasicTunedCalc {
         hoodPercent = hoodPercentFilter.calculate(hoodPercent);
 
         Pose2d robotPoseLookAhead = RobotState.getInstance().getLookaheadPose(timeOfFlightMap.get(distance));
-        double dx = blueHubPose.getX() - shooterPose.getX();
-        double dy = blueHubPose.getY() - shooterPose.getY();
-        double targetAngle = Math.atan2(dy, dx)-(Math.atan2(dy, dx)*0.105) ;
+        double dx = hubPose.getX() - shooterPose.getX();
+        double dy = hubPose.getY() - shooterPose.getY();
+    Optional<Alliance> ally = DriverStation.getAlliance();
+    double targetAngle = 0.0;
+    if(ally.isPresent()){
+        if (ally.get() == Alliance.Red){
+         //targetAngle = Math.atan2(dy, dx)+(Math.atan2(dy, dx)*0.105);
+         targetAngle = Math.atan2(dy, dx)-(Math.atan2(dy, dx)*0.04) ;
+        }
+        if (ally.get() == Alliance.Blue)
+        {
+          targetAngle = Math.atan2(dy, dx)-(Math.atan2(dy, dx)*0.105);
+
+        }
+        
+    }
+    else {
+
+    }
+      // targetAngle = Math.atan2(dy, dx)-(Math.atan2(dy, dx)*0.105) ;
         targetAngle = driveAngleFilter.calculate(targetAngle);
 Logger.recordOutput("target angle", targetAngle);
         return new ShootingSolution(flywheelVelocity, hoodPercent, Rotation2d.fromRadians(targetAngle), distance);
