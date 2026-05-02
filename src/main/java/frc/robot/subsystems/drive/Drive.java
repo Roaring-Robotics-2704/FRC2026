@@ -120,6 +120,7 @@ public class Drive extends SubsystemBase {
         orchestra.loadMusic("music/thx.chrp");
         
         // orchestra.play();
+        turnController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     @Override
@@ -341,7 +342,7 @@ public class Drive extends SubsystemBase {
         ChassisSpeeds speeds = new ChassisSpeeds(
             sample.vx + driveXController.calculate(pose.getX(), sample.x),
             sample.vy + driveYController.calculate(pose.getY(), sample.y),
-            sample.omega + turnController.calculate(pose.getRotation().getRadians(), sample.heading)
+            sample.omega + turnController.calculate(pose.getRotation().getRadians(),  MathUtil.angleModulus(sample.heading))
         );
         speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, RobotState.getInstance().getRotation());
         Logger.recordOutput("Auto/TrajectoryFollower/Speeds", speeds);

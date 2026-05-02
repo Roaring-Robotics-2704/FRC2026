@@ -32,7 +32,7 @@
   "constraints":[
     {"from":1, "to":1, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"5 m / s", "val":5.0}}}, "enabled":true},
     {"from":1, "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
-    {"from":3, "to":4, "data":{"type":"MaxAngularVelocity", "props":{"max":{"exp":"0 rad / s", "val":0.0}}}, "enabled":true},
+    {"from":2, "to":3, "data":{"type":"MaxAngularVelocity", "props":{"max":{"exp":"0 rad / s", "val":0.0}}}, "enabled":true},
     {"from":3, "to":4, "data":{"type":"KeepInLane", "props":{"tolerance":{"exp":"0.01 m", "val":0.01}}}, "enabled":true},
     {"from":4, "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":4, "to":6, "data":{"type":"KeepOutCircle", "props":{"x":{"exp":"0.18380162864923477 m", "val":0.18380162864923477}, "y":{"exp":"3.979295566678047 m", "val":3.979295566678047}, "r":{"exp":"1 m", "val":1.0}}}, "enabled":true},
