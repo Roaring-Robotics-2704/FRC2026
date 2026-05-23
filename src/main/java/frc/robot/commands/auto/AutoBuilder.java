@@ -96,7 +96,7 @@ public class AutoBuilder {
         //sendableChooser.addOption("Shoot, collect, shoot, climb", shootCollectShootClimb().cmd().withName("Shoot, collect, shoot, climb"));
         //sendableChooser.addOption("Shoot, collect, shoot, climb (mirrored)", shootCollectShootClimbMirrored().cmd().withName("Shoot, collect, shoot, climb (mirrored)"));
         //sendableChooser.addOption("Shoot, depot, climb", shootDepotClimb().cmd().withName("Shoot, depot, climb"));
-        //sendableChooser.addOption("Shoot, depot, shoot", shootDepotShoot().cmd().withName("Shoot, depot, shoot"));
+        sendableChooser.addOption("Shoot, depot, shoot", shootDepotShoot().cmd().withName("Shoot, depot, shoot"));
         //sendableChooser.addOption("The cooler shoot, depot, shoot", theCoolerShootDepotShoot().cmd().withName("The cooler shoot, depot, shoot"));
         sendableChooser.addOption("AAA the cooler shoot, depot, shoot", aaaTheCoolerShootDepotShoot().cmd().withName("AAA the cooler shoot, depot, shoot"));
 
