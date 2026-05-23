@@ -38,27 +38,6 @@ public record ChoreoTraj(
 	    new Pose2d(4.4, 7.4, Rotation2d.fromRadians(0)),
 	    new Pose2d(6.968, 7.402, Rotation2d.fromRadians(0))
 	);
-	public static final ChoreoTraj ShootDepotShoot = new ChoreoTraj(
-	    "ShootDepotShoot",
-	    OptionalInt.empty(),
-	    16.47373,
-	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
-	    new Pose2d(1.75, 3.857, Rotation2d.fromRadians(-1.571))
-	);
-	public static final ChoreoTraj ShootDepotShoot$0 = new ChoreoTraj(
-	    "ShootDepotShoot",
-	    OptionalInt.of(0),
-	    3.06876,
-	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
-	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
-	);
-	public static final ChoreoTraj ShootDepotShoot$1 = new ChoreoTraj(
-	    "ShootDepotShoot",
-	    OptionalInt.of(1),
-	    13.404969999999999,
-	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
-	    new Pose2d(1.75, 3.857, Rotation2d.fromRadians(-1.571))
-	);
 	public static final ChoreoTraj ShootDepotClimb = new ChoreoTraj(
 	    "ShootDepotClimb",
 	    OptionalInt.empty(),
@@ -276,47 +255,68 @@ public record ChoreoTraj(
 	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
 	);
-	public static final ChoreoTraj TheCoolerShootDepotShoot = new ChoreoTraj(
-	    "TheCoolerShootDepotShoot",
-	    OptionalInt.empty(),
-	    16.74272,
-	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
-	    new Pose2d(2.159, 3.857, Rotation2d.fromRadians(-1.571))
-	);
-	public static final ChoreoTraj TheCoolerShootDepotShoot$0 = new ChoreoTraj(
-	    "TheCoolerShootDepotShoot",
-	    OptionalInt.of(0),
-	    3.07665,
-	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
-	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
-	);
-	public static final ChoreoTraj TheCoolerShootDepotShoot$1 = new ChoreoTraj(
-	    "TheCoolerShootDepotShoot",
-	    OptionalInt.of(1),
-	    13.666069999999998,
-	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
-	    new Pose2d(2.159, 3.857, Rotation2d.fromRadians(-1.571))
-	);
 	public static final ChoreoTraj AAATheCoolerShootDepotShoot = new ChoreoTraj(
 	    "AAATheCoolerShootDepotShoot",
 	    OptionalInt.empty(),
-	    9.91729,
+	    11.93451,
 	    new Pose2d(3.543, 3.857, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
 	);
 	public static final ChoreoTraj AAATheCoolerShootDepotShoot$0 = new ChoreoTraj(
 	    "AAATheCoolerShootDepotShoot",
 	    OptionalInt.of(0),
-	    1.56432,
+	    3.05507,
 	    new Pose2d(3.543, 3.857, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
 	);
 	public static final ChoreoTraj AAATheCoolerShootDepotShoot$1 = new ChoreoTraj(
 	    "AAATheCoolerShootDepotShoot",
 	    OptionalInt.of(1),
-	    8.35297,
+	    8.879439999999999,
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
 	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj ShootDepotShoot = new ChoreoTraj(
+	    "ShootDepotShoot",
+	    OptionalInt.empty(),
+	    8.36308,
+	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(1.75, 3.857, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj ShootDepotShoot$0 = new ChoreoTraj(
+	    "ShootDepotShoot",
+	    OptionalInt.of(0),
+	    1.5603,
+	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj ShootDepotShoot$1 = new ChoreoTraj(
+	    "ShootDepotShoot",
+	    OptionalInt.of(1),
+	    6.80278,
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(1.75, 3.857, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj TheCoolerShootDepotShoot = new ChoreoTraj(
+	    "TheCoolerShootDepotShoot",
+	    OptionalInt.empty(),
+	    21.31548,
+	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.159, 3.857, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj TheCoolerShootDepotShoot$0 = new ChoreoTraj(
+	    "TheCoolerShootDepotShoot",
+	    OptionalInt.of(0),
+	    7.6367,
+	    new Pose2d(3.543, 4.035, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571))
+	);
+	public static final ChoreoTraj TheCoolerShootDepotShoot$1 = new ChoreoTraj(
+	    "TheCoolerShootDepotShoot",
+	    OptionalInt.of(1),
+	    13.67878,
+	    new Pose2d(2.032, 3.857, Rotation2d.fromRadians(-1.571)),
+	    new Pose2d(2.159, 3.857, Rotation2d.fromRadians(-1.571))
 	);
 
     /**
@@ -326,9 +326,6 @@ public record ChoreoTraj(
     public static final Map<String, ChoreoTraj> ALL_TRAJECTORIES = Map.ofEntries(
     	Map.entry("CollectShootCollectShoot", CollectShootCollectShoot),
 		Map.entry("ShootCollectShootNew", ShootCollectShootNew),
-		Map.entry("ShootDepotShoot", ShootDepotShoot),
-		Map.entry("ShootDepotShoot$0", ShootDepotShoot$0),
-		Map.entry("ShootDepotShoot$1", ShootDepotShoot$1),
 		Map.entry("ShootDepotClimb", ShootDepotClimb),
 		Map.entry("ShootDepotClimb$0", ShootDepotClimb$0),
 		Map.entry("ShootDepotClimb$1", ShootDepotClimb$1),
@@ -360,12 +357,15 @@ public record ChoreoTraj(
 		Map.entry("ShootAndClimb$0", ShootAndClimb$0),
 		Map.entry("ShootAndClimb$1", ShootAndClimb$1),
 		Map.entry("MinMovementShoot", MinMovementShoot),
-		Map.entry("TheCoolerShootDepotShoot", TheCoolerShootDepotShoot),
-		Map.entry("TheCoolerShootDepotShoot$0", TheCoolerShootDepotShoot$0),
-		Map.entry("TheCoolerShootDepotShoot$1", TheCoolerShootDepotShoot$1),
 		Map.entry("AAATheCoolerShootDepotShoot", AAATheCoolerShootDepotShoot),
 		Map.entry("AAATheCoolerShootDepotShoot$0", AAATheCoolerShootDepotShoot$0),
-		Map.entry("AAATheCoolerShootDepotShoot$1", AAATheCoolerShootDepotShoot$1)
+		Map.entry("AAATheCoolerShootDepotShoot$1", AAATheCoolerShootDepotShoot$1),
+		Map.entry("ShootDepotShoot", ShootDepotShoot),
+		Map.entry("ShootDepotShoot$0", ShootDepotShoot$0),
+		Map.entry("ShootDepotShoot$1", ShootDepotShoot$1),
+		Map.entry("TheCoolerShootDepotShoot", TheCoolerShootDepotShoot),
+		Map.entry("TheCoolerShootDepotShoot$0", TheCoolerShootDepotShoot$0),
+		Map.entry("TheCoolerShootDepotShoot$1", TheCoolerShootDepotShoot$1)
     );
 
     /**
