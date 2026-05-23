@@ -29,6 +29,8 @@ import frc.robot.util.PhoenixUtil;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.superstructure.shooter.ShooterConstants.*;
 
+import java.security.DrbgParameters.NextBytes;
+
 /** Add your docs here. */
 public class ShooterIOLQR implements ShooterIO {
     private StatusSignal<AngularVelocity> leftflywheelVelocitySignal;
@@ -136,7 +138,7 @@ public class ShooterIOLQR implements ShooterIO {
                 flywheelAccelerationSignal,
                 leftFlywheelAppliedVoltsSignal,
                 rightFlyWheelAppliedVoltsSignal,
-                leftFlywheelAppliedVoltsSignal,
+                leftFlywheelCurrentAmpsSignal,
                 rightFlywheelCurrentAmpsSignal,
                 leftTempSignal,
                 rightTempSignal);
@@ -179,6 +181,7 @@ public class ShooterIOLQR implements ShooterIO {
         m_loop.predict(Constants.loopTimeSeconds);
         double nextVoltage = m_loop.getU(0);
         flywheelMotor1.setControl(new VoltageOut(Volts.of(nextVoltage)));
+        flywheelMotor2.setControl(new VoltageOut(Volts.of(-nextVoltage)));
     }
 
     @Override

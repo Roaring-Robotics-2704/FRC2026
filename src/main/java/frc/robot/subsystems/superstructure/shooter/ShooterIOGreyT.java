@@ -144,7 +144,7 @@ public class ShooterIOGreyT implements ShooterIO {
                 flywheelAccelerationSignal,
                 leftFlywheelAppliedVoltsSignal,
                 rightFlyWheelAppliedVoltsSignal,
-                leftFlywheelAppliedVoltsSignal,
+                leftFlywheelCurrentAmpsSignal,
                 rightFlywheelCurrentAmpsSignal,
                 leftTempSignal,
                 rightTempSignal,
@@ -221,6 +221,7 @@ public class ShooterIOGreyT implements ShooterIO {
                 .withKA(kA)
                 .withKS(kS);
         PhoenixUtil.tryUntilOk(5, () -> flywheelMotor1.getConfigurator().apply(pidConfigs));
+        PhoenixUtil.tryUntilOk(5, () -> flywheelMotor2.getConfigurator().apply(pidConfigs));
     }
 
 
