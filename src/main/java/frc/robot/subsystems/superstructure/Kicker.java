@@ -46,6 +46,8 @@ public class Kicker extends SubsystemBase {
                 .withCurrentLimits(
                         currentLimits);
         //setKickerVoltage(-2);
+        try {kickerMotor.getConfigurator().apply(config);}
+        catch (Exception exception) {}
     }
 
     @Override

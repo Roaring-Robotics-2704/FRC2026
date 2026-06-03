@@ -182,12 +182,16 @@ public class ShooterIOLQR implements ShooterIO {
         double nextVoltage = m_loop.getU(0);
         flywheelMotor1.setControl(new VoltageOut(Volts.of(nextVoltage)));
         flywheelMotor2.setControl(new VoltageOut(Volts.of(-nextVoltage)));
+        //flywheelMotor1.setControl(new VoltageOut(Volts.of(0)));
+        //flywheelMotor2.setControl(new VoltageOut(Volts.of(0)));
     }
 
     @Override
     public void setFlywheelVoltage(Voltage voltage) {
         flywheelMotor1.setControl(new VoltageOut(voltage));
         flywheelMotor2.setControl(new VoltageOut(voltage.unaryMinus()));
+        //flywheelMotor1.setControl(new VoltageOut(Volts.of(0)));
+        //flywheelMotor2.setControl(new VoltageOut(Volts.of(0)));
     }
     /**
      * Sets the hood angle by converting the desired angle to servo positions.
