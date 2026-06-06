@@ -47,6 +47,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.RobotState;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.tunables.LoggedTunableNumber;
 
 /** Subsystem for controlling the swerve drive. Contains four modules and a gyro. */
 public class Drive extends SubsystemBase {
@@ -60,6 +61,9 @@ public class Drive extends SubsystemBase {
     public static final PIDController driveXController = new PIDController(5, 0.0, 0.4, Constants.loopTimeSeconds);
     public static final PIDController driveYController = new PIDController(5, 0.0, 0.4, Constants.loopTimeSeconds);
 //    private SwerveSetpointGenerator setpointGenerator;
+
+    public static final LoggedTunableNumber acceleration = new LoggedTunableNumber("Drive/Acceleration");
+    public static final LoggedTunableNumber deceleration = new LoggedTunableNumber("Drive/Deceleration");
 
     static final Lock odometryLock = new ReentrantLock();
     private final GyroIO gyroIO;
@@ -122,6 +126,10 @@ public class Drive extends SubsystemBase {
         
         // orchestra.play();
         turnController.enableContinuousInput(-Math.PI, Math.PI);
+
+
+        acceleration.initDefault(DriveConstants.driveAcceleration);
+        deceleration.initDefault(DriveConstants.driveDeceleration);
     }
 
     @Override
@@ -276,6 +284,12 @@ public class Drive extends SubsystemBase {
         runVelocity(new ChassisSpeeds());
     }
 
+    public void stopWithDeceleration()
+    {
+        double[] decel = {deceleration.get(), deceleration.get(), deceleration.get(), deceleration.get()};
+        runVelocity(new ChassisSpeeds(), decel);
+    }
+
     /**
      * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will return to their
      * normal orientations the next time a nonzero velocity is requested.
@@ -286,7 +300,7 @@ public class Drive extends SubsystemBase {
             headings[i] = DriveConstants.moduleTranslations[i].getAngle();
         }
         robotState.kinematics.resetHeadings(headings);
-        stop();
+        stopWithDeceleration();
     }
 
     /** Returns the module states (turn angles and drive velocities) for all of the modules. */

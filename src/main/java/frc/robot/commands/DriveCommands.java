@@ -71,9 +71,11 @@ public class DriveCommands {
                 && DriverStation.getAlliance().get() == Alliance.Red;
             // drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
             if (Math.abs(speeds.vxMetersPerSecond) > 0.0001 || Math.abs(speeds.vyMetersPerSecond) > 0.0001 || Math.abs(speeds.omegaRadiansPerSecond) > 0.0001) {
+                double[] accel = {drive.acceleration.get(), drive.acceleration.get(), drive.acceleration.get(), drive.acceleration.get()};
                 drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
                     speeds,
-                    isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()));
+                    isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()),
+                    accel);
             } else {
                 drive.stopWithX();
             }
@@ -108,9 +110,11 @@ public class DriveCommands {
                 && DriverStation.getAlliance().get() == Alliance.Red;
             // drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
             if (Math.abs(speeds.vxMetersPerSecond) > 0.0001 || Math.abs(speeds.vyMetersPerSecond) > 0.0001 || Math.abs(speeds.omegaRadiansPerSecond) > 0.0001) {
+                double[] accel = {drive.acceleration.get(), drive.acceleration.get(), drive.acceleration.get(), drive.acceleration.get()};
                 drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
                     speeds,
-                    isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()));
+                    isFlipped ? robotState.getRotation().plus(new Rotation2d(Math.PI)) : robotState.getRotation()),
+                    accel);
             } else {
                 drive.stopWithX();
             }
@@ -150,11 +154,13 @@ public class DriveCommands {
                     omega);
                 boolean isFlipped = DriverStation.getAlliance().isPresent()
                     && DriverStation.getAlliance().get() == Alliance.Red;
+                double[] accel = {drive.acceleration.get(), drive.acceleration.get(), drive.acceleration.get(), drive.acceleration.get()};
                 drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
                     speeds,
                     isFlipped
                         ? robotState.getRotation().plus(new Rotation2d(Math.PI))
-                        : robotState.getRotation()));
+                        : robotState.getRotation()),
+                    accel);
             },
             drive)
             // Reset PID controller when command starts
