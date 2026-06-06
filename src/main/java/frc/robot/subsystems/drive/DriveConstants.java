@@ -58,6 +58,9 @@ import edu.wpi.first.units.measure.Voltage;
  * -
  */
 public class DriveConstants {
+
+    public static final float DriveLimitPercent = 0.5f; // Default value is 60, and this is multiplied by the value given.
+
     public static class SwerveModuleConfig {
         public final int steerMotorId;
         public final int driveMotorId;
@@ -191,7 +194,7 @@ public class DriveConstants {
             .withCurrentLimits(new CurrentLimitsConfigs()
                     //.withStatorCurrentLimit(Amps.of(60 * 0.5))
                     //.withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Amps.of(60 * 0.5))
+                    .withSupplyCurrentLimit(Amps.of(60 * DriveLimitPercent))
                     .withSupplyCurrentLimitEnable(true));
                     
     private static final TalonFXConfiguration steerInitialConfigs = new TalonFXConfiguration()
@@ -201,7 +204,7 @@ public class DriveConstants {
                     // stator current limit to help avoid brownouts without impacting performance.
                     //.withStatorCurrentLimit(Amps.of(60 * 0.5))
                     //.withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Amps.of(60 * 0.5))
+                    .withSupplyCurrentLimit(Amps.of(60 * DriveLimitPercent))
                     .withSupplyCurrentLimitEnable(true));
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
