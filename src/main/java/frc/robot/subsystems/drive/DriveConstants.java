@@ -59,7 +59,7 @@ import edu.wpi.first.units.measure.Voltage;
  */
 public class DriveConstants {
 
-    public static final float driveLimitPercent = 0.5f; // Default value is 60, and this is multiplied by the value given.
+    public static final float driveLimitPercent = 0.25f; // Default value is 60, and this is multiplied by the value given.
 
     /**
      * Acceleration of the drivetrain in metres/sec^2.

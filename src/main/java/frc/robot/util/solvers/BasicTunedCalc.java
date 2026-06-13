@@ -54,6 +54,9 @@ public class BasicTunedCalc {
     private final LinearFilter driveAngleFilter = LinearFilter.movingAverage((int) (0.1 / Constants.loopTimeSeconds));
     private final Pose2d blueHubPose = new Pose2d(4.625, 4.03, Rotation2d.fromDegrees(0));
 
+    private final double distFromRobotToShooter = Math.sqrt( (0.2413*0.2413) + (0.17145*0.17145) );
+    private final double angleBetweenRobotAndShooter = Math.atan(6.75/9.5);
+
     double lastHoodAngle = 0;
     double lastDriveAngle = 0;
 
@@ -112,13 +115,14 @@ public class BasicTunedCalc {
     Optional<Alliance> ally = DriverStation.getAlliance();
     double targetAngle = 0.0;
     if(ally.isPresent()){
+        double calculatedAngleOffset = Math.asin( (Math.sin(angleBetweenRobotAndShooter) * distFromRobotToShooter) / distance );
         if (ally.get() == Alliance.Red){
          //targetAngle = Math.atan2(dy, dx)+(Math.atan2(dy, dx)*0.105);
-         targetAngle = Math.atan2(dy, dx)-(Math.atan2(dy, dx)*0.04) ;
+         targetAngle = Math.atan2(dy, dx)-calculatedAngleOffset;
         }
         if (ally.get() == Alliance.Blue)
         {
-          targetAngle = Math.atan2(dy, dx)-(Math.atan2(dy, dx)*0.105);
+          targetAngle = Math.atan2(dy, dx)-calculatedAngleOffset;
 
         }
         
