@@ -112,13 +112,14 @@ public class BasicTunedCalc {
     Optional<Alliance> ally = DriverStation.getAlliance();
     double targetAngle = 0.0;
     if(ally.isPresent()){
+        double angleOffset = Math.tan(6.75/-9.5);
         if (ally.get() == Alliance.Red){
          //targetAngle = Math.atan2(dy, dx)+(Math.atan2(dy, dx)*0.105);
-         targetAngle = Math.atan2(dy, dx)-(Math.atan2(dy, dx)*0.04) ;
+         targetAngle = Math.atan2(dy, dx)+angleOffset;
         }
         if (ally.get() == Alliance.Blue)
         {
-          targetAngle = Math.atan2(dy, dx)-(Math.atan2(dy, dx)*0.105);
+          targetAngle = Math.atan2(dy, dx)+angleOffset;
 
         }
         
